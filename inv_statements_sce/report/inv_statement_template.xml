@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+<template id="inv_statement_template">
+<t t-call="web.basic_layout">
+<t t-set="o" t-value="o.with_context(lang=lang)" />
+<div class="page">
+  <div class="oe_structure"/>
+  <div class="header_report_sce row">
+    <div class="col-12">
+    <div class="company_logo">
+      <img t-if="company_id.logo"
+           t-att-src="image_data_uri(company_id.logo)"
+           style="max-height: 45px;"
+           alt="Logo"/>
+    </div>
+    <div class="company_info">
+      <span t-field="company_id.street"/>
+      <span t-if="company_id.street">,</span>
+      <span t-field="company_id.street2"/>
+      <br />
+      <span t-field="company_id.state_id"/>
+      <span t-if="company_id.state_id">, </span>
+      <span t-field="company_id.country_id"/>
+      <span t-if="company_id.zip"> | </span>
+      <span t-field="company_id.zip"/>
+      <br />
+      <span t-field="company_id.phone"/>
+      <span t-if="company_id.phone"> | </span>
+      <span t-field="company_id.mobile"/>
+      <br />
+      <span t-field="company_id.email"/>
+      <span t-if="company_id.email"> | </span>
+      <span t-field="company_id.website"/>
+      <br />
+      <span t-field="company_id.vat"/>
+    </div>
+    <div t-if="o.id" class="header_right">
+      <h6 t-esc="o.name" />
+      <span t-field="o.phone"/>
+      <span t-if="o.phone"> | </span>
+      <span t-field="o.mobile"/>
+      <br />
+      <span t-field="o.email"/>
+      <span t-if="o.email"> | </span>
+      <span t-field="o.website"/>
+      <br />
+      <span t-field="o.vat"/>
+    </div>
+    </div>
+  </div>
+  <hr style="height:1px;background-color:gray"/>
+  <table class="table table-bordered" style="font-size: 10px;" width="100%">
+    <thead>
+      <tr>
+        <th>Invoice/ Bill/ Payment</th>
+        <th>Date</th>
+        <th>Total Amount</th>
+        <th>Due Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <t t-foreach="invoice_ids[o.id]" t-as="invoice_id">
+        <tr class="grey_background_light">
+          <td><t t-esc="invoice_id.name" /></td>
+          <td><t t-esc="invoice_id.invoice_date" /></td>
+          <td><t t-esc="invoice_id.amount_total" /></td>
+          <td><t t-esc="invoice_id.amount_residual" /></td>
+        </tr>
+        <t t-set="payments_vals"
+           t-value="invoice_id.sudo().invoice_payments_widget and invoice_id.sudo().invoice_payments_widget['content'] or []"/>
+        <tr t-foreach="payments_vals" t-as="payment_vals">
+          <td><t t-esc="payment_vals['ref']" /></td>
+          <td><t t-esc="payment_vals['date']" /></td>
+          <td><t t-esc="payment_vals['amount']" /></td>
+          <td />
+        </tr>
+      </t>
+      <t t-foreach="bill_ids[o.id]" t-as="bill_id">
+        <tr class="grey_background_light">
+          <td><t t-esc="bill_id.name" /></td>
+          <td><t t-esc="bill_id.invoice_date" /></td>
+          <td><t t-esc="bill_id.amount_total" /></td>
+          <td><t t-esc="bill_id.amount_residual" /></td>
+        </tr>
+        <t t-set="payments_vals"
+           t-value="bill_id.sudo().invoice_payments_widget and bill_id.sudo().invoice_payments_widget['content'] or []"/>
+        <tr t-foreach="payments_vals" t-as="payment_vals">
+          <td><t t-esc="payment_vals['ref']" /></td>
+          <td><t t-esc="payment_vals['date']" /></td>
+          <td><t t-esc="payment_vals['amount']" /></td>
+          <td />
+        </tr>
+      </t>
+    </tbody>
+  </table>
+</div>
+</t>
+</template>
+
+<template id="individual_statement_summary_template">
+<t t-call="web.basic_layout">
+<t t-set="o" t-value="o.with_context(lang=lang)" />
+<div class="page">
+  <div class="oe_structure"/>
+  <div class="header_report_sce row">
+    <div class="col-12">
+    <div class="company_logo">
+      <img t-if="company_id.logo"
+           t-att-src="image_data_uri(company_id.logo)"
+           style="max-height: 45px;"
+           alt="Logo"/>
+    </div>
+    <div class="company_info">
+      <span t-field="company_id.street"/>
+      <span t-if="company_id.street">,</span>
+      <span t-field="company_id.street2"/>
+      <br />
+      <span t-field="company_id.state_id"/>
+      <span t-if="company_id.state_id">, </span>
+      <span t-field="company_id.country_id"/>
+      <span t-if="company_id.zip"> | </span>
+      <span t-field="company_id.zip"/>
+      <br />
+      <span t-field="company_id.phone"/>
+      <span t-if="company_id.phone"> | </span>
+      <span t-field="company_id.mobile"/>
+      <br />
+      <span t-field="company_id.email"/>
+      <span t-if="company_id.email"> | </span>
+      <span t-field="company_id.website"/>
+      <br />
+      <span t-field="company_id.vat"/>
+    </div>
+    <div t-if="o.id" class="header_right">
+      <h6 t-esc="o.name" />
+      <span t-field="o.phone"/>
+      <span t-if="o.phone"> | </span>
+      <span t-field="o.mobile"/>
+      <br />
+      <span t-field="o.email"/>
+      <span t-if="o.email"> | </span>
+      <span t-field="o.website"/>
+      <br />
+      <span t-field="o.vat"/>
+    </div>
+    </div>
+  </div>
+  <hr style="height:1px;background-color:gray"/>
+  <table class="table table-bordered" style="font-size: 10px;" width="100%">
+    <thead>
+      <tr>
+        <th>Invoice/ Bill</th>
+        <th>Date</th>
+        <th>Total Amount</th>
+        <th>Due Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <t t-foreach="invoice_ids[o.id]" t-as="invoice_id">
+        <tr>
+          <td><t t-esc="invoice_id.name" /></td>
+          <td><t t-esc="invoice_id.invoice_date" /></td>
+          <td><t t-esc="invoice_id.amount_total" /></td>
+          <td><t t-esc="invoice_id.amount_residual" /></td>
+        </tr>
+      </t>
+      <t t-foreach="bill_ids[o.id]" t-as="bill_id">
+        <tr>
+          <td><t t-esc="bill_id.name" /></td>
+          <td><t t-esc="bill_id.invoice_date" /></td>
+          <td><t t-esc="bill_id.amount_total" /></td>
+          <td><t t-esc="bill_id.amount_residual" /></td>
+        </tr>
+      </t>
+      <tr class="grey_background">
+        <td colspan="2">Total</td>
+        <td>
+          <t t-esc="round((invoice_total[o.id] - bill_total[o.id]),2)" /></td>
+        <td><t t-esc="round((inv_residual[o.id] - bill_residual[o.id]),2)" /></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</t>
+</template>
+
+<template id="inv_statement_summary_template">
+<t t-call="web.basic_layout">
+<t t-set="o" t-value="user_id.partner_id.with_context(lang=lang)" />
+<div class="page">
+  <div class="oe_structure"/>
+  <div class="header_report_sce row">
+    <div class="col-12">
+    <div class="company_logo">
+      <img t-if="company_id.logo"
+           t-att-src="image_data_uri(company_id.logo)"
+           style="max-height: 45px;"
+           alt="Logo"/>
+    </div>
+    <div class="company_info">
+      <span t-field="company_id.street"/>
+      <span t-if="company_id.street">,</span>
+      <span t-field="company_id.street2"/>
+      <br />
+      <span t-field="company_id.state_id"/>
+      <span t-if="company_id.state_id">, </span>
+      <span t-field="company_id.country_id"/>
+      <span t-if="company_id.zip"> | </span>
+      <span t-field="company_id.zip"/>
+      <br />
+      <span t-field="company_id.phone"/>
+      <span t-if="company_id.phone"> | </span>
+      <span t-field="company_id.mobile"/>
+      <br />
+      <span t-field="company_id.email"/>
+      <span t-if="company_id.email"> | </span>
+      <span t-field="company_id.website"/>
+      <br />
+      <span t-field="company_id.vat"/>
+    </div>
+    <div t-if="o.id" class="header_right">
+      <h6 t-esc="o.name" />
+      <span t-field="o.phone"/>
+      <span t-if="o.phone"> | </span>
+      <span t-field="o.mobile"/>
+      <br />
+      <span t-field="o.email"/>
+      <span t-if="o.email"> | </span>
+      <span t-field="o.website"/>
+      <br />
+      <span t-field="o.vat"/>
+    </div>
+    </div>
+  </div>
+  <hr style="height:1px;background-color:gray"/>
+  <t t-set="company_invoiced" t-value="0" />
+  <t t-set="company_billed" t-value="0" />
+  <t t-set="company_due" t-value="0" />
+  <table class="table table-bordered" style="font-size: 10px;" width="100%">
+    <thead>
+      <tr>
+        <th>Partner</th>
+        <th>Phone</th>
+        <th>Vat</th>
+        <th>Total Invoiced</th>
+        <th>Total Billed</th>
+        <th>Total Due Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr t-foreach="docs" t-as="partner">
+        <td><t t-esc="partner.name" /></td>
+        <td><t t-esc="partner.phone" /></td>
+        <td><t t-esc="partner.vat" /></td>
+        <td><t t-esc="invoice_total[partner.id]" /></td>
+        <td><t t-esc="bill_total[partner.id]" /></td>
+        <td><t t-esc="inv_residual[partner.id] - bill_residual[partner.id]" /></td>
+        <t t-set="company_invoiced" t-value="company_invoiced+invoice_total[partner.id]" />
+        <t t-set="company_billed" t-value="company_billed+bill_total[partner.id]" />
+        <t t-set="company_due" t-value="company_due+inv_residual[partner.id]-bill_residual[partner.id]" />
+      </tr>
+      <tr class="grey_background">
+        <td colspan="3">Total</td>
+        <td t-esc="round(company_invoiced,2)" />
+        <td t-esc="round(company_billed,2)" />
+        <td t-esc="round(company_due,2)" />
+      </tr>
+    </tbody>
+  </table>
+</div>
+</t>
+</template>
+
+<template id="inv_statement_pdf">
+  <t t-call="web.html_container">
+    <t t-foreach="docs" t-as="o">
+      <t t-set="lang" t-value="o.lang"/>
+      <t t-call="inv_statements_sce.inv_statement_template" t-lang="lang"/>
+      <t t-call="inv_statements_sce.individual_statement_summary_template" t-lang="lang"/>
+    </t>
+    <t t-set="lang" t-value="user.partner_id.lang"/>
+    <t t-call="inv_statements_sce.inv_statement_summary_template" t-lang="lang"/>
+  </t>
+</template>
+</data>
+</odoo>

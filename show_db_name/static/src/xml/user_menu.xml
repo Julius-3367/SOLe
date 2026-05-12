@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="UserMenu" t-inherit="web.UserMenu" t-inherit-mode="extension" >
+         <xpath expr="//Dropdown/t/small" position="attributes">
+             <attribute name="t-att-class">'d-lg-inline-block'</attribute>
+        </xpath>
+
+    </t>
+</templates>

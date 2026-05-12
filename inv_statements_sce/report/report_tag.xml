@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+  <record id="action_report_inv_statement_sce" model="ir.actions.report">
+    <field name="name">Invoice/Bill Statements</field>
+    <field name="model">inv.statement.wiz</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="report_name">inv_statements_sce.inv_statement_pdf</field>
+    <field name="print_report_name">'Invoice/Bill Statement'</field>
+    <field name="binding_model_id" ref="model_inv_statement_wiz"/>
+    <field name="binding_type">report</field>
+    <field name="paperformat_id" ref="inv_statements_sce.paperformat_inv_statement_sce"/>
+  </record>
+</odoo>

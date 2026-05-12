@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+  <record id="view_inv_statement_wiz_form" model="ir.ui.view">
+    <field name="name">Customer Invoice Statements</field>
+    <field name="model">inv.statement.wiz</field>
+    <field name="arch" type="xml">
+      <form string="Customer Invoice Statements">
+        <group>
+          <group>
+            <field name="partner_ids" widget="many2many_tags" />
+          </group>
+          <group>
+            <field name="company_id" readonly="1" />
+          </group>
+        </group>
+
+        <footer>
+          <button name="action_print_pdf"
+                  string="Print PDF"
+                  groups="account.group_account_manager"
+                  type="object"
+                  class="btn-primary"/>
+          <button special="cancel" string="Cancel" class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_inv_statement_wiz" model="ir.actions.act_window">
+    <field name="name">Customer Invoice Statements</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">inv.statement.wiz</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <menuitem id="menu_inv_statement_wiz"
+            name="Invoice/Bill Statements"
+            parent="account.menu_finance_reports"
+            action="action_inv_statement_wiz"
+            sequence="20" />
+</odoo>
