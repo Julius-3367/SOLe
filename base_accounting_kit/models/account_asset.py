@@ -483,7 +483,7 @@ class AccountAssetAsset(models.Model):
             view_mode = 'form'
             if len(move_ids) > 1:
                 name = _('Disposal Moves')
-                view_mode = 'tree,form'
+                view_mode = 'list,form'
             return {
                 'name': name,
                 'view_mode': view_mode,
@@ -589,7 +589,7 @@ class AccountAssetAsset(models.Model):
                     move_ids.append(depreciation_line.move_id.id)
         return {
             'name': _('Journal Entries'),
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'account.move',
             'view_id': False,
             'type': 'ir.actions.act_window',

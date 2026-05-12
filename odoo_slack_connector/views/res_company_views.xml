@@ -26,21 +26,21 @@
                             <page string="Users">
                                 <group>
                                     <field name="slack_users_ids">
-                                        <tree create="false" delete="0">
+                                        <list create="false" delete="0">
                                             <field name="name"/>
                                             <field name="email"/>
                                             <field name="user"/>
-                                        </tree>
+                                        </list>
                                     </field>
                                 </group>
                             </page>
                             <page string="Channels">
                                 <group>
                                     <field name="slack_channel_ids">
-                                        <tree
+                                        <list
                                               create="false" delete="0">
                                             <field name="name"/>
-                                        </tree>
+                                        </list>
                                     </field>
                                 </group>
                             </page>

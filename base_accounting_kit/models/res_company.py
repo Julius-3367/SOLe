@@ -39,7 +39,7 @@ class ResCompany(models.Model):
             if draft_entries:
                 error_msg = _('There are still unposted entries in the period you want to lock. You should either post or delete them.')
                 action_error = {
-                    'view_mode': 'tree',
+                    'view_mode': 'list',
                     'name': 'Unposted Entries',
                     'res_model': 'account.move',
                     'type': 'ir.actions.act_window',
@@ -59,7 +59,7 @@ class ResCompany(models.Model):
                 error_msg = _("There are still unreconciled bank statement lines in the period you want to lock."
                             "You should either reconcile or delete them.")
                 action_error = {
-                    'view_mode': 'tree',
+                    'view_mode': 'list',
                     'name': 'Unreconciled Transactions',
                     'res_model': 'account.bank.statement.line',
                     'type': 'ir.actions.act_window',

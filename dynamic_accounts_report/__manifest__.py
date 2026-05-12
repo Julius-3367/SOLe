@@ -21,7 +21,7 @@
 ################################################################################
 {
     'name': 'Odoo17 Dynamic Accounts  Reports',
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Accounting',
     'summary': "Odoo17 Dynamic Accounts  Reports, Dynamic Financial Reports with drill down and filters–"
                "Community Edition",

@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'Odoo 17 Full Accounting Kit',
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Accounting',
     'summary': """Odoo 17 Accounting, Asset and Budget Management,Accounting Reports, PDC, 
     Lock dates, Credit Limit, Follow Ups, Day-Bank-Cash book reports.""",

@@ -26,11 +26,11 @@
                             <page string="Units">
                                 <div style="height:5px"/>
                                 <field name="property_ids">
-                                    <tree>
+                                    <list>
                                             <button string=" " icon="fa-external-link" name="open_property" type="object"/>
                                             <field name="name" readonly="1"/>
                                             <field name="status" readonly="1"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Accounts">
@@ -53,37 +53,37 @@
                                 <div style="height:5px"/>
                                 <div>Accounts to Distribute Costs</div>
                                 <field name="account_ids">
-                                    <tree>
+                                    <list>
                                         <field name="code" />
                                         <field name="name" />
                                         <field name="account_type" />
                                         <field name="current_balance" />
-                                    </tree>
+                                    </list>
                                 </field>
                                 <div style="height:5px"/>
                                 <div>Analytic Accounts</div>
                                 <field name="analytic_account_ids">
-                                    <tree>
+                                    <list>
                                         <field name="name"/>
                                         <field name="plan_id"/>
                                         <field name="debit"/>
                                         <field name="credit"/>
                                         <field name="balance"/>
-                                    </tree>
+                                    </list>
                                 </field>
                             </page>
                             <page string="Additional Costs Billing">
                                 <group>    
                                     <group>
                                         <field name="account_expense_ids">
-                                            <tree 
+                                            <list 
                                             create="0"
                                             editable="bottom"
                                             delete="0">
                                                 <field name="code" readonly="1"/>
                                                 <field name="name" readonly="1"/>
                                                 <field name="current_balance" sum="Total" />
-                                            </tree>
+                                            </list>
                                         </field>
                                         <field name="total_vacant_cost"/>
                                     </group>            
@@ -103,7 +103,7 @@
                                     </div>
                                     <div style="height:50px"/>
                                     <field name="rent_contract_ids">
-                                        <tree 
+                                        <list 
                                         create="0"
                                         editable="bottom"
                                         delete="0"
@@ -119,7 +119,7 @@
                                             <field name="administrative_expenses" sum="Total" />
                                             <field name="monthly_extra_costs_paid_calc" sum="Total"/>
                                             <field name="cost_billing_total" sum="Total" />
-                                        </tree>
+                                        </list>
                                      </field>
                                     
                                 </group>
@@ -156,17 +156,17 @@
             <field name="name">insafety.property.building.tree</field>
             <field name="model">insafety.property.building</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="name"/>    
                     <field name="description"/>
-                </tree>
+                </list>
             </field>
         </record>
 
         <record id="action_property_building" model="ir.actions.act_window">
             <field name="name">Property Building</field>
             <field name="res_model">insafety.property.building</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a Property to Advertise

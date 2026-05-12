@@ -21,7 +21,7 @@
 ##############################################################################
 {
     'name': 'Sales Contract and Recurring Invoices',
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Sales,Accounting',
     'summary': """Create sale contracts and recurring invoices.""",
     'description': """This module helps to create sale contracts with recurring 

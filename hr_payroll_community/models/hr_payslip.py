@@ -159,13 +159,13 @@ class HrPayslip(models.Model):
                                     False)
         return {
             'name': _("Refund Payslip"),
-            'view_mode': 'tree, form',
+            'view_mode': 'list, form',
             'view_id': False,
             'res_model': 'hr.payslip',
             'type': 'ir.actions.act_window',
             'target': 'current',
             'domain': "[('id', 'in', %s)]" % copied_payslip.ids,
-            'views': [(treeview_ref and treeview_ref.id or False, 'tree'),
+            'views': [(treeview_ref and treeview_ref.id or False, 'list'),
                       (formview_ref and formview_ref.id or False, 'form')],
             'context': {}
         }

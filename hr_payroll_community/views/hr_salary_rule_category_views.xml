@@ -22,11 +22,11 @@
         <field name="name">hr.salary.rule.category.view.tree</field>
         <field name="model">hr.salary.rule.category</field>
         <field name="arch" type="xml">
-            <tree string="Salary Rule Categories">
+            <list string="Salary Rule Categories">
                 <field name="name"/>
                 <field name="code"/>
                 <field name="parent_id" invisible="1"/>
-            </tree>
+            </list>
         </field>
     </record>
     <!-- Search option for Salary Categories-->

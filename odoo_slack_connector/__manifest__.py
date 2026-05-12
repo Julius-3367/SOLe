@@ -21,7 +21,7 @@
 ################################################################################
 {
     'name': "Slack Odoo Connector",
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Extra Tools',
     'summary': """This module will help you to connect with slack to manage 
      Slack Conversations""",

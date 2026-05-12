@@ -27,12 +27,12 @@
             <page name="hr_settings" position="after">
                 <page name="stage_history" string="Status History">
                     <field name="stages_history_ids">
-                        <tree>
+                        <list>
                             <field name="state"/>
                             <field name="start_date"/>
                             <field name="end_date"/>
                             <field name="duration" sum="Total"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </page>
@@ -81,7 +81,7 @@
     <record id="hr.open_view_employee_list_my" model="ir.actions.act_window">
         <field name="name">Employees</field>
         <field name="res_model">hr.employee</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="domain">[]</field>
         <field name="context">{"search_default_employee":1}</field>
         <field name="view_id" eval="False"/>

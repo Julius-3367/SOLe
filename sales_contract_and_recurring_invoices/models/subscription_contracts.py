@@ -139,7 +139,7 @@ class SubscriptionContracts(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'name': 'Invoices',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'res_model': 'account.move',
             'domain': [('contract_origin', '=', self.id)],
         }

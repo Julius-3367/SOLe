@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'Send Whatsapp Message',
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'category': 'Extra Tools',
     'summary': 'Send Message to partner via Whatsapp web',
     'description': 'This module helps you to directly send messages to your '

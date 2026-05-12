@@ -5,7 +5,7 @@
         <record id="action_document_open" model="ir.actions.act_window">
             <field name="name">Documents</field>
             <field name="res_model">document.document</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">kanban,list,form</field>
             <field name="domain">[]</field>
         </record>
 
@@ -28,7 +28,7 @@
             <field name="name">Document Tree</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="parent_full_name" invisible="'default_parent_id' in context"/>
@@ -37,7 +37,7 @@
                     <field name="create_date"/>
                     <field name="write_uid"/>
                     <field name="write_date"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -144,7 +144,7 @@
         <record id="action_document_main" model="ir.actions.act_window">
             <field name="name">Documents</field>
             <field name="res_model">document.document</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">kanban,list,form</field>
             <field name="domain">[]</field>
             <field name="context" eval="{'search_default_filter_is_root':1}"/>
         </record>
