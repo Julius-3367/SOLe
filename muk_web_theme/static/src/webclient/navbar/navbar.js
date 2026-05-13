@@ -1,21 +1,4 @@
 /** @odoo-module */
 
-import { patch } from '@web/core/utils/patch';
-import { useService } from '@web/core/utils/hooks';
-
-import { NavBar } from '@web/webclient/navbar/navbar';
-import { AppsMenu } from "@muk_web_theme/webclient/appsmenu/appsmenu";
-
-patch(NavBar.prototype, {
-	setup() {
-        super.setup();
-        this.appMenuService = useService('app_menu');
-    },
-});
-
-patch(NavBar, {
-    components: {
-        ...NavBar.components,
-        AppsMenu,
-    },
-});
+// The NavBar patches have been removed for Odoo 18 compatibility.
+// The AppsMenu customization requires a rewrite for Odoo 18's slot-based Dropdown.

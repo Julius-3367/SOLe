@@ -31,7 +31,7 @@
         'web.assets_backend': [
             (
                 'after', 
-                'mail/static/src/views/web/form/form_compiler.js', 
+                'mail/static/src/chatter/web/form_compiler.js', 
                 'muk_web_chatter/static/src/views/form/form_compiler.js'
             ),
             'muk_web_chatter/static/src/core/**/*.xml',
