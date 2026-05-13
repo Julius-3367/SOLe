@@ -45,10 +45,11 @@ class AccountBudgetPost(models.Model):
         if not account_ids:
             raise ValidationError(_('The budget must have at least one account.'))
 
-    @api.model
-    def create(self, vals):
-        self._check_account_ids(vals)
-        return super(AccountBudgetPost, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._check_account_ids(vals)
+        return super(AccountBudgetPost, self).create(vals_list)
 
     def write(self, vals):
         self._check_account_ids(vals)
@@ -60,19 +61,18 @@ class Budget(models.Model):
     _description = "Budget"
     _inherit = ['mail.thread']
 
-    name = fields.Char('Budget Name', required=True, states={'done': [('readonly', True)]})
+    name = fields.Char('Budget Name', required=True)
     creating_user_id = fields.Many2one('res.users', 'Responsible', default=lambda self: self.env.user)
-    date_from = fields.Date('Start Date', required=True, states={'done': [('readonly', True)]})
-    date_to = fields.Date('End Date', required=True, states={'done': [('readonly', True)]})
+    date_from = fields.Date('Start Date', required=True)
+    date_to = fields.Date('End Date', required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('cancel', 'Cancelled'),
         ('confirm', 'Confirmed'),
         ('validate', 'Validated'),
         ('done', 'Done')
-    ], 'Status', default='draft', index=True, required=True, readonly=True, copy=False, track_visibility='always')
-    budget_line = fields.One2many('budget.lines', 'budget_id', 'Budget Lines',
-                                  states={'done': [('readonly', True)]}, copy=True)
+    ], 'Status', default='draft', index=True, required=True, readonly=True, copy=False, tracking=True)
+    budget_line = fields.One2many('budget.lines', 'budget_id', 'Budget Lines', copy=True)
     company_id = fields.Many2one('res.company', 'Company', required=True,
                                  default=lambda self: self.env['res.company']._company_default_get(
                                      'account.budget.post'))

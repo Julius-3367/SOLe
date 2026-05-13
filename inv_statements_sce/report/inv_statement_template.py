@@ -3,6 +3,7 @@ from odoo import models
 
 class InvoiceStatementReport(models.AbstractModel):
     _name = 'report.inv_statements_sce.inv_statement_pdf'
+    _description = 'Invoice Statement PDF Report'
 
     def _get_report_values(self, docids, data=None):
         # report = self.env['ir.actions.report']._get_report_from_name(

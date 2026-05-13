@@ -34,7 +34,7 @@ class HrEmployee(models.Model):
                               ('relieved', 'Resigned'),
                               ('terminate', 'Terminated')], string='Status',
                              default='joined',
-                             track_visibility='always', copy=False,
+                             tracking=True, copy=False,
                              help="Employee Stages.\nSlap On: "
                                   "Joined\nGrounding: Training\nTest period : "
                                   "Probation")
@@ -148,7 +148,7 @@ class EmployeeStageHistory(models.Model):
                               ('terminate', 'Terminated')], string='Stage')
     employee_id = fields.Many2one('hr.employee', help="Stage "
                                                       "of the employee",
-                                  invisible=1, string="Employee")
+                                  string="Employee")
 
     @api.depends('start_date', 'end_date')
     def _compute_get_duration(self):

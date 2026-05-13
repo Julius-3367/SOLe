@@ -17,7 +17,7 @@ class Document(models.Model):
     _order = 'parent_id,sequence,id'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    parent_path = fields.Char(index=True, unaccent=False)
+    parent_path = fields.Char(index=True)
     parent_left = fields.Integer(index=True)
     parent_right = fields.Integer(index=True)
     active = fields.Boolean(default=True)

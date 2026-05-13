@@ -41,10 +41,10 @@ class MailMessage(models.Model):
     channel = fields.Many2one('discuss.channel', string="Channel",
                               help="Channel corresponds to the message")
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Over-riding the create method to sent message to slack"""
-        res = super().create(vals)
+        res = super().create(vals_list)
         channels = self.env['discuss.channel'].search([('is_slack', '=', True)])
         for channel in channels:
             msg = self.env['mail.message'].search(
