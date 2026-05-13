@@ -214,7 +214,6 @@ class ImportChartAccount(models.TransientModel):
                 'group_id':group_get.id,
                 'currency_id':currency_get or False,
                 'reconcile':is_reconcile,
-                'deprecated':is_deprecated,
 
                 }
         chart_id = account_obj.create(data)     

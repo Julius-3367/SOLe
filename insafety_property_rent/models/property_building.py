@@ -16,8 +16,8 @@ class Property(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, readonly=True,
         default=lambda self: self.env.company)
     description = fields.Text(string="Description", tracking=True)
-    account_receivable_id = fields.Many2one('account.account', string="Default Account Receivable", 
-                                            domain=[('deprecated', '=', False)], check_company=True, required=True, tracking=True)
+    account_receivable_id = fields.Many2one('account.account', string="Default Account Receivable",
+                                            check_company=True, required=True, tracking=True)
     tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('active', '=', True)], tracking=True)
     invoice_payment_term_id = fields.Many2one('account.payment.term', string="Rent Payment Term", required=True, tracking=True)
     qr_code_method = fields.Selection(
@@ -28,7 +28,7 @@ class Property(models.Model):
              "will be used.",
     )
     account_payable_id = fields.Many2one('account.account', tracking=True,
-                                         string="Account Payable", domain=[('deprecated', '=', False),('account_type','=','expense')], check_company=True)
+                                         string="Account Payable", domain=[('account_type','=','expense')], check_company=True)
     administrative_expenses = fields.Float(string="Administrative Expenses Percentage", tracking=True)
 
     total_area = fields.Integer(string="Total Area (sqm)", compute="_compute_total_area")
@@ -53,8 +53,8 @@ class Property(models.Model):
     total_vacant_cost = fields.Float(string="Total Vacant Costs", compute="_compute_total")
     total_administrative_expenses = fields.Float(string="Total Administrative Expenses", compute="_compute_total")
     rent_contract_ids = fields.One2many("insafety.property.rent.contract", string="Contracts", compute="_compute_contracts")
-    cost_billing_receivable_id = fields.Many2one('account.account', string="Cost Account Receivable", 
-                                                 domain=[('deprecated', '=', False)], check_company=True, required=True, tracking=True)
+    cost_billing_receivable_id = fields.Many2one('account.account', string="Cost Account Receivable",
+                                                 check_company=True, required=True, tracking=True)
     cost_billing_tax_ids = fields.Many2many('account.tax', string='Taxes Cost Billing', domain=[('active', '=', True)],relation="insafety_cost_billing_tax_ids")
     cost_billing_payment_term_id = fields.Many2one('account.payment.term', string="Cost Billing Payment Term", required=True, tracking=True)
     cost_billing_qr_code_method = fields.Selection(
@@ -66,7 +66,7 @@ class Property(models.Model):
     )
 
     cost_billing_administrative_fees_id = fields.Many2one('account.account', string="Administrative Fees", tracking=True,
-                                                 domain=[('deprecated', '=', False)], check_company=True, required=True)
+                                                 check_company=True, required=True)
     cost_billing_administrative_tax_ids = fields.Many2many('account.tax', string='Administrative Fees Taxes', check_company=True, tracking=True,
                                                            domain=[('active', '=', True)], relation="insafety_cost_billing_administrative_tax_ids")
 

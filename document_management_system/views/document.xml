@@ -60,7 +60,7 @@
                             <div role="separator" class="dropdown-divider"/>
                             <ul class="oe_kanban_colorpicker" data-field="color"/>
                         </t>
-                        <t t-name="kanban-box">
+                        <t t-name="card">
                             <div t-attf-class="#{kanban_color(record.color.raw_value)}">
                                 <div t-attf-class="oe_kanban_content">
                                     <div class="o_kanban_image">
@@ -97,21 +97,21 @@
                     <sheet>
                         <field name="id" invisible="1"/>
                         <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
+                            <label for="name"/>
                             <h1>
                                 <field name="name"/>
                             </h1>
                         </div>
                         <div class="oe_title">
-                            <label for="description" class="oe_edit_only"/>
+                            <label for="description"/>
                             <h1>
                                 <field name="description"/>
                             </h1>
                         </div>
-                        <label for="content" class="oe_edit_only"/>
+                        <label for="content"/>
                         <field name="content"/>
                         <separator/>
-                        <label for="child_ids" class="oe_edit_only"/>
+                        <label for="child_ids"/>
                         <field name="child_ids" context="{'default_parent_id': id}"/>
                         <group>
                             <group>

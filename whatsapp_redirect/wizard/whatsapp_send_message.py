@@ -28,7 +28,7 @@ class WhatsappSendMessage(models.TransientModel):
     _description = "Whatsapp Wizard"
 
     user_id = fields.Many2one('res.partner', string="Recipient")
-    mobile = fields.Char(related='user_id.mobile', required=True)
+    mobile = fields.Char(related='user_id.phone', required=True)
     message = fields.Text(string="Message", required=True)
 
     def action_send_message(self):

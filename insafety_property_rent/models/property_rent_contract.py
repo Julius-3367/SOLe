@@ -37,7 +37,7 @@ class PropertyTag(models.Model):
     administrative_expenses = fields.Float(string="Administration", compute="_cal_admin_expens")
     cost_billing_total = fields.Float(string="Invoice", compute="_cal_cost_billing_total")
 
-    account_receivable_id = fields.Many2one('account.account', string="Account Receivable", domain=[('deprecated', '=', False)], 
+    account_receivable_id = fields.Many2one('account.account', string="Account Receivable",
                                             check_company=True, compute="_compute_default", store=True, readonly=False, tracking=True)
     
     tax_ids = fields.Many2many('account.tax', string='Taxes', domain=[('active', '=', True)],

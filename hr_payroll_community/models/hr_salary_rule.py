@@ -66,7 +66,7 @@ class HrSalaryRule(models.Model):
     company_id = fields.Many2one('res.company', string='Company',
                                  help="Choose Company",
                                  default=lambda self:
-                                 self.env['res.company']._company_default_get())
+                                 self.env.company)
     condition_select = fields.Selection([
         ('none', 'Always True'),
         ('range', 'Range'),

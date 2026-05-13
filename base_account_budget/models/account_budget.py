@@ -30,12 +30,10 @@ class AccountBudgetPost(models.Model):
     _description = "Budgetary Position"
 
     name = fields.Char('Name', required=True)
-    account_ids = fields.Many2many('account.account', 'account_budget_rel', 'budget_id', 'account_id', 'Accounts',
-                                   domain=[('deprecated', '=', False)])
+    account_ids = fields.Many2many('account.account', 'account_budget_rel', 'budget_id', 'account_id', 'Accounts')
     budget_line = fields.One2many('budget.lines', 'general_budget_id', 'Budget Lines')
     company_id = fields.Many2one('res.company', 'Company', required=True,
-                                 default=lambda self: self.env['res.company']._company_default_get(
-                                     'account.budget.post'))
+                                 default=lambda self: self.env.company)
 
     def _check_account_ids(self, vals):
         if 'account_ids' in vals:
@@ -74,8 +72,7 @@ class Budget(models.Model):
     ], 'Status', default='draft', index=True, required=True, readonly=True, copy=False, tracking=True)
     budget_line = fields.One2many('budget.lines', 'budget_id', 'Budget Lines', copy=True)
     company_id = fields.Many2one('res.company', 'Company', required=True,
-                                 default=lambda self: self.env['res.company']._company_default_get(
-                                     'account.budget.post'))
+                                 default=lambda self: self.env.company)
 
     def action_budget_confirm(self):
         self.write({'state': 'confirm'})

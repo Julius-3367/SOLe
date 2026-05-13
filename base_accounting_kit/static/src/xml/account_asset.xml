@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="base_accounting_kit.DeprecLinesToggler">
+        <button
+            type="button"
+            t-att-title="title"
+            t-att-disabled="isDisabled or undefined"
+            t-on-click="onClick"
+            t-att-class="buttonClass"
+        />
+    </t>
+</templates>

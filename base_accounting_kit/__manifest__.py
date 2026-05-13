@@ -21,7 +21,7 @@
 #############################################################################
 {
     'name': 'Odoo 17 Full Accounting Kit',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Accounting',
     'summary': """Odoo 17 Accounting, Asset and Budget Management,Accounting Reports, PDC, 
     Lock dates, Credit Limit, Follow Ups, Day-Bank-Cash book reports.""",
@@ -89,6 +89,12 @@
         'wizard/account_lock_date.xml',
         'views/account_payment_view.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'base_accounting_kit/static/src/xml/account_asset.xml',
+            'base_accounting_kit/static/src/js/account_asset.js',
+        ],
+    },
     'license': 'LGPL-3',
     'images': ['static/description/banner.gif'],
     'installable': True,

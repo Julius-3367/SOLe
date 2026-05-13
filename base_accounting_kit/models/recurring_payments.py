@@ -56,13 +56,9 @@ class RecurringPayments(models.Model):
 
     name = fields.Char(string='Name')
     debit_account = fields.Many2one('account.account', 'Debit Account',
-                                    required=True,
-                                    domain="['|', ('company_id', '=', False), "
-                                           "('company_id', '=', company_id)]")
+                                    required=True)
     credit_account = fields.Many2one('account.account', 'Credit Account',
-                                     required=True,
-                                     domain="['|', ('company_id', '=', False), "
-                                            "('company_id', '=', company_id)]")
+                                     required=True)
     journal_id = fields.Many2one('account.journal', 'Journal', required=True)
     analytic_account_id = fields.Many2one('account.analytic.account',
                                           'Analytic Account')

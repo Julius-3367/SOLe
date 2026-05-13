@@ -17,7 +17,7 @@
     # Check https://github.com/odoo/odoo/blob/master/odoo/addons/base/module/module_data.xml
     # for the full list
     'category': 'Tools',
-    'version': '1.0.0',
+    'version': '19.0.1.0.0',
 
     # any module necessary for this one to work correctly
     'depends': ['web'],

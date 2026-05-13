@@ -34,7 +34,7 @@
     </record>
 
     <menuitem action="open_budget_post_form" id="menu_budget_post_form"
-              parent="account.account_management_menu"
+              parent="account.account_account_menu"
               sequence="5"/>
 
     <record model="ir.ui.view" id="view_budget_post_form">
@@ -89,7 +89,7 @@
                 </header>
                 <sheet string="Budget">
                     <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
+                        <label for="name"/>
                         <h1>
                             <field name="name" readonly="state != 'draft'"
                                    placeholder="Budget Name"/>
@@ -215,7 +215,7 @@
                 <field name="creating_user_id"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="row mb4">
                                 <div class="col-8">

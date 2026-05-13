@@ -22,7 +22,7 @@
 #############################################################################
 {
     'name': 'Odoo 17 HR Payroll',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Human Resources',
     'summary': 'Manage your employee payroll records',
     'description': "odoo17, Odoo 17 HR Payroll, odoo payroll, odoo17 payroll, payroll community,odoo 17, payroll,Odoo 17 Payroll for Community version where can manage "
@@ -31,7 +31,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.openhrms.com',
-    'depends': ['hr_contract', 'hr_holidays'],
+    'depends': ['hr_contract', 'hr_holidays'],  # hr_contract is our community shim in SOLe
     'data': [
         'security/hr_payroll_security.xml',
         'security/ir.model.access.csv',

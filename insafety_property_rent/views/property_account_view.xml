@@ -5,8 +5,12 @@
         <field name="model">account.account</field>
         <field name="inherit_id" ref="account.view_account_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='allowed_journal_ids']" position="after">
-                <field name="building_id"/>
+            <xpath expr="//page[@name='accounting']" position="after">
+                <page string="Building">
+                    <group>
+                        <field name="building_id"/>
+                    </group>
+                </page>
             </xpath>
         </field>
         <!-- <field name="arch" type="xml">

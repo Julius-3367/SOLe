@@ -238,11 +238,11 @@ class AccountInvoiceLine(models.Model):
         if context.get('account_ids'):
             domain += [('account_id', 'in', context['account_ids'].ids)]
 
-        if context.get('analytic_tag_ids'):
-            domain += [('analytic_tag_ids', 'in', context['analytic_tag_ids'].ids)]
+        # analytic_tag_ids was removed in Odoo 17 - skip this filter
 
         if context.get('analytic_account_ids'):
-            domain += [('analytic_account_id', 'in', context['analytic_account_ids'].ids)]
+            analytic_ids = [str(aid) for aid in context['analytic_account_ids'].ids]
+            domain += [('analytic_distribution', 'in', analytic_ids)]
 
         if context.get('partner_ids'):
             domain += [('partner_id', 'in', context['partner_ids'].ids)]

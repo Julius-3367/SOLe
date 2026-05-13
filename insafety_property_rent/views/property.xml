@@ -26,9 +26,8 @@
                     <filter name="state_rented" string="Rented" domain="[('status','=','rented')]"/>    
                     <filter name="state_free" string="Free" domain="[('status','=','free')]"/> 
                     <separator/>
-                    <group expand="0" string="Group By">
-                        <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
-                    </group>
+                    <separator/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
                     <!-- <searchpanel>
                         <field name="status" icon="fa-filter" groupby="group_by_status" limit="0"/>
                     </searchpanel>                -->
@@ -50,7 +49,7 @@
                     <field name="status"/>
                     <field name="type_id"/>
                     <templates>
-                        <t t-name="kanban-box">
+                        <t t-name="card">
                             <div class="oe_kanban_global_click">
                                 <div class="oe_kanban_details">
                                     <strong class="o_kanban_record_title">

@@ -50,17 +50,17 @@ class AccountAssetCategory(models.Model):
                                           domain="[('company_id', '=', company_id)]")
     account_asset_id = fields.Many2one('account.account',
                                        string='Asset Account', required=True,
-                                       domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=', 'liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=', 'liability_credit_card'),('deprecated', '=', False)]",
+                                       domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=', 'liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=', 'liability_credit_card')]",
                                        help="Account used to record the purchase of the asset at its original price.")
     account_depreciation_id = fields.Many2one(
         'account.account', string='Depreciation Account',
         required=True,
-        domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=', 'liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=', 'liability_credit_card'),('deprecated', '=', False),('company_id', '=', company_id)]",
+        domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=', 'liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=', 'liability_credit_card'),('company_ids', 'in', [company_id])]",
         help="Account used in the depreciation entries, to decrease the asset value.")
     account_depreciation_expense_id = fields.Many2one(
         'account.account', string='Expense Account',
         required=True,
-        domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=','liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=','liability_credit_card'),('deprecated', '=', False),('company_id', '=', company_id)]",
+        domain="[('account_type', '!=', 'asset_receivable'),('account_type', '!=','liability_payable'),('account_type', '!=', 'asset_cash'),('account_type', '!=','liability_credit_card'),('company_ids', 'in', [company_id])]",
         help="Account used in the periodical entries, to record a part of the asset as expense.")
     journal_id = fields.Many2one('account.journal', string='Journal',
                                  required=True)
@@ -733,7 +733,7 @@ class AccountAssetDepreciationLine(models.Model):
             'debit': 0.0,
             'credit': amount,
             'journal_id': category_id.journal_id.id,
-            'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'sale' else False,
+            'analytic_distribution': {str(category_id.account_analytic_id.id): 100} if category_id.account_analytic_id and category_id.type == 'sale' else {},
         }
         move_line_2 = {
             'name': name,
@@ -741,7 +741,7 @@ class AccountAssetDepreciationLine(models.Model):
             'credit': 0.0,
             'debit': amount,
             'journal_id': category_id.journal_id.id,
-            'analytic_account_id': category_id.account_analytic_id.id if category_id.type == 'purchase' else False,
+            'analytic_distribution': {str(category_id.account_analytic_id.id): 100} if category_id.account_analytic_id and category_id.type == 'purchase' else {},
         }
         move_vals = {
             'ref': category_id.name,

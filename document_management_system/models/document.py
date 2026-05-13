@@ -68,7 +68,6 @@ class Document(models.Model):
         for record in self:
             record.full_name = res_dict.get(record.id, "")
 
-    @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         default = dict(default or {})
         default.update(name=_("%s (copy)") % (self.name or ''))

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form view -->
+    <record id="hr_contract_view_form" model="ir.ui.view">
+        <field name="name">hr.contract.view.form</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <form string="Contract">
+                <header>
+                    <button name="action_confirm" string="Confirm"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state not in ('cancel','close')"/>
+                    <button name="action_cancel" string="Cancel"
+                            type="object"
+                            invisible="state not in ('draft','open')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,open,close"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Contract Reference"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="job_id"/>
+                            <field name="department_id"/>
+                            <field name="contract_type_id"/>
+                            <field name="company_id"
+                                   groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="trial_date_end"/>
+                            <field name="resource_calendar_id"/>
+                            <field name="hr_responsible_id"/>
+                            <field name="kanban_state" widget="priority"
+                                   invisible="state == 'cancel'"/>
+                        </group>
+                    </group>
+                    <group name="salary" string="Salary Information">
+                        <field name="wage"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes_page">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- List view -->
+    <record id="hr_contract_view_list" model="ir.ui.view">
+        <field name="name">hr.contract.view.list</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <list string="Employee Contracts" decoration-success="state == 'open'"
+                  decoration-muted="state == 'close'"
+                  decoration-info="state == 'draft'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="job_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="wage"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="hr_contract_view_search" model="ir.ui.view">
+        <field name="name">hr.contract.view.search</field>
+        <field name="model">hr.contract</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <filter string="New" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Running" name="open" domain="[('state','=','open')]"/>
+                <filter string="Expired" name="close" domain="[('state','=','close')]"/>
+                <separator/>
+                <filter string="Employee" name="group_employee"
+                        context="{'group_by': 'employee_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_hr_contract" model="ir.actions.act_window">
+        <field name="name">Employee Contracts</field>
+        <field name="res_model">hr.contract</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="hr_contract_view_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+</odoo>

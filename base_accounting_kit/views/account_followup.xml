@@ -17,7 +17,7 @@
             <field name="model">followup.line</field>
             <field name="arch" type="xml">
                 <form string="Follow-up Steps">
-                    <label for="name" class="oe_edit_only"/>
+                    <label for="name"/>
                     <h1><field name="name"/></h1>
                     <div class="oe_inline">
                         After <field name="delay" class="oe_inline"/> days overdue, do the following actions:
@@ -76,7 +76,7 @@
                 <kanban>
                     <field name="name"/>
                     <templates>
-                        <t t-name="kanban-box">
+                        <t t-name="card">
                             <div t-attf-class="oe_kanban_global_click">
                                 <div>
                                     <strong><i class="fa fa-building" role="img" aria-label="Enterprise"/> <t t-esc="record.name.value"/></strong>
@@ -106,7 +106,7 @@
         </record>
 
         <menuitem action="action_account_followup_definition_form" id="account_followup_menu"
-                  parent="account.account_management_menu" name="Follow-up Levels"
+                  parent="account.account_account_menu" name="Follow-up Levels"
                   groups="account.group_account_manager" sequence="2"/>
 
     </data>

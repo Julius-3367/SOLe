@@ -13,7 +13,7 @@
     'website': "https://odoo.insafety.ch",
 
     'category': 'Accounting',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
 
     'depends': ['contacts','account','mail'],
 

@@ -504,8 +504,8 @@
             </t>
         </t>
 
-        <t t-if="layout" t-call="{{layout}}"><t t-raw="0"/></t>
-        <t t-else="else" t-call="base_accounting_kit.standard"><t t-raw="0"/></t>
+        <t t-if="layout" t-call="{{layout}}"><t t-out="0"/></t>
+        <t t-else="else" t-call="base_accounting_kit.standard"><t t-out="0"/></t>
 
     </template>
 

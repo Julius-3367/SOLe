@@ -115,8 +115,9 @@ class HrPayrollReportView(models.Model):
                 join hr_salary_rule rlu on rlu.id = psl.salary_rule_id
                 join hr_employee emp on ps.employee_id=emp.id
                 join hr_salary_rule_category rl on rl.id = psl.category_id
-                left join hr_department dp on emp.department_id=dp.id
-                left join hr_job jb on emp.job_id=jb.id
+                left join hr_version ver on ver.id=emp.current_version_id
+                left join hr_department dp on ver.department_id=dp.id
+                left join hr_job jb on ver.job_id=jb.id
                 join res_company cmp on cmp.id=ps.company_id
              """
         return from_str

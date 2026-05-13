@@ -6,14 +6,35 @@ from odoo.tools import misc
 
 from odoo.addons.base.models.assetsbundle import EXTENSIONS
 
+_match_asset_file_url_regex = re.compile(r"^(/_custom/([^/]+))?/(\w+)/([/\w]+\.\w+)$")
+
 
 class ScssEditor(models.AbstractModel):
-    
-    _inherit = 'web_editor.assets'
+    """SCSS asset manager — was provided by web_editor in Odoo < 19.
+    Defined here since web_editor is no longer shipped in Odoo 19 Community."""
+
+    _name = 'web_editor.assets'
+    _description = 'SCSS Asset Manager'
 
     # ----------------------------------------------------------
     # Helper
     # ----------------------------------------------------------
+
+    @api.model
+    def _make_custom_asset_url(self, url, bundle_xmlid):
+        return f"/_custom/{bundle_xmlid}{url}"
+
+    @api.model
+    def _get_data_from_url(self, url):
+        m = _match_asset_file_url_regex.match(url)
+        if not m:
+            return False
+        return {
+            'module': m.group(3),
+            'resource_path': m.group(4),
+            'customized': bool(m.group(1)),
+            'bundle': m.group(2) or False,
+        }
 
     @api.model
     def _get_colors_attachment(self, custom_url):

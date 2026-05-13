@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <kanban class="o_kanban_mobile">
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_content oe_kanban_global_click">
                             <div class="row">
                                 <div class="col-8">
@@ -57,11 +57,11 @@
         <field name="model">hr.salary.rule</field>
         <field name="arch" type="xml">
             <form string="Salary Rules">
-                <label for="name" class="oe_edit_only"/>
+                <label for="name"/>
                 <h1>
                     <field name="name"/>
                 </h1>
-                <label for="category_id" class="oe_edit_only"/>
+                <label for="category_id"/>
                 <h2>
                     <field name="category_id"/>
                 </h2>
@@ -129,7 +129,7 @@
                         <field name="child_ids"/>
                     </page>
                     <page string="Inputs">
-                        <field name="input_ids" mode="tree">
+                        <field name="input_ids" mode="list">
                             <list string="Input Data" editable="bottom">
                                 <field name="name"/>
                                 <field name="code"/>
@@ -153,10 +153,9 @@
                        filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
                 <field name="category_id"/>
                 <field name="condition_range_min"/>
-                <group col="8" colspan="4" expand="0" string="Group By">
-                    <filter string="Category" name="head"
-                            context="{'group_by':'category_id'}"/>
-                </group>
+                <separator/>
+                <filter string="Category" name="head"
+                        context="{'group_by':'category_id'}"/>
             </search>
         </field>
     </record>

@@ -13,8 +13,8 @@
                 <sheet>
                     <group>
                         <div class="oe_title">
-                            <label for="name" string="Asset Type" class="oe_edit_only" invisible="type != 'purchase'"/>
-                            <label for="name" string="Deferred Revenue Type" class="oe_edit_only" invisible="type in 'purchase'"/>
+                            <label for="name" string="Asset Type" invisible="type != 'purchase'"/>
+                            <label for="name" string="Deferred Revenue Type" invisible="type in 'purchase'"/>
                             <h1>
                                 <field name="name" placeholder="e.g. Computers"/>
                             </h1>
@@ -84,7 +84,7 @@
                 <field name="journal_id"/>
                 <field name="method"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click">
                             <div class="row mb4">
                                 <div class="col-xs-6">
@@ -124,9 +124,8 @@
                 <filter name="type" string="Purchase" domain="[('type','=', 'purchase')]" help="Assets"/>
                 <field name="name" string="Category"/>
                 <field name="journal_id"/>
-                <group expand="0" string="Group By...">
-                    <filter name="type" string="Type" domain="[]" context="{'group_by':'type'}"/>
-                </group>
+                <separator/>
+                <filter name="type" string="Type" domain="[]" context="{'group_by':'type'}"/>
             </search>
         </field>
     </record>
@@ -152,7 +151,7 @@
                         </button>
                     </div>
                     <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
+                        <label for="name"/>
                         <h1>
                             <field name="name" placeholder="e.g. Laptop iBook"
                             readonly="state != 'draft'"/>
@@ -189,7 +188,7 @@
                     </group>
                     <notebook colspan="4">
                         <page string="Depreciation Board">
-                            <field name="depreciation_line_ids" mode="tree"
+                            <field name="depreciation_line_ids" mode="list"
                                    readonly="state not in ['draft', 'open']"
                                    options="{'reload_whole_on_button': true}">
                                 <list string="Depreciation Lines" decoration-info="(move_check == False)" create="false">
@@ -271,7 +270,7 @@
                 <field name="date"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
                             <div class="row mb4">
                                 <div class="col-xs-6">
@@ -327,10 +326,9 @@
                 <filter name="state" string="Closed" domain="[('state','=', 'close')]" help="Assets in closed state"/>
                 <field name="category_id"/>
                 <field name="partner_id" filter_domain="[('partner_id','child_of',self)]"/>
-                <group expand="0" string="Group By...">
-                        <filter name="date" string="Month" domain="[]" context="{'group_by':'date'}"/>
-                        <filter name="category_id" string="Category" domain="[]" context="{'group_by':'category_id'}"/>
-                </group>
+                <separator/>
+                    <filter name="date" string="Month" domain="[]" context="{'group_by':'date'}"/>
+                    <filter name="category_id" string="Category" domain="[]" context="{'group_by':'category_id'}"/>
             </search>
         </field>
     </record>
@@ -360,6 +358,6 @@
         <field name="context">{'default_type': 'purchase'}</field>
     </record>
 
-    <menuitem parent="account.account_management_menu" id="menu_action_account_asset_asset_list_normal_purchase" action="action_account_asset_asset_list_normal_purchase" sequence="6"/>
+    <menuitem parent="account.account_account_menu" id="menu_action_account_asset_asset_list_normal_purchase" action="action_account_asset_asset_list_normal_purchase" sequence="6"/>
 
 </odoo>

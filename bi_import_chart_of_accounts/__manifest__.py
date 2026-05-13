@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
 	'name': 'Import Chart of Accounts from CSV or Excel File',	
-	'version': '18.0.0.0',
+	'version': '19.0.0.0',
 	'category': 'Accounting',
 	'summary': 'This apps helps to import chart of accounts using CSV or Excel file',
 	'description': '''Using this module Charts os accounts is imported using excel sheets

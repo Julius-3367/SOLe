@@ -26,6 +26,7 @@
                    'Payroll-Payslip Reporting, Automatic Mail During '
                    'Confirmation of Payslip, Mass Confirm Payslip ',
     'category': 'Generic Modules/Human Resources',
+    'version': '19.0.1.0.0',
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
