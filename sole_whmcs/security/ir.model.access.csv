@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_whmcs_config_user,sole.whmcs.config user,model_sole_whmcs_config,base.group_user,1,0,0,0
+access_sole_whmcs_config_admin,sole.whmcs.config admin,model_sole_whmcs_config,base.group_system,1,1,1,1
+access_sole_whmcs_sync_log_user,sole.whmcs.sync.log user,model_sole_whmcs_sync_log,base.group_user,1,0,0,0
+access_sole_whmcs_sync_log_admin,sole.whmcs.sync.log admin,model_sole_whmcs_sync_log,base.group_system,1,1,1,1
+access_sole_whmcs_sync_wizard,sole.whmcs.sync.wizard,model_sole_whmcs_sync_wizard,base.group_user,1,1,1,1

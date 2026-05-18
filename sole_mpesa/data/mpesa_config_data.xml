@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="sole_mpesa_config_default" model="sole.mpesa.config">
+        <field name="name">M-Pesa (Sandbox)</field>
+        <field name="environment">sandbox</field>
+        <field name="consumer_key">YOUR_CONSUMER_KEY</field>
+        <field name="consumer_secret">YOUR_CONSUMER_SECRET</field>
+        <field name="shortcode">174379</field>
+        <field name="passkey">bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</field>
+        <field name="callback_url_base">https://sole.co.ke</field>
+        <field name="is_active">True</field>
+    </record>
+</odoo>

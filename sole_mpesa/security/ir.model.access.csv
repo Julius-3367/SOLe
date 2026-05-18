@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_mpesa_config_user,sole.mpesa.config user,model_sole_mpesa_config,base.group_user,1,0,0,0
+access_sole_mpesa_config_manager,sole.mpesa.config manager,model_sole_mpesa_config,base.group_system,1,1,1,1
+access_sole_mpesa_transaction_user,sole.mpesa.transaction user,model_sole_mpesa_transaction,base.group_user,1,0,0,0
+access_sole_mpesa_transaction_manager,sole.mpesa.transaction manager,model_sole_mpesa_transaction,base.group_system,1,1,1,1
+access_sole_stk_push_wizard,sole.stk.push.wizard,model_sole_stk_push_wizard,base.group_user,1,1,1,1

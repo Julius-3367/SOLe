@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="stage_new" model="sole.support.stage">
+        <field name="name">New</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="stage_in_progress" model="sole.support.stage">
+        <field name="name">In Progress</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="stage_waiting" model="sole.support.stage">
+        <field name="name">Waiting on Customer</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="stage_resolved" model="sole.support.stage">
+        <field name="name">Resolved</field>
+        <field name="sequence">40</field>
+        <field name="is_resolved">True</field>
+    </record>
+    <record id="stage_closed" model="sole.support.stage">
+        <field name="name">Closed</field>
+        <field name="sequence">50</field>
+        <field name="is_closed">True</field>
+        <field name="fold">True</field>
+    </record>
+</odoo>

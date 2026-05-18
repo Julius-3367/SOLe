@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_ipay_config_user,sole.ipay.config user,model_sole_ipay_config,base.group_user,1,0,0,0
+access_sole_ipay_config_manager,sole.ipay.config manager,model_sole_ipay_config,base.group_system,1,1,1,1
+access_sole_ipay_transaction_user,sole.ipay.transaction user,model_sole_ipay_transaction,base.group_user,1,1,1,0
+access_sole_ipay_transaction_manager,sole.ipay.transaction manager,model_sole_ipay_transaction,base.group_system,1,1,1,1

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="sole_sms_provider_onfon" model="sole.sms.provider">
+        <field name="name">OnfonMedia Kenya</field>
+        <field name="provider_type">onfon</field>
+        <field name="api_url">https://api.onfonmedia.co.ke/v1/sms/SendBulkSMS</field>
+        <field name="api_key">afDbo4V6NIMphwRyivW2sFk3GErcPL059jAQm7KtJ1SnOZT8</field>
+        <field name="username">softlinkoptions</field>
+        <field name="sender_id">SOLe</field>
+        <field name="is_active">True</field>
+    </record>
+
+    <record id="sole_sms_template_welcome" model="sole.sms.template">
+        <field name="name">Welcome</field>
+        <field name="body">Dear {customer_name}, welcome to SOLe. Contact us at support@sole.co.ke. — {company_name}</field>
+        <field name="category">General</field>
+    </record>
+    <record id="sole_sms_template_payment_confirm" model="sole.sms.template">
+        <field name="name">Payment Confirmation</field>
+        <field name="body">Dear {customer_name}, your payment of KES {amount} (Ref: {ref}) has been received. Thank you. — {company_name}</field>
+        <field name="category">Payments</field>
+    </record>
+    <record id="sole_sms_template_reminder" model="sole.sms.template">
+        <field name="name">Payment Reminder</field>
+        <field name="body">Dear {customer_name}, your payment of KES {amount} is due on {date}. Please pay promptly. — {company_name}</field>
+        <field name="category">Payments</field>
+    </record>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Recon Line standalone list for search -->
+    <record id="view_sole_bank_recon_line_search" model="ir.ui.view">
+        <field name="name">sole.bank.recon.line.search</field>
+        <field name="model">sole.bank.recon.line</field>
+        <field name="arch" type="xml">
+            <search string="Search Reconciliation Lines">
+                <field name="description"/>
+                <field name="ref"/>
+                <filter name="unmatched" string="Unmatched" domain="[('state','=','unmatched')]"/>
+                <filter name="matched" string="Matched" domain="[('state','=','matched')]"/>
+                <separator/>
+                    <filter name="by_import" string="Group by Import" context="{'group_by': 'import_id'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>

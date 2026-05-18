@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_kenya_county_user,sole.kenya.county user,model_sole_kenya_county,base.group_user,1,0,0,0
+access_sole_kenya_county_admin,sole.kenya.county admin,model_sole_kenya_county,base.group_system,1,1,1,1

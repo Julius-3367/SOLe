@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Transaction Form -->
+    <record id="view_sole_mpesa_transaction_form" model="ir.ui.view">
+        <field name="name">sole.mpesa.transaction.form</field>
+        <field name="model">sole.mpesa.transaction</field>
+        <field name="arch" type="xml">
+            <form string="M-Pesa Transaction">
+                <header>
+                    <button name="action_create_journal_entry" type="object"
+                            string="Create Payment"
+                            invisible="state != 'completed'"
+                            class="btn-primary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,completed,failed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Transaction Info">
+                            <field name="checkout_request_id"/>
+                            <field name="merchant_request_id"/>
+                            <field name="mpesa_receipt_number"/>
+                            <field name="transaction_type"/>
+                            <field name="config_id"/>
+                        </group>
+                        <group string="Payment Details">
+                            <field name="phone"/>
+                            <field name="amount"/>
+                            <field name="account_ref"/>
+                            <field name="transaction_desc"/>
+                            <field name="partner_id"/>
+                            <field name="mpesa_transaction_date"/>
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <field name="result_code"/>
+                        <field name="result_desc"/>
+                        <field name="move_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Raw Payload">
+                            <field name="raw_payload" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Transaction List -->
+    <record id="view_sole_mpesa_transaction_list" model="ir.ui.view">
+        <field name="name">sole.mpesa.transaction.list</field>
+        <field name="model">sole.mpesa.transaction</field>
+        <field name="arch" type="xml">
+            <list string="M-Pesa Transactions" decoration-success="state=='completed'"
+                  decoration-danger="state=='failed'" decoration-muted="state=='cancelled'">
+                <field name="create_date" string="Date"/>
+                <field name="transaction_type"/>
+                <field name="phone"/>
+                <field name="amount"/>
+                <field name="account_ref"/>
+                <field name="mpesa_receipt_number"/>
+                <field name="partner_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="view_sole_mpesa_transaction_search" model="ir.ui.view">
+        <field name="name">sole.mpesa.transaction.search</field>
+        <field name="model">sole.mpesa.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search Transactions">
+                <field name="phone"/>
+                <field name="account_ref"/>
+                <field name="mpesa_receipt_number"/>
+                <filter name="completed" string="Completed" domain="[('state','=','completed')]"/>
+                <filter name="pending" string="Pending" domain="[('state','=','pending')]"/>
+                <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>
+                <filter name="stk_push" string="STK Push" domain="[('transaction_type','=','stk_push')]"/>
+                <filter name="c2b" string="C2B Paybill" domain="[('transaction_type','=','c2b')]"/>
+                <separator/>
+                <filter name="group_state" string="Group by Status" context="{'group_by': 'state'}"/>
+                <filter name="group_type" string="Group by Type" context="{'group_by': 'transaction_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_sole_mpesa_transaction" model="ir.actions.act_window">
+        <field name="name">M-Pesa Transactions</field>
+        <field name="res_model">sole.mpesa.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sole_mpesa_transaction_search"/>
+    </record>
+
+    <!-- STK Push Action -->
+    <record id="action_sole_mpesa_stk_push" model="ir.actions.act_window">
+        <field name="name">Send STK Push</field>
+        <field name="res_model">sole.stk.push.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

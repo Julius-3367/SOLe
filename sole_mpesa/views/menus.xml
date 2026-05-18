@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- M-Pesa Menus -->
+    <menuitem id="menu_sole_mpesa_root" name="M-Pesa" sequence="80"
+              web_icon="sole_mpesa,static/description/icon.png"/>
+
+    <menuitem id="menu_sole_mpesa_transactions" name="Transactions"
+              parent="menu_sole_mpesa_root"
+              action="action_sole_mpesa_transaction" sequence="10"/>
+
+    <menuitem id="menu_sole_mpesa_stk" name="Send STK Push"
+              parent="menu_sole_mpesa_root"
+              action="action_sole_mpesa_stk_push" sequence="20"/>
+
+    <menuitem id="menu_sole_mpesa_config" name="Configuration"
+              parent="menu_sole_mpesa_root"
+              action="action_sole_mpesa_config" sequence="90"
+              groups="base.group_system"/>
+
+</odoo>

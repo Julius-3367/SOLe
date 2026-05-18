@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_ipay_config_form" model="ir.ui.view">
+        <field name="name">sole.ipay.config.form</field>
+        <field name="model">sole.ipay.config</field>
+        <field name="arch" type="xml">
+            <form string="iPay Configuration">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_transactions" type="object"
+                                class="oe_stat_button" icon="fa-credit-card">
+                            <field name="transaction_count" widget="statinfo" string="Transactions"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="General">
+                            <field name="name"/>
+                            <field name="environment"/>
+                            <field name="is_active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Credentials">
+                            <field name="vendor_id"/>
+                            <field name="hash_key" password="True"/>
+                            <field name="currency"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Integration">
+                            <field name="callback_url"/>
+                            <field name="account_journal_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sole_ipay_config_list" model="ir.ui.view">
+        <field name="name">sole.ipay.config.list</field>
+        <field name="model">sole.ipay.config</field>
+        <field name="arch" type="xml">
+            <list string="iPay Configurations">
+                <field name="name"/>
+                <field name="environment"/>
+                <field name="vendor_id"/>
+                <field name="currency"/>
+                <field name="is_active"/>
+                <field name="transaction_count"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sole_ipay_config" model="ir.actions.act_window">
+        <field name="name">iPay Configuration</field>
+        <field name="res_model">sole.ipay.config</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

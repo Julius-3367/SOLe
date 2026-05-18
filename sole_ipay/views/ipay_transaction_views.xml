@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_ipay_transaction_form" model="ir.ui.view">
+        <field name="name">sole.ipay.transaction.form</field>
+        <field name="model">sole.ipay.transaction</field>
+        <field name="arch" type="xml">
+            <form string="iPay Transaction">
+                <header>
+                    <button name="action_generate_url" type="object"
+                            string="Generate Payment URL" class="btn-primary"
+                            invisible="state not in ['draft', 'sent']"/>
+                    <button name="action_open_payment_url" type="object"
+                            string="Open Payment Page" class="btn-secondary"
+                            invisible="not payment_url"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,sent,paid,failed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Order Info">
+                            <field name="order_id"/>
+                            <field name="invoice_no"/>
+                            <field name="amount"/>
+                            <field name="partner_id"/>
+                            <field name="config_id"/>
+                        </group>
+                        <group string="Customer">
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="p1"/>
+                            <field name="p2"/>
+                            <field name="p3"/>
+                            <field name="p4"/>
+                        </group>
+                    </group>
+                    <group string="Result" invisible="state == 'draft'">
+                        <field name="ipay_status"/>
+                        <field name="ipay_txn_ref"/>
+                        <field name="move_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Payment URL">
+                            <field name="payment_url" widget="url"/>
+                        </page>
+                        <page string="Callback Data" invisible="not raw_callback">
+                            <field name="raw_callback" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sole_ipay_transaction_list" model="ir.ui.view">
+        <field name="name">sole.ipay.transaction.list</field>
+        <field name="model">sole.ipay.transaction</field>
+        <field name="arch" type="xml">
+            <list string="iPay Transactions" decoration-success="state=='paid'"
+                  decoration-danger="state=='failed'" decoration-muted="state=='cancelled'">
+                <field name="create_date" string="Date"/>
+                <field name="order_id"/>
+                <field name="invoice_no"/>
+                <field name="amount"/>
+                <field name="phone"/>
+                <field name="partner_id"/>
+                <field name="ipay_txn_ref"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_ipay_transaction_search" model="ir.ui.view">
+        <field name="name">sole.ipay.transaction.search</field>
+        <field name="model">sole.ipay.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search iPay Transactions">
+                <field name="order_id"/>
+                <field name="invoice_no"/>
+                <field name="phone"/>
+                <field name="partner_id"/>
+                <filter name="paid" string="Paid" domain="[('state','=','paid')]"/>
+                <filter name="pending" string="Pending" domain="[('state','in',['draft','sent'])]"/>
+                <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sole_ipay_transaction" model="ir.actions.act_window">
+        <field name="name">iPay Transactions</field>
+        <field name="res_model">sole.ipay.transaction</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sole_ipay_transaction_search"/>
+    </record>
+</odoo>

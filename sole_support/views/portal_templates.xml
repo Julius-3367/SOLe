@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal home panel entry -->
+    <template id="portal_my_home_ticket" name="Portal My Home: Tickets"
+              inherit_id="portal.portal_my_home"
+              customize_show="True"
+              priority="30">
+        <xpath expr="//div[contains(@class,'o_portal_docs')]" position="before">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/sole_support/static/description/icon.png'"/>
+                <t t-set="title">Support Tickets</t>
+                <t t-set="url" t-value="'/support'"/>
+                <t t-set="count" t-value="ticket_count"/>
+                <t t-set="text">My support requests</t>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Ticket List Page -->
+    <template id="portal_ticket_list" name="My Support Tickets">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Support Tickets</t>
+            </t>
+            <t t-if="not tickets">
+                <div class="alert alert-info mt-3">
+                    You have no support tickets yet.
+                    <a href="/support/new" class="btn btn-sm btn-primary ms-2">Open a Ticket</a>
+                </div>
+            </t>
+            <t t-if="tickets">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <a href="/support/new" class="btn btn-primary float-end mb-2">New Ticket</a>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Ticket #</th>
+                                    <th>Subject</th>
+                                    <th>Stage</th>
+                                    <th>Priority</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="tickets" t-as="ticket">
+                                    <tr>
+                                        <td>
+                                            <a t-attf-href="/support/#{ticket.id}">
+                                                <t t-esc="ticket.name"/>
+                                            </a>
+                                        </td>
+                                        <td><t t-esc="ticket.subject"/></td>
+                                        <td><t t-esc="ticket.stage_id.name"/></td>
+                                        <td><t t-esc="dict(ticket._fields['priority'].selection)[ticket.priority]"/></td>
+                                        <td><t t-esc="ticket.create_date" t-options='{"widget": "datetime", "format": "dd MMM yyyy"}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- New Ticket Page -->
+    <template id="portal_new_ticket" name="Submit New Ticket">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <h2>Open a Support Ticket</h2>
+                <form action="/support/new" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label class="form-label">Subject *</label>
+                        <input type="text" name="subject" class="form-control" required="1"
+                               placeholder="Brief description of your issue"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="category_id" class="form-select">
+                            <option value="">-- Select Category --</option>
+                            <t t-foreach="categories" t-as="cat">
+                                <option t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="6"
+                                  placeholder="Please provide as much detail as possible..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                    <a href="/support" class="btn btn-secondary ms-2">Cancel</a>
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <!-- Ticket Detail Page -->
+    <template id="portal_ticket_detail" name="Ticket Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2><t t-esc="ticket.name"/> — <t t-esc="ticket.subject"/></h2>
+                    <span t-attf-class="badge bg-#{ticket.stage_id.is_closed and 'secondary' or ticket.stage_id.is_resolved and 'success' or 'primary'}">
+                        <t t-esc="ticket.stage_id.name"/>
+                    </span>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-3">Category</dt>
+                            <dd class="col-sm-9"><t t-esc="ticket.category_id.name or 'N/A'"/></dd>
+                            <dt class="col-sm-3">Priority</dt>
+                            <dd class="col-sm-9">
+                                <t t-esc="dict(ticket._fields['priority'].selection)[ticket.priority]"/>
+                            </dd>
+                            <dt class="col-sm-3">Assigned To</dt>
+                            <dd class="col-sm-9"><t t-esc="ticket.assigned_to.name or 'Unassigned'"/></dd>
+                            <dt class="col-sm-3">Created</dt>
+                            <dd class="col-sm-9">
+                                <t t-esc="ticket.create_date" t-options='{"widget": "datetime"}'/>
+                            </dd>
+                        </dl>
+                        <hr/>
+                        <div t-if="ticket.description">
+                            <t t-out="ticket.description"/>
+                        </div>
+                    </div>
+                </div>
+                <a href="/support" class="btn btn-secondary mt-3">Back to Tickets</a>
+            </div>
+        </t>
+    </template>
+</odoo>

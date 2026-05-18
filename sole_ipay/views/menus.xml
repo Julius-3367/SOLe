@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sole_ipay_root" name="iPay" sequence="81"
+              web_icon="sole_ipay,static/description/icon.png"/>
+
+    <menuitem id="menu_sole_ipay_transactions" name="Transactions"
+              parent="menu_sole_ipay_root"
+              action="action_sole_ipay_transaction" sequence="10"/>
+
+    <menuitem id="menu_sole_ipay_new" name="New Payment"
+              parent="menu_sole_ipay_root"
+              action="action_sole_ipay_transaction" sequence="20"/>
+
+    <menuitem id="menu_sole_ipay_config" name="Configuration"
+              parent="menu_sole_ipay_root"
+              action="action_sole_ipay_config" sequence="90"
+              groups="base.group_system"/>
+
+</odoo>

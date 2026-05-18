@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_sms_template_form" model="ir.ui.view">
+        <field name="name">sole.sms.template.form</field>
+        <field name="model">sole.sms.template</field>
+        <field name="arch" type="xml">
+            <form string="SMS Template">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="category"/>
+                        <field name="is_active"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group string="Message">
+                        <field name="body" widget="text" nolabel="1"
+                               placeholder="Dear {customer_name}, your payment of KES {amount} is due. — {company_name}"/>
+                    </group>
+                    <group string="Available Placeholders">
+                        <div>
+                            <code>{customer_name}</code> &amp;nbsp;
+                            <code>{amount}</code> &amp;nbsp;
+                            <code>{ref}</code> &amp;nbsp;
+                            <code>{date}</code> &amp;nbsp;
+                            <code>{company_name}</code>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sole_sms_template_list" model="ir.ui.view">
+        <field name="name">sole.sms.template.list</field>
+        <field name="model">sole.sms.template</field>
+        <field name="arch" type="xml">
+            <list string="SMS Templates">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="is_active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sole_sms_template" model="ir.actions.act_window">
+        <field name="name">SMS Templates</field>
+        <field name="res_model">sole.sms.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

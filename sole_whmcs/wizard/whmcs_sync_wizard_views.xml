@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_whmcs_sync_wizard_form" model="ir.ui.view">
+        <field name="name">sole.whmcs.sync.wizard.form</field>
+        <field name="model">sole.whmcs.sync.wizard</field>
+        <field name="arch" type="xml">
+            <form string="WHMCS Sync">
+                <group>
+                    <field name="config_id"/>
+                    <field name="sync_clients"/>
+                    <field name="sync_invoices"/>
+                </group>
+                <footer>
+                    <button name="action_sync" type="object" string="Start Sync"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_whmcs_sync_wizard" model="ir.actions.act_window">
+        <field name="name">WHMCS Sync</field>
+        <field name="res_model">sole.whmcs.sync.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

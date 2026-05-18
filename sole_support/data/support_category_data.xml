@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="category_billing" model="sole.support.category">
+        <field name="name">Billing &amp; Payments</field>
+    </record>
+    <record id="category_technical" model="sole.support.category">
+        <field name="name">Technical Support</field>
+    </record>
+    <record id="category_account" model="sole.support.category">
+        <field name="name">Account &amp; Access</field>
+    </record>
+    <record id="category_hosting" model="sole.support.category">
+        <field name="name">Hosting &amp; Services</field>
+    </record>
+    <record id="category_general" model="sole.support.category">
+        <field name="name">General Enquiry</field>
+    </record>
+</odoo>

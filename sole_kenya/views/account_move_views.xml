@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Show M-Pesa payment details on customer invoices ── -->
+    <record id="view_sole_kenya_invoice_mpesa" model="ir.ui.view">
+        <field name="name">sole.kenya.account.move.invoice.mpesa</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Add M-Pesa info tab after the Other Info tab -->
+            <xpath expr="//notebook/page[@name='other_info']" position="after">
+                <page string="M-Pesa Payment" name="mpesa_payment_tab"
+                      invisible="move_type not in ['out_invoice', 'out_receipt']">
+                    <group>
+                        <group string="Pay via M-Pesa">
+                            <field name="mpesa_paybill" string="Paybill / Till No." readonly="1"/>
+                            <field name="mpesa_account_ref" string="Account Reference" readonly="1"/>
+                        </group>
+                        <group string="Payment Instructions">
+                            <div class="text-muted">
+                                <p><b>How to pay via M-Pesa:</b></p>
+                                <ol>
+                                    <li>Go to M-Pesa on your phone</li>
+                                    <li>Select <b>Lipa na M-Pesa &gt; Paybill</b></li>
+                                    <li>Enter Business Number: <b><field name="mpesa_paybill" nolabel="1" readonly="1"/></b></li>
+                                    <li>Enter Account Number: <b><field name="mpesa_account_ref" nolabel="1" readonly="1"/></b></li>
+                                    <li>Enter amount and confirm</li>
+                                </ol>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

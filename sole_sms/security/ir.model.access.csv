@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_sms_provider_user,sole.sms.provider user,model_sole_sms_provider,base.group_user,1,0,0,0
+access_sole_sms_provider_admin,sole.sms.provider admin,model_sole_sms_provider,base.group_system,1,1,1,1
+access_sole_sms_template_user,sole.sms.template user,model_sole_sms_template,base.group_user,1,0,0,0
+access_sole_sms_template_admin,sole.sms.template admin,model_sole_sms_template,base.group_system,1,1,1,1
+access_sole_sms_log_user,sole.sms.log user,model_sole_sms_log,base.group_user,1,0,0,0
+access_sole_sms_log_admin,sole.sms.log admin,model_sole_sms_log,base.group_system,1,1,1,1
+access_sole_sms_batch_user,sole.sms.batch user,model_sole_sms_batch,base.group_user,1,1,1,0
+access_sole_sms_batch_admin,sole.sms.batch admin,model_sole_sms_batch,base.group_system,1,1,1,1
+access_sole_sms_batch_line_user,sole.sms.batch.line user,model_sole_sms_batch_line,base.group_user,1,1,1,1
+access_sole_send_sms_wizard,sole.send.sms.wizard,model_sole_send_sms_wizard,base.group_user,1,1,1,1

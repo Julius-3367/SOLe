@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- All 47 Kenya Counties -->
+    <record id="county_mombasa" model="sole.kenya.county"><field name="name">Mombasa</field><field name="code">001</field></record>
+    <record id="county_kwale" model="sole.kenya.county"><field name="name">Kwale</field><field name="code">002</field></record>
+    <record id="county_kilifi" model="sole.kenya.county"><field name="name">Kilifi</field><field name="code">003</field></record>
+    <record id="county_tana_river" model="sole.kenya.county"><field name="name">Tana River</field><field name="code">004</field></record>
+    <record id="county_lamu" model="sole.kenya.county"><field name="name">Lamu</field><field name="code">005</field></record>
+    <record id="county_taita_taveta" model="sole.kenya.county"><field name="name">Taita-Taveta</field><field name="code">006</field></record>
+    <record id="county_garissa" model="sole.kenya.county"><field name="name">Garissa</field><field name="code">007</field></record>
+    <record id="county_wajir" model="sole.kenya.county"><field name="name">Wajir</field><field name="code">008</field></record>
+    <record id="county_mandera" model="sole.kenya.county"><field name="name">Mandera</field><field name="code">009</field></record>
+    <record id="county_marsabit" model="sole.kenya.county"><field name="name">Marsabit</field><field name="code">010</field></record>
+    <record id="county_isiolo" model="sole.kenya.county"><field name="name">Isiolo</field><field name="code">011</field></record>
+    <record id="county_meru" model="sole.kenya.county"><field name="name">Meru</field><field name="code">012</field></record>
+    <record id="county_tharaka_nithi" model="sole.kenya.county"><field name="name">Tharaka-Nithi</field><field name="code">013</field></record>
+    <record id="county_embu" model="sole.kenya.county"><field name="name">Embu</field><field name="code">014</field></record>
+    <record id="county_kitui" model="sole.kenya.county"><field name="name">Kitui</field><field name="code">015</field></record>
+    <record id="county_machakos" model="sole.kenya.county"><field name="name">Machakos</field><field name="code">016</field></record>
+    <record id="county_makueni" model="sole.kenya.county"><field name="name">Makueni</field><field name="code">017</field></record>
+    <record id="county_nyandarua" model="sole.kenya.county"><field name="name">Nyandarua</field><field name="code">018</field></record>
+    <record id="county_nyeri" model="sole.kenya.county"><field name="name">Nyeri</field><field name="code">019</field></record>
+    <record id="county_kirinyaga" model="sole.kenya.county"><field name="name">Kirinyaga</field><field name="code">020</field></record>
+    <record id="county_muranga" model="sole.kenya.county"><field name="name">Murang'a</field><field name="code">021</field></record>
+    <record id="county_kiambu" model="sole.kenya.county"><field name="name">Kiambu</field><field name="code">022</field></record>
+    <record id="county_turkana" model="sole.kenya.county"><field name="name">Turkana</field><field name="code">023</field></record>
+    <record id="county_west_pokot" model="sole.kenya.county"><field name="name">West Pokot</field><field name="code">024</field></record>
+    <record id="county_samburu" model="sole.kenya.county"><field name="name">Samburu</field><field name="code">025</field></record>
+    <record id="county_trans_nzoia" model="sole.kenya.county"><field name="name">Trans-Nzoia</field><field name="code">026</field></record>
+    <record id="county_uasin_gishu" model="sole.kenya.county"><field name="name">Uasin Gishu</field><field name="code">027</field></record>
+    <record id="county_elgeyo_marakwet" model="sole.kenya.county"><field name="name">Elgeyo-Marakwet</field><field name="code">028</field></record>
+    <record id="county_nandi" model="sole.kenya.county"><field name="name">Nandi</field><field name="code">029</field></record>
+    <record id="county_baringo" model="sole.kenya.county"><field name="name">Baringo</field><field name="code">030</field></record>
+    <record id="county_laikipia" model="sole.kenya.county"><field name="name">Laikipia</field><field name="code">031</field></record>
+    <record id="county_nakuru" model="sole.kenya.county"><field name="name">Nakuru</field><field name="code">032</field></record>
+    <record id="county_narok" model="sole.kenya.county"><field name="name">Narok</field><field name="code">033</field></record>
+    <record id="county_kajiado" model="sole.kenya.county"><field name="name">Kajiado</field><field name="code">034</field></record>
+    <record id="county_kericho" model="sole.kenya.county"><field name="name">Kericho</field><field name="code">035</field></record>
+    <record id="county_bomet" model="sole.kenya.county"><field name="name">Bomet</field><field name="code">036</field></record>
+    <record id="county_kakamega" model="sole.kenya.county"><field name="name">Kakamega</field><field name="code">037</field></record>
+    <record id="county_vihiga" model="sole.kenya.county"><field name="name">Vihiga</field><field name="code">038</field></record>
+    <record id="county_bungoma" model="sole.kenya.county"><field name="name">Bungoma</field><field name="code">039</field></record>
+    <record id="county_busia" model="sole.kenya.county"><field name="name">Busia</field><field name="code">040</field></record>
+    <record id="county_siaya" model="sole.kenya.county"><field name="name">Siaya</field><field name="code">041</field></record>
+    <record id="county_kisumu" model="sole.kenya.county"><field name="name">Kisumu</field><field name="code">042</field></record>
+    <record id="county_homa_bay" model="sole.kenya.county"><field name="name">Homa Bay</field><field name="code">043</field></record>
+    <record id="county_migori" model="sole.kenya.county"><field name="name">Migori</field><field name="code">044</field></record>
+    <record id="county_kisii" model="sole.kenya.county"><field name="name">Kisii</field><field name="code">045</field></record>
+    <record id="county_nyamira" model="sole.kenya.county"><field name="name">Nyamira</field><field name="code">046</field></record>
+    <record id="county_nairobi" model="sole.kenya.county"><field name="name">Nairobi City</field><field name="code">047</field></record>
+</odoo>

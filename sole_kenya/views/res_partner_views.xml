@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ── Extend Contact / Partner form with KRA PIN and County ── -->
+    <record id="view_sole_kenya_partner_form" model="ir.ui.view">
+        <field name="name">sole.kenya.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Inject KRA PIN + County right after the vat (TIN) field -->
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="kra_pin" placeholder="e.g. A123456789B"/>
+                <field name="is_vat_registered"/>
+                <field name="kenya_county_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── County list view for admin ── -->
+    <record id="view_sole_kenya_county_list" model="ir.ui.view">
+        <field name="name">sole.kenya.county.list</field>
+        <field name="model">sole.kenya.county</field>
+        <field name="arch" type="xml">
+            <list string="Kenya Counties">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="partner_ids" string="Partners" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sole_kenya_county" model="ir.actions.act_window">
+        <field name="name">Kenya Counties</field>
+        <field name="res_model">sole.kenya.county</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <!-- ── Menu under Contacts ── -->
+    <menuitem id="menu_sole_kenya_counties"
+              name="Kenya Counties"
+              parent="contacts.res_partner_menu_contacts"
+              action="action_sole_kenya_county"
+              sequence="100"
+              groups="base.group_system"/>
+</odoo>

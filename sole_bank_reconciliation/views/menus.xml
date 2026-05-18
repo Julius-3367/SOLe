@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sole_bank_recon_root" name="Bank Reconciliation"
+              parent="account.menu_finance" sequence="100"/>
+
+    <menuitem id="menu_sole_bank_stmt_imports" name="Statement Imports"
+              parent="menu_sole_bank_recon_root"
+              action="action_sole_bank_stmt_import" sequence="10"/>
+
+    <menuitem id="menu_sole_bank_import_new" name="Import Statement"
+              parent="menu_sole_bank_recon_root"
+              action="action_sole_bank_import_wizard" sequence="5"/>
+
+</odoo>

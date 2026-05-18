@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="sole_ipay_config_default" model="sole.ipay.config">
+        <field name="name">iPay (Sandbox)</field>
+        <field name="environment">sandbox</field>
+        <field name="vendor_id">demo</field>
+        <field name="hash_key">demo_hash_key</field>
+        <field name="callback_url">https://sole.co.ke/sole/ipay/callback</field>
+        <field name="currency">KES</field>
+        <field name="is_active">True</field>
+    </record>
+</odoo>

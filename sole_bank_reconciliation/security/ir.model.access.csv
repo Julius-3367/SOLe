@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_bank_stmt_import_user,sole.bank.statement.import user,model_sole_bank_statement_import,base.group_user,1,1,1,0
+access_sole_bank_stmt_import_admin,sole.bank.statement.import admin,model_sole_bank_statement_import,base.group_system,1,1,1,1
+access_sole_bank_recon_line_user,sole.bank.recon.line user,model_sole_bank_recon_line,base.group_user,1,1,1,0
+access_sole_bank_recon_line_admin,sole.bank.recon.line admin,model_sole_bank_recon_line,base.group_system,1,1,1,1
+access_sole_bank_import_wizard,sole.bank.import.wizard,model_sole_bank_import_wizard,base.group_user,1,1,1,1

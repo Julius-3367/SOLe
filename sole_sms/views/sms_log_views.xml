@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_sms_log_list" model="ir.ui.view">
+        <field name="name">sole.sms.log.list</field>
+        <field name="model">sole.sms.log</field>
+        <field name="arch" type="xml">
+            <list string="SMS Logs" decoration-success="state=='delivered'"
+                  decoration-danger="state=='failed'">
+                <field name="create_date" string="Date"/>
+                <field name="phone"/>
+                <field name="message"/>
+                <field name="provider_id"/>
+                <field name="provider_msg_id"/>
+                <field name="partner_id"/>
+                <field name="state"/>
+                <field name="error"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_sms_log_search" model="ir.ui.view">
+        <field name="name">sole.sms.log.search</field>
+        <field name="model">sole.sms.log</field>
+        <field name="arch" type="xml">
+            <search string="Search SMS Logs">
+                <field name="phone"/>
+                <field name="partner_id"/>
+                <filter name="sent" string="Sent" domain="[('state','=','sent')]"/>
+                <filter name="delivered" string="Delivered" domain="[('state','=','delivered')]"/>
+                <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sole_sms_log" model="ir.actions.act_window">
+        <field name="name">SMS Logs</field>
+        <field name="res_model">sole.sms.log</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_sole_sms_log_search"/>
+    </record>
+</odoo>

@@ -109,7 +109,7 @@
                             </h1>
                         </div>
                         <label for="content"/>
-                        <field name="content"/>
+                        <field name="content" options="{'collaborative': false}" style="min-height: 300px;"/>
                         <separator/>
                         <label for="child_ids"/>
                         <field name="child_ids" context="{'default_parent_id': id}"/>

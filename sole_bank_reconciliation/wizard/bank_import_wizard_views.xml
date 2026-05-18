@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_bank_import_wizard_form" model="ir.ui.view">
+        <field name="name">sole.bank.import.wizard.form</field>
+        <field name="model">sole.bank.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Bank Statement">
+                <group>
+                    <group string="Statement Details">
+                        <field name="import_name"/>
+                        <field name="journal_id"/>
+                        <field name="bank_format"/>
+                        <field name="skip_rows"/>
+                    </group>
+                    <group string="File">
+                        <field name="csv_file" widget="binary" filename="csv_filename"/>
+                        <field name="csv_filename" invisible="1"/>
+                    </group>
+                </group>
+                <group string="Format Guide">
+                    <div class="text-muted small">
+                        <b>M-Pesa:</b> Receipt No, Completion Time, Details, Status, Paid In, Withdrawn, Balance<br/>
+                        <b>Equity:</b> Date, Description, Debit, Credit, Balance<br/>
+                        <b>KCB:</b> Value Date, Transaction Date, Description, Reference, Debit, Credit, Balance<br/>
+                        <b>Co-op:</b> Posting Date, Value Date, Description, Reference, Amount, Balance<br/>
+                        <b>Generic:</b> Date, Description, Debit, Credit, Balance
+                    </div>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Import"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_bank_import_wizard" model="ir.actions.act_window">
+        <field name="name">Import Bank Statement</field>
+        <field name="res_model">sole.bank.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_sole_whmcs_sync" model="ir.cron">
+        <field name="name">SOLe WHMCS: Scheduled Sync</field>
+        <field name="model_id" ref="sole_whmcs.model_sole_whmcs_config"/>
+        <field name="state">code</field>
+        <field name="code">
+config = model.search([('is_active', '=', True)], limit=1)
+if config:
+    config.sync_clients()
+    config.sync_invoices()
+        </field>
+        <field name="interval_number">12</field>
+        <field name="interval_type">hours</field>
+        <field name="active">False</field>
+    </record>
+</odoo>

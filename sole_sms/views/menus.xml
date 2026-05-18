@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sole_sms_root" name="SMS" sequence="82"
+              web_icon="sole_sms,static/description/icon.png"/>
+
+    <menuitem id="menu_sole_sms_send" name="Send SMS"
+              parent="menu_sole_sms_root"
+              action="action_sole_sms_send_wizard" sequence="5"/>
+
+    <menuitem id="menu_sole_sms_logs" name="Message Logs"
+              parent="menu_sole_sms_root"
+              action="action_sole_sms_log" sequence="10"/>
+
+    <menuitem id="menu_sole_sms_campaigns" name="Campaigns"
+              parent="menu_sole_sms_root"
+              action="action_sole_sms_batch" sequence="20"/>
+
+    <menuitem id="menu_sole_sms_templates" name="Templates"
+              parent="menu_sole_sms_root"
+              action="action_sole_sms_template" sequence="30"/>
+
+    <menuitem id="menu_sole_sms_config" name="Providers"
+              parent="menu_sole_sms_root"
+              action="action_sole_sms_provider" sequence="90"
+              groups="base.group_system"/>
+
+</odoo>

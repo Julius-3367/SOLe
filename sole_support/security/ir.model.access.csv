@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_support_stage_user,sole.support.stage user,model_sole_support_stage,base.group_user,1,0,0,0
+access_sole_support_stage_admin,sole.support.stage admin,model_sole_support_stage,base.group_system,1,1,1,1
+access_sole_support_category_user,sole.support.category user,model_sole_support_category,base.group_user,1,0,0,0
+access_sole_support_category_admin,sole.support.category admin,model_sole_support_category,base.group_system,1,1,1,1
+access_sole_support_ticket_user,sole.support.ticket user,model_sole_support_ticket,base.group_user,1,1,1,0
+access_sole_support_ticket_admin,sole.support.ticket admin,model_sole_support_ticket,base.group_system,1,1,1,1
+access_sole_support_ticket_public,sole.support.ticket public,model_sole_support_ticket,base.group_public,0,0,1,0
