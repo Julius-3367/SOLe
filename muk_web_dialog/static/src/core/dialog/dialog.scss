@@ -5,3 +5,15 @@
 	    opacity: $btn-close-hover-opacity;
 	}
 }
+
+// Dialog surface
+.o_dialog .modal-content {
+	background: $white;
+	border: 1px solid rgba(0,0,0,0.06);
+	border-radius: $mk-border-radius;
+	box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+	transition: transform $mk-transition-medium, box-shadow $mk-transition-medium;
+}
+.o_dialog .modal-content:hover {
+	transform: translateY(-2px);
+}

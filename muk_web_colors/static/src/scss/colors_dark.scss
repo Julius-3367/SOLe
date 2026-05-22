@@ -1,12 +1,28 @@
 // Colors
 
-$mk_color_brand: #243742;
-$mk_color_primary: #5D8DA8;
+$mk_color_brand: #01247b;
+$mk_color_primary: #f85304;
+$mk_color_neutral: #9a999a;
 
-$mk_color_success: #1DC959;
-$mk_color_info: #6AB5FB;
-$mk_color_warning: #FBB56A;
-$mk_color_danger: #FF5757;
+// Google Material palette accents (used for context colors)
+$gd-blue: #4285F4;
+$gd-red: #EA4335;
+$gd-yellow: #FBBC05;
+$gd-green: #34A853;
+$gd-gray: #9e9e9e;
+
+$mk_color_success: $gd-green;
+$mk_color_info: $gd-blue;
+$mk_color_warning: $gd-yellow;
+$mk_color_danger: $gd-red;
+
+// Dash-style aliases (some files reference mk-color-* naming)
+$mk-color-brand: $mk_color_brand;
+$mk-color-primary: $mk_color_primary;
+$mk-color-success: $mk_color_success;
+$mk-color-info: $mk_color_info;
+$mk-color-warning: $mk_color_warning;
+$mk-color-danger: $mk_color_danger;
 
 // Override
 

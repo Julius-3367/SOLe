@@ -13,6 +13,13 @@
     > .o_navbar {
     	grid-area: navbar;
     }
+
+    // Navbar: solid brand background for clarity
+    > .o_navbar {
+        background-color: $mk-appbar-background;
+        color: $mk-appbar-color;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
     > .mk_apps_sidebar_panel {
     	grid-area: sidebar;
     }

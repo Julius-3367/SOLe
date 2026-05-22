@@ -1,1 +1,11 @@
 $o-navbar-badge-bg: $o-brand-primary;
+
+// Muk theme tuning variables to align spacing and icon sizes with Odoo 19 Enterprise
+$mk-border-radius: 0.25rem !default;
+$mk-icon-size: 20px !default;
+$mk-avatar-size: 32px !default;
+$mk-app-icon-radius: $mk-border-radius !default;
+
+// Smooth transitions
+$mk-transition-fast: 120ms !default;
+$mk-transition-medium: 180ms !default;

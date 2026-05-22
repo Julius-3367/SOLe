@@ -1,9 +1,9 @@
 .mk_apps_sidebar_panel {
-    @include mk-disable-scrollbar();
-    background-color: $mk-appbar-background;
+	@include mk-disable-scrollbar();
+	background-color: $mk-appbar-background;
     width: var(--mk-sidebar-width, 0);
     overflow-y: auto;
-    .mk_apps_sidebar {
+        .mk_apps_sidebar {
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -11,21 +11,21 @@
 	    white-space: nowrap;
 	    .mk_apps_sidebar_menu {
 	    	padding: 0;
-		    > li > a {
-		        cursor: pointer;
-	            font-size: 13px;
-	            font-weight: 300;
-	            overflow: hidden;
-	            padding: 8px 11px;
-	            text-decoration: none;
-	            color: $mk-appbar-color;
-	            text-overflow: ellipsis;
-	            .mk_apps_sidebar_icon {
-				    width: 22px;
-				    height: 22px;
-	    			margin-right: 5px;
+			> li > a {
+				cursor: pointer;
+				font-size: 14px;
+				font-weight: 400;
+				overflow: hidden;
+				padding: 10px 12px;
+				text-decoration: none;
+				color: $mk-appbar-color;
+				text-overflow: ellipsis;
+				.mk_apps_sidebar_icon {
+					width: $mk-icon-size;
+					height: $mk-icon-size;
+					margin-right: 8px;
 				}
-		    }
+			}
 	        > li.active > a {
 			    background: $mk-appbar-active;
 	        }

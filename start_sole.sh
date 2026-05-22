@@ -14,7 +14,7 @@ set -euo pipefail
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ODOO_BIN="${HOME}/odoo19_community/odoo-bin"
+ODOO_BIN="${HOME}/odoo-19/odoo-bin"
 CONF="${SCRIPT_DIR}/sole.conf"
 VENV="${HOME}/odoo_venv"
 LOG="/tmp/sole_odoo.log"
