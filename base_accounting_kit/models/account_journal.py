@@ -19,13 +19,23 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import models, _
+from odoo import api, models, _
 
 
 class AccountJournal(models.Model):
     """Module inherited for adding the reconcile method in the account
     journal"""
     _inherit = "account.journal"
+
+    @api.model
+    def _accounting_kit_liquidity_account_ids(self, journal_type):
+        """Default bank/cash liquidity accounts for accounting kit reports."""
+        journals = self.search([('type', '=', journal_type)])
+        return [
+            journal.default_account_id.id
+            for journal in journals
+            if journal.default_account_id
+        ]
 
     # def action_open_reconcile(self):
     #     self.ensure_one()

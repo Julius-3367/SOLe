@@ -47,6 +47,8 @@
         'report/aged_payable_templates.xml',
         'report/aged_receivable_templates.xml',
         'report/tax_report_templates.xml',
+        'report/cash_flow_statement_pdf_template.xml',
+        'report/equity_statement_pdf_template.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -60,6 +62,8 @@
             'dynamic_accounts_report/static/src/xml/aged_payable_report_views.xml',
             'dynamic_accounts_report/static/src/xml/aged_receivable_report_views.xml',
             'dynamic_accounts_report/static/src/xml/tax_report_views.xml',
+            'dynamic_accounts_report/static/src/xml/cash_flow_statement_templates.xml',
+            'dynamic_accounts_report/static/src/xml/equity_statement_templates.xml',
             'dynamic_accounts_report/static/src/css/accounts_report.css',
             'dynamic_accounts_report/static/src/js/general_ledger.js',
             'dynamic_accounts_report/static/src/js/trial_balance.js',
@@ -71,6 +75,8 @@
             'dynamic_accounts_report/static/src/js/aged_payable_report.js',
             'dynamic_accounts_report/static/src/js/aged_receivable_report.js',
             'dynamic_accounts_report/static/src/js/tax_report.js',
+            'dynamic_accounts_report/static/src/js/cash_flow_statement.js',
+            'dynamic_accounts_report/static/src/js/equity_statement.js',
         ],
     },
     'images': ['static/description/banner.png'],

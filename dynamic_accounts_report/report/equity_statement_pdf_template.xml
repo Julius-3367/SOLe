@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Statement of Changes in Equity PDF Report Template -->
+    <template id="dynamic_accounts_report.equity_statement_pdf">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="data_report_dpi" t-value="110"/>
+                <div class="page">
+                    <h3>
+                        <span t-esc="report_name"/>
+                    </h3>
+                    <br/>
+                    <t t-set="eqs" t-value="data.get('data', {})"/>
+                    <table cellspacing="0" width="100%"
+                           style="border-collapse:collapse;border:1px solid #ccc;font-size:12px;">
+                        <thead>
+                            <tr style="background:#2E75B6;color:white;font-weight:bold;text-align:center;">
+                                <th style="padding:6px 8px;width:40%;text-align:left;border:1px solid #ccc;">
+                                    Description
+                                </th>
+                                <th style="padding:6px 8px;border:1px solid #ccc;">
+                                    Share Capital
+                                </th>
+                                <th style="padding:6px 8px;border:1px solid #ccc;">
+                                    Retained Earnings
+                                </th>
+                                <th style="padding:6px 8px;border:1px solid #ccc;">
+                                    Total Equity
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Opening Balance -->
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td style="padding:5px 8px;border:1px solid #ccc;">
+                                    Opening Balance
+                                </td>
+                                <td style="padding:5px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('open_share', '0.00')"/>
+                                </td>
+                                <td style="padding:5px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('open_retained', '0.00')"/>
+                                </td>
+                                <td style="padding:5px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('open_total', '0.00')"/>
+                                </td>
+                            </tr>
+
+                            <!-- Net Income -->
+                            <tr>
+                                <td style="padding:4px 8px 4px 20px;border:1px solid #ccc;">
+                                    Net Income / (Loss) for the Period
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('net_income_share', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('net_income_retained', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('net_income_total', '0.00')"/>
+                                </td>
+                            </tr>
+
+                            <!-- Share Capital Movements -->
+                            <tr>
+                                <td style="padding:4px 8px 4px 20px;border:1px solid #ccc;">
+                                    Share Capital Movements
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('share_movement', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('share_movement_retained', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('share_movement_total', '0.00')"/>
+                                </td>
+                            </tr>
+
+                            <!-- Other Equity Movements -->
+                            <tr>
+                                <td style="padding:4px 8px 4px 20px;border:1px solid #ccc;">
+                                    Other Equity Movements (Dividends, Transfers)
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('retained_movement', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('retained_movement_retained', '0.00')"/>
+                                </td>
+                                <td style="padding:4px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('retained_movement_total', '0.00')"/>
+                                </td>
+                            </tr>
+
+                            <!-- Closing Balance -->
+                            <tr style="background:#1B4F72;color:white;font-weight:bold;font-size:1.05em;">
+                                <td style="padding:6px 8px;border:1px solid #ccc;">
+                                    Closing Balance
+                                </td>
+                                <td style="padding:6px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('close_share', '0.00')"/>
+                                </td>
+                                <td style="padding:6px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('close_retained', '0.00')"/>
+                                </td>
+                                <td style="padding:6px 8px;text-align:right;border:1px solid #ccc;">
+                                    <t t-esc="eqs.get('close_total', '0.00')"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

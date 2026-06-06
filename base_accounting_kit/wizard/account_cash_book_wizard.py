@@ -51,11 +51,7 @@ class CashBookWizard(models.TransientModel):
                                      help='If you selected date, this field allow you to add a row to display the amount of debit/credit/balance that precedes the filter you\'ve set.')
 
     def _get_default_account_ids(self):
-        journals = self.env['account.journal'].search([('type', '=', 'cash')])
-        accounts = []
-        for journal in journals:
-            accounts.append(journal.company_id.account_journal_payment_credit_account_id.id)
-        return accounts
+        return self.env['account.journal']._accounting_kit_liquidity_account_ids('cash')
 
     account_ids = fields.Many2many('account.account',
                                    'account_report_cashbook_account_rel',
@@ -72,11 +68,7 @@ class CashBookWizard(models.TransientModel):
     @api.onchange('account_ids')
     def onchange_account_ids(self):
         if self.account_ids:
-            journals = self.env['account.journal'].search(
-                [('type', '=', 'cash')])
-            accounts = []
-            for journal in journals:
-                accounts.append(journal.company_id.account_journal_payment_credit_account_id.id)
+            accounts = self.env['account.journal']._accounting_kit_liquidity_account_ids('cash')
             domain = {'account_ids': [('id', 'in', accounts)]}
             return {'domain': domain}
 

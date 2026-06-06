@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="cfs_template_new" owl="1">
+        <div class="w-100">
+            <div style="border-bottom: 1px solid #d8dadd;">
+                <div class="filter_view_dfr p-2">
+                    <div>
+                        <h1 class="p-2">
+                            <t t-esc="state.title"/>
+                        </h1>
+                    </div>
+                    <div class="sub_container_right d-flex mx-2">
+                        <t t-if="state.filter_data">
+                            <div class="report_print">
+                                <button type="button"
+                                        class="btn btn-info btn-report-print"
+                                        t-on-click="print_pdf"
+                                        style="margin-right: 8px;">
+                                    Print (PDF)
+                                </button>
+                                <button type="button"
+                                        class="btn btn-info btn-report-print"
+                                        t-on-click="print_xlsx">
+                                    Export (XLSX)
+                                </button>
+                            </div>
+                            <div class="filter d-flex ms-auto" style="gap:1.5rem;">
+                                <!-- Date Range -->
+                                <div class="time_range">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-calendar" title="Dates"
+                                              role="img" aria-label="Dates"/>
+                                        Date Range
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <div class="list-group">
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'month'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Month
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'quarter'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Quarter
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'year'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Year
+                                            </button>
+                                            <div role="separator" class="dropdown-divider"/>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-month'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Month
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-quarter'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Quarter
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-year'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Year
+                                            </button>
+                                            <div role="separator" class="dropdown-divider"/>
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" id="start_date"
+                                                   t-on-change="apply_date"
+                                                   style="border:none;border-bottom:1px solid #000;padding:5px;outline:none;"
+                                                   name="start_date"/>
+                                            <label for="end_date">End Date:</label>
+                                            <input type="date" id="end_date"
+                                                   t-on-change="apply_date"
+                                                   style="border:none;border-bottom:1px solid #000;padding:5px;outline:none;"
+                                                   name="end_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Journals -->
+                                <div class="journals_filter dropdown">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-book"/>
+                                        Journals
+                                    </a>
+                                    <div class="dropdown-menu journals" name="states[]">
+                                        <div role="separator" class="dropdown-divider"/>
+                                        <t t-foreach="state.filter_data['journal']"
+                                           t-as="journal" t-key="journal_index">
+                                            <span class="dropdown-item" role="menuitem"
+                                                  t-on-click="apply_journal">
+                                                <span t-esc="journal.id" class="d-none"/>
+                                                <t t-esc="journal.name"/>
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+
+                                <!-- Target Move -->
+                                <div class="search_Target_move">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-filter"/>
+                                        Target Move
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <div class="list-group">
+                                            <button class="report-filter-button"
+                                                    value="posted" type="button"
+                                                    t-on-click="apply_entries">
+                                                Posted Entries
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    value="draft" type="button"
+                                                    t-on-click="apply_entries">
+                                                Include Draft Entries
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Table -->
+            <t t-if="state.data">
+                <div class="table_view_dfr p-3">
+                    <table cellspacing="0" width="100%"
+                           class="table table-bordered table-sm">
+                        <thead>
+                            <tr style="background:#2E75B6;color:white;">
+                                <th style="width:70%;">Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- OPERATING -->
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td colspan="2">A.  OPERATING ACTIVITIES</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Net Profit / (Loss)</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_income"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Add: Depreciation &amp; Amortisation</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.depreciation"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">(Increase)/Decrease in Trade Receivables</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_receivables"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">(Increase)/Decrease in Prepayments</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_prepayments"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">(Increase)/Decrease in Other Current Assets</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_current_assets"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Increase/(Decrease) in Trade Payables</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_payables"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Increase/(Decrease) in Credit Card Liabilities</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_credit_card"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Increase/(Decrease) in Other Current Liabilities</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.wc_current_liabilities"/>
+                                </td>
+                            </tr>
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td>Net Cash from Operating Activities</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_operating"/>
+                                </td>
+                            </tr>
+
+                            <!-- INVESTING -->
+                            <tr>
+                                <td colspan="2" style="padding:0;height:8px;"/>
+                            </tr>
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td colspan="2">B.  INVESTING ACTIVITIES</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">(Purchase)/Disposal of Fixed Assets (PP&amp;E)</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.invest_fixed"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">(Purchase)/Disposal of Non-current Assets</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.invest_non_current"/>
+                                </td>
+                            </tr>
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td>Net Cash from Investing Activities</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_investing"/>
+                                </td>
+                            </tr>
+
+                            <!-- FINANCING -->
+                            <tr>
+                                <td colspan="2" style="padding:0;height:8px;"/>
+                            </tr>
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td colspan="2">C.  FINANCING ACTIVITIES</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Proceeds from Share Issuance / Capital</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.finance_equity"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Change in Retained / Unallocated Earnings</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.finance_retained"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4">Proceeds from / (Repayment of) Long-term Borrowings</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.finance_lt_liabilities"/>
+                                </td>
+                            </tr>
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td>Net Cash from Financing Activities</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_financing"/>
+                                </td>
+                            </tr>
+
+                            <!-- SUMMARY -->
+                            <tr>
+                                <td colspan="2" style="padding:0;height:8px;"/>
+                            </tr>
+                            <tr style="background:#1B4F72;color:white;font-weight:bold;font-size:1.05em;">
+                                <td>Net Increase / (Decrease) in Cash and Cash Equivalents</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_change"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ps-2">Opening Cash and Cash Equivalents</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.opening_cash"/>
+                                </td>
+                            </tr>
+                            <tr style="background:#1B4F72;color:white;font-weight:bold;font-size:1.05em;">
+                                <td>Closing Cash and Cash Equivalents</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.closing_cash"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

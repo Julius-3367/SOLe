@@ -29,14 +29,18 @@ class AccountUpdateLockDate(models.TransientModel):
 
     company_id = fields.Many2one(comodel_name='res.company', string="Company",
                                  required=True)
-    period_lock_date = fields.Date(string="Lock Date for Non-Advisers",
-                                   help="Only users with the 'Adviser' role can edit accounts prior to "
-                                        "and inclusive of this date. Use it for period locking inside an "
-                                        "open fiscal year, for example.")
-    fiscalyear_lock_date = fields.Date(string="Lock Date",
-                                       help="No users, including Advisers, can edit accounts prior to and "
-                                            "inclusive of this date. Use it for fiscal year locking for "
-                                            "example.")
+    sale_lock_date = fields.Date(
+        string="Sales Lock Date",
+        help="Any sales entry prior to and including this date will be postponed to a later date.",
+    )
+    fiscalyear_lock_date = fields.Date(
+        string="Global Lock Date",
+        help="Any entry up to and including that date will be postponed to a later time.",
+    )
+    hard_lock_date = fields.Date(
+        string="Hard Lock Date",
+        help="Irreversible lock date; no exceptions are allowed.",
+    )
 
     @api.model
     def default_get(self, field_list):
@@ -44,8 +48,9 @@ class AccountUpdateLockDate(models.TransientModel):
         company = self.env.company
         res.update({
             'company_id': company.id,
-            'period_lock_date': company.period_lock_date,
+            'sale_lock_date': company.sale_lock_date,
             'fiscalyear_lock_date': company.fiscalyear_lock_date,
+            'hard_lock_date': company.hard_lock_date,
         })
         return res
 
@@ -60,6 +65,7 @@ class AccountUpdateLockDate(models.TransientModel):
         self.ensure_one()
         self._check_execute_allowed()
         self.company_id.sudo().write({
-            'period_lock_date': self.period_lock_date,
+            'sale_lock_date': self.sale_lock_date,
             'fiscalyear_lock_date': self.fiscalyear_lock_date,
+            'hard_lock_date': self.hard_lock_date,
         })

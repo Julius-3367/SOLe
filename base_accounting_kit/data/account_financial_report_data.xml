@@ -74,47 +74,172 @@
             <field name="account_type_ids">expense</field>
         </record>
 
+        <!-- ═══ BALANCE SHEET ══════════════════════════════════════════════ -->
         <record id="account_financial_report_balancesheet0"
                 model="account.financial.report">
             <field name="name">Balance Sheet</field>
             <field name="type">sum</field>
         </record>
 
+        <!-- ── ASSETS ─────────────────────────────────────────────────────── -->
         <record id="account_financial_report_assets0"
                 model="account.financial.report">
             <field name="name">Assets</field>
-            <field name="parent_id"
-                   ref="account_financial_report_balancesheet0"/>
-            <field name="display_detail">detail_with_hierarchy</field>
-            <field name="type">account_type</field>
-            <field name="account_type_ids">income_other</field>
-        </record>
-
-        <record id="account_financial_report_liabilitysum0"
-                model="account.financial.report">
-            <field name="name">Liability</field>
             <field name="sequence">1</field>
-            <field name="parent_id"
-                   ref="account_financial_report_balancesheet0"/>
-            <field name="display_detail">no_detail</field>
+            <field name="parent_id" ref="account_financial_report_balancesheet0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
             <field name="type">sum</field>
         </record>
 
-        <record id="account_financial_report_liability0"
-                model="account.financial.report">
-            <field name="name">Liability</field>
-            <field name="parent_id"
-                   ref="account_financial_report_liabilitysum0"/>
+        <!-- Current Assets -->
+        <record id="bs_current_assets" model="account.financial.report">
+            <field name="name">Current Assets</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="account_financial_report_assets0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">sum</field>
+        </record>
+        <record id="bs_asset_cash" model="account.financial.report">
+            <field name="name">Bank and Cash Accounts</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="bs_current_assets"/>
             <field name="display_detail">detail_with_hierarchy</field>
             <field name="type">account_type</field>
-            <field name="account_type_ids">income_other</field>
+            <field name="account_type_ids">asset_cash</field>
+        </record>
+        <record id="bs_asset_receivable" model="account.financial.report">
+            <field name="name">Trade Receivables</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="bs_current_assets"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">asset_receivable</field>
+        </record>
+        <record id="bs_asset_current" model="account.financial.report">
+            <field name="name">Other Current Assets</field>
+            <field name="sequence">3</field>
+            <field name="parent_id" ref="bs_current_assets"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">asset_current</field>
+        </record>
+        <record id="bs_asset_prepayments" model="account.financial.report">
+            <field name="name">Prepayments</field>
+            <field name="sequence">4</field>
+            <field name="parent_id" ref="bs_current_assets"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">asset_prepayments</field>
         </record>
 
+        <!-- Non-current Assets -->
+        <record id="bs_non_current_assets" model="account.financial.report">
+            <field name="name">Non-current Assets</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="account_financial_report_assets0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">sum</field>
+        </record>
+        <record id="bs_asset_fixed" model="account.financial.report">
+            <field name="name">Fixed Assets (Property, Plant &amp; Equipment)</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="bs_non_current_assets"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">asset_fixed</field>
+        </record>
+        <record id="bs_asset_non_current" model="account.financial.report">
+            <field name="name">Other Non-current Assets</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="bs_non_current_assets"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">asset_non_current</field>
+        </record>
+
+        <!-- ── LIABILITIES ─────────────────────────────────────────────────── -->
+        <record id="account_financial_report_liabilitysum0"
+                model="account.financial.report">
+            <field name="name">Liabilities</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="account_financial_report_balancesheet0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">sum</field>
+        </record>
+
+        <!-- Current Liabilities -->
+        <record id="bs_current_liabilities" model="account.financial.report">
+            <field name="name">Current Liabilities</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="account_financial_report_liabilitysum0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">sum</field>
+        </record>
+        <record id="account_financial_report_liability0"
+                model="account.financial.report">
+            <field name="name">Trade Payables</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="bs_current_liabilities"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">liability_payable</field>
+        </record>
+        <record id="bs_liability_credit_card" model="account.financial.report">
+            <field name="name">Credit Card Liabilities</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="bs_current_liabilities"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">liability_credit_card</field>
+        </record>
+        <record id="bs_liability_current" model="account.financial.report">
+            <field name="name">Other Current Liabilities</field>
+            <field name="sequence">3</field>
+            <field name="parent_id" ref="bs_current_liabilities"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">liability_current</field>
+        </record>
+
+        <!-- Non-current Liabilities -->
+        <record id="bs_non_current_liabilities" model="account.financial.report">
+            <field name="name">Non-current Liabilities</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="account_financial_report_liabilitysum0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">liability_non_current</field>
+        </record>
+
+        <!-- ── EQUITY ───────────────────────────────────────────────────────── -->
+        <record id="bs_equity_section" model="account.financial.report">
+            <field name="name">Equity</field>
+            <field name="sequence">3</field>
+            <field name="parent_id" ref="account_financial_report_balancesheet0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">sum</field>
+        </record>
+        <record id="bs_equity" model="account.financial.report">
+            <field name="name">Share Capital and Reserves</field>
+            <field name="sequence">1</field>
+            <field name="parent_id" ref="bs_equity_section"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">equity</field>
+        </record>
+        <record id="bs_equity_unaffected" model="account.financial.report">
+            <field name="name">Retained Earnings (Unallocated)</field>
+            <field name="sequence">2</field>
+            <field name="parent_id" ref="bs_equity_section"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">equity_unaffected</field>
+        </record>
         <record id="account_financial_report_profitloss_toreport0"
                 model="account.financial.report">
-            <field name="name">Profit (Loss) to report</field>
-            <field name="parent_id"
-                   ref="account_financial_report_liabilitysum0"/>
+            <field name="name">Current Year Earnings</field>
+            <field name="sequence">3</field>
+            <field name="parent_id" ref="bs_equity_section"/>
             <field name="display_detail">no_detail</field>
             <field name="type">account_report</field>
             <field name="account_report_id"

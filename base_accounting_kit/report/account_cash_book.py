@@ -76,11 +76,8 @@ class ReportCashBook(models.AbstractModel):
         filters = filters.replace('account_move_line__move_id', 'm').replace(
             'account_move_line', 'l')
         if not accounts:
-            journals = self.env['account.journal'].search([('type', '=', 'cash')])
-            accounts = []
-            for journal in journals:
-                accounts.append(journal.company_id.account_journal_payment_credit_account_id.id)
-            accounts = self.env['account.account'].search([('id','in',accounts)])
+            account_ids = self.env['account.journal']._accounting_kit_liquidity_account_ids('cash')
+            accounts = self.env['account.account'].search([('id', 'in', account_ids)])
 
         # Get move lines base on sql query and Calculate the total balance of move lines
         sql = ('''SELECT l.id AS lid, l.account_id AS account_id, l.date AS ldate, j.code AS lcode, l.currency_id, l.amount_currency, l.ref AS lref, l.name AS lname, COALESCE(l.debit,0) AS debit, COALESCE(l.credit,0) AS credit, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) AS balance,\
@@ -145,11 +142,8 @@ class ReportCashBook(models.AbstractModel):
         accounts = self.env['account.account'].search(
             [('id', 'in', account_ids)])
         if not accounts:
-            journals = self.env['account.journal'].search([('type', '=', 'cash')])
-            accounts = []
-            for journal in journals:
-                accounts.append(journal.company_id.account_journal_payment_credit_account_id.id)
-            accounts = self.env['account.account'].search([('id', 'in', accounts)])
+            account_ids = self.env['account.journal']._accounting_kit_liquidity_account_ids('cash')
+            accounts = self.env['account.account'].search([('id', 'in', account_ids)])
         accounts_res = self.with_context(
             data['form'].get('used_context', {}))._get_account_move_entry(
             accounts,

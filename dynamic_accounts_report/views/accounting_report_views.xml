@@ -77,4 +77,20 @@
               action="action_tax_report"
               name="Tax Report" sequence="10"
               parent="dynamic_report_accounting"/>
+    <record id="action_cash_flow_statement" model="ir.actions.client">
+        <field name="name">Cash Flow Statement</field>
+        <field name="tag">cfs</field>
+    </record>
+    <record id="action_equity_statement" model="ir.actions.client">
+        <field name="name">Statement of Changes in Equity</field>
+        <field name="tag">eqs</field>
+    </record>
+    <menuitem id="menu_cash_flow_statement"
+              action="action_cash_flow_statement"
+              name="Cash Flow Statement" sequence="11"
+              parent="dynamic_report_accounting"/>
+    <menuitem id="menu_equity_statement"
+              action="action_equity_statement"
+              name="Statement of Changes in Equity" sequence="12"
+              parent="dynamic_report_accounting"/>
 </odoo>

@@ -28,4 +28,6 @@ from . import aged_receivable_report
 from . import bank_book_report
 from . import cash_book_report
 from . import dynamic_balance_sheet_report
+from . import dynamic_cash_flow_statement
+from . import equity_statement_report
 from . import tax_report

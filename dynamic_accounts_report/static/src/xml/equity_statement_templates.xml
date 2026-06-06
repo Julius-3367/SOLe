@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+    <t t-name="eqs_template_new" owl="1">
+        <div class="w-100">
+            <div style="border-bottom: 1px solid #d8dadd;">
+                <div class="filter_view_dfr p-2">
+                    <div>
+                        <h1 class="p-2">
+                            <t t-esc="state.title"/>
+                        </h1>
+                    </div>
+                    <div class="sub_container_right d-flex mx-2">
+                        <t t-if="state.filter_data">
+                            <div class="report_print">
+                                <button type="button"
+                                        class="btn btn-info btn-report-print"
+                                        t-on-click="print_pdf"
+                                        style="margin-right: 8px;">
+                                    Print (PDF)
+                                </button>
+                                <button type="button"
+                                        class="btn btn-info btn-report-print"
+                                        t-on-click="print_xlsx">
+                                    Export (XLSX)
+                                </button>
+                            </div>
+                            <div class="filter d-flex ms-auto" style="gap:1.5rem;">
+                                <!-- Date Range -->
+                                <div class="time_range">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-calendar" title="Dates"
+                                              role="img" aria-label="Dates"/>
+                                        Date Range
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <div class="list-group">
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'month'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Month
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'quarter'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Quarter
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'year'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                This Year
+                                            </button>
+                                            <div role="separator" class="dropdown-divider"/>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-month'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Month
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-quarter'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Quarter
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    t-att-data-value="'last-year'"
+                                                    type="button"
+                                                    t-on-click="apply_date">
+                                                Last Year
+                                            </button>
+                                            <div role="separator" class="dropdown-divider"/>
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" id="start_date"
+                                                   t-on-change="apply_date"
+                                                   style="border:none;border-bottom:1px solid #000;padding:5px;outline:none;"
+                                                   name="start_date"/>
+                                            <label for="end_date">End Date:</label>
+                                            <input type="date" id="end_date"
+                                                   t-on-change="apply_date"
+                                                   style="border:none;border-bottom:1px solid #000;padding:5px;outline:none;"
+                                                   name="end_date"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Journals -->
+                                <div class="journals_filter dropdown">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-book"/>
+                                        Journals
+                                    </a>
+                                    <div class="dropdown-menu journals" name="states[]">
+                                        <div role="separator" class="dropdown-divider"/>
+                                        <t t-foreach="state.filter_data['journal']"
+                                           t-as="journal" t-key="journal_index">
+                                            <span class="dropdown-item" role="menuitem"
+                                                  t-on-click="apply_journal">
+                                                <span t-esc="journal.id" class="d-none"/>
+                                                <t t-esc="journal.name"/>
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+
+                                <!-- Target Move -->
+                                <div class="search_Target_move">
+                                    <a type="button" class="dropdown-toggle"
+                                       data-bs-toggle="dropdown">
+                                        <span class="fa fa-filter"/>
+                                        Target Move
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <div class="list-group">
+                                            <button class="report-filter-button"
+                                                    value="posted" type="button"
+                                                    t-on-click="apply_entries">
+                                                Posted Entries
+                                            </button>
+                                            <button class="report-filter-button"
+                                                    value="draft" type="button"
+                                                    t-on-click="apply_entries">
+                                                Include Draft Entries
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Table -->
+            <t t-if="state.data">
+                <div class="table_view_dfr p-3">
+                    <table cellspacing="0" width="100%"
+                           class="table table-bordered table-sm">
+                        <thead>
+                            <tr style="background:#2E75B6;color:white;text-align:center;">
+                                <th style="width:40%;text-align:left;">Description</th>
+                                <th>Share Capital</th>
+                                <th>Retained Earnings</th>
+                                <th>Total Equity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Opening Balance -->
+                            <tr style="background:#D6E4F0;font-weight:bold;">
+                                <td>Opening Balance</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.open_share"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.open_retained"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.open_total"/>
+                                </td>
+                            </tr>
+
+                            <!-- Net Income -->
+                            <tr>
+                                <td class="ps-4">Net Income / (Loss) for the Period</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_income_share"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_income_retained"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.net_income_total"/>
+                                </td>
+                            </tr>
+
+                            <!-- Share Capital Movements -->
+                            <tr>
+                                <td class="ps-4">Share Capital Movements</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.share_movement"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.share_movement_retained"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.share_movement_total"/>
+                                </td>
+                            </tr>
+
+                            <!-- Other Equity Movements (dividends, transfers) -->
+                            <tr>
+                                <td class="ps-4">Other Equity Movements</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.retained_movement"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.retained_movement_retained"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.retained_movement_total"/>
+                                </td>
+                            </tr>
+
+                            <!-- Closing Balance -->
+                            <tr style="background:#1B4F72;color:white;font-weight:bold;font-size:1.05em;">
+                                <td>Closing Balance</td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.close_share"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.close_retained"/>
+                                </td>
+                                <td class="text-end">
+                                    <t t-esc="state.data.close_total"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

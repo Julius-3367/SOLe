@@ -29,9 +29,9 @@ class AccountMove(models.Model):
         for move in self:
             config = self.env["sole.mpesa.config"].search([
                 ("company_id", "=", move.company_id.id),
-                ("active", "=", True),
+                ("is_active", "=", True),
             ], limit=1)
-            move.mpesa_paybill = config.business_short_code if config else ""
+            move.mpesa_paybill = config.shortcode if config else ""
             move.mpesa_account_ref = move.name or ""
 
 
