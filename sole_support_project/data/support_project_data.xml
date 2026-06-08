@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="project_support_duties" model="project.project">
+        <field name="name">Support Duties</field>
+        <field name="privacy_visibility">employees</field>
+        <field name="allow_task_dependencies" eval="False"/>
+        <field name="allow_milestones" eval="False"/>
+        <field name="description">Team board for support tickets assigned to staff. Changes here sync with Support.</field>
+    </record>
+
+    <record id="task_stage_new" model="project.task.type">
+        <field name="name">New</field>
+        <field name="sequence">10</field>
+        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
+    </record>
+    <record id="task_stage_in_progress" model="project.task.type">
+        <field name="name">In Progress</field>
+        <field name="sequence">20</field>
+        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
+    </record>
+    <record id="task_stage_waiting" model="project.task.type">
+        <field name="name">Waiting on Customer</field>
+        <field name="sequence">30</field>
+        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
+    </record>
+    <record id="task_stage_resolved" model="project.task.type">
+        <field name="name">Resolved</field>
+        <field name="sequence">40</field>
+        <field name="fold" eval="True"/>
+        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
+    </record>
+    <record id="task_stage_closed" model="project.task.type">
+        <field name="name">Closed</field>
+        <field name="sequence">50</field>
+        <field name="fold" eval="True"/>
+        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
+    </record>
+</odoo>

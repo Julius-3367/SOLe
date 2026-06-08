@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_support_ticket_form_project" model="ir.ui.view">
+        <field name="name">sole.support.ticket.form.project</field>
+        <field name="model">sole.support.ticket</field>
+        <field name="inherit_id" ref="sole_support.view_sole_support_ticket_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_project_task" type="object"
+                            class="oe_stat_button" icon="fa-tasks"
+                            invisible="not task_id">
+                        <field name="task_count" widget="statinfo" string="Project Task"/>
+                    </button>
+                </div>
+            </xpath>
+            <field name="assigned_to" position="after">
+                <field name="task_id" readonly="1" groups="project.group_project_user"/>
+            </field>
+        </field>
+    </record>
+</odoo>

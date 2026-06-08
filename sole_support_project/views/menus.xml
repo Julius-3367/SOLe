@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_support_duties_project" model="ir.actions.act_window">
+        <field name="name">Support Duties</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain" eval="[('project_id', '=', ref('sole_support_project.project_support_duties')), ('support_ticket_id', '!=', False)]"/>
+        <field name="context" eval="{'default_project_id': ref('sole_support_project.project_support_duties'), 'search_default_support_duties': 1}"/>
+    </record>
+
+    <menuitem id="menu_support_duties_project"
+              name="Team Duties"
+              parent="project.menu_main_pm"
+              action="action_support_duties_project"
+              sequence="5"
+              groups="project.group_project_user"/>
+
+    <menuitem id="menu_support_duties_from_support"
+              name="Team Duties"
+              parent="sole_support.menu_sole_support_root"
+              action="action_support_duties_project"
+              sequence="15"
+              groups="project.group_project_user"/>
+</odoo>
