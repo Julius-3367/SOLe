@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Salary rule categories for Kenyan statutory deductions, nested
+             under hr_payroll_community's DED so they roll up into NET. -->
+        <record id="hr_salary_rule_category_nssf" model="hr.salary.rule.category">
+            <field name="name">NSSF Contribution</field>
+            <field name="code">NSSF</field>
+            <field name="parent_id" ref="hr_payroll_community.DED"/>
+        </record>
+        <record id="hr_salary_rule_category_shif" model="hr.salary.rule.category">
+            <field name="name">SHIF Contribution</field>
+            <field name="code">SHIF</field>
+            <field name="parent_id" ref="hr_payroll_community.DED"/>
+        </record>
+        <record id="hr_salary_rule_category_ahl" model="hr.salary.rule.category">
+            <field name="name">Affordable Housing Levy</field>
+            <field name="code">AHL</field>
+            <field name="parent_id" ref="hr_payroll_community.DED"/>
+        </record>
+        <record id="hr_salary_rule_category_paye" model="hr.salary.rule.category">
+            <field name="name">PAYE (Income Tax)</field>
+            <field name="code">PAYE</field>
+            <field name="parent_id" ref="hr_payroll_community.DED"/>
+        </record>
+
+        <!-- Contribution registers, so each statutory deduction can be
+             reported/remitted to its respective body. -->
+        <record id="hr_contribution_register_nssf" model="hr.contribution.register">
+            <field name="name">NSSF</field>
+        </record>
+        <record id="hr_contribution_register_shif" model="hr.contribution.register">
+            <field name="name">SHIF</field>
+        </record>
+        <record id="hr_contribution_register_paye" model="hr.contribution.register">
+            <field name="name">KRA PAYE</field>
+        </record>
+
+        <!-- Salary rules -->
+        <record id="hr_salary_rule_ke_nssf" model="hr.salary.rule">
+            <field name="name">NSSF Contribution (Employee)</field>
+            <field name="code">NSSF</field>
+            <field name="sequence" eval="150"/>
+            <field name="category_id" ref="hr_salary_rule_category_nssf"/>
+            <field name="register_id" ref="hr_contribution_register_nssf"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# NSSF Act 2013 Tier I/II employee contribution rates (in force since
+# February 2025): 6% of pensionable pay, split between Tier I (pay up to
+# the Lower Earnings Limit) and Tier II (pay between the Lower and Upper
+# Earnings Limits). The employer matches this amount separately.
+tier_1_limit = 8000.0
+tier_2_limit = 72000.0
+pensionable_pay = min(categories.GROSS, tier_2_limit)
+tier_1 = min(pensionable_pay, tier_1_limit) * 0.06
+tier_2 = max(pensionable_pay - tier_1_limit, 0.0) * 0.06
+result = -(tier_1 + tier_2)
+            </field>
+            <field name="note">Statutory employee NSSF contribution: 6% of pensionable pay across Tier I (first KES 8,000) and Tier II (KES 8,001-72,000), per the NSSF Act 2013 rates in force since February 2025. The employer remits a matching amount.</field>
+        </record>
+
+        <record id="hr_salary_rule_ke_shif" model="hr.salary.rule">
+            <field name="name">SHIF Contribution</field>
+            <field name="code">SHIF</field>
+            <field name="sequence" eval="160"/>
+            <field name="category_id" ref="hr_salary_rule_category_shif"/>
+            <field name="register_id" ref="hr_contribution_register_shif"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Social Health Insurance Fund (SHIF) replaced NHIF from October 2024:
+# 2.75% of gross pay, subject to a minimum monthly contribution of KES 300.
+result = -max(categories.GROSS * 0.0275, 300.0)
+            </field>
+            <field name="note">Social Health Insurance Fund contribution: 2.75% of gross pay, minimum KES 300/month (replaces NHIF from October 2024).</field>
+        </record>
+
+        <record id="hr_salary_rule_ke_ahl" model="hr.salary.rule">
+            <field name="name">Affordable Housing Levy (Employee)</field>
+            <field name="code">AHL</field>
+            <field name="sequence" eval="170"/>
+            <field name="category_id" ref="hr_salary_rule_category_ahl"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Affordable Housing Act 2024: employee contributes 1.5% of gross pay; the
+# employer remits a matching 1.5% (not deducted from the employee).
+result = -(categories.GROSS * 0.015)
+            </field>
+            <field name="note">Affordable Housing Levy: employee contributes 1.5% of gross pay. The employer matches with an equal 1.5%, remitted but not deducted from the employee's pay.</field>
+        </record>
+
+        <record id="hr_salary_rule_ke_paye" model="hr.salary.rule">
+            <field name="name">PAYE</field>
+            <field name="code">PAYE</field>
+            <field name="sequence" eval="180"/>
+            <field name="category_id" ref="hr_salary_rule_category_paye"/>
+            <field name="register_id" ref="hr_contribution_register_paye"/>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+# Pay As You Earn, computed on taxable pay (gross less the statutory
+# NSSF/SHIF/AHL contributions, which are all tax-deductible) using the
+# graduated monthly bands from the Finance Act 2023 (in force since
+# 1 July 2023), less the monthly personal relief of KES 2,400.
+taxable_pay = categories.GROSS + categories.NSSF + categories.SHIF + categories.AHL
+bands = [
+    (24000.0, 0.10),
+    (8333.0, 0.25),
+    (467667.0, 0.30),
+    (300000.0, 0.325),
+    (float('inf'), 0.35),
+]
+remaining = max(taxable_pay, 0.0)
+tax = 0.0
+for width, rate in bands:
+    if remaining &lt;= 0:
+        break
+    slice_amount = min(remaining, width)
+    tax += slice_amount * rate
+    remaining -= slice_amount
+personal_relief = 2400.0
+result = -max(tax - personal_relief, 0.0)
+            </field>
+            <field name="note">Income tax computed on taxable pay (gross less NSSF/SHIF/AHL) using the Finance Act 2023 graduated bands — 10% / 25% / 30% / 32.5% / 35% — less the KES 2,400 monthly personal relief.</field>
+        </record>
+
+        <!-- Kenya statutory payroll structure: built on hr_payroll_community's
+             base (BASIC/GROSS/NET) and adds the Kenyan statutory deductions. -->
+        <record id="hr_payroll_structure_ke_statutory" model="hr.payroll.structure">
+            <field name="name">Kenya Statutory Payroll</field>
+            <field name="code">KE_STAT</field>
+            <field name="parent_id" ref="hr_payroll_community.structure_base"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field eval="[(6, 0, [
+                ref('hr_salary_rule_ke_nssf'),
+                ref('hr_salary_rule_ke_shif'),
+                ref('hr_salary_rule_ke_ahl'),
+                ref('hr_salary_rule_ke_paye'),
+            ])]" name="rule_ids"/>
+            <field name="note">Kenyan statutory payroll: NSSF (Tier I/II), SHIF, Affordable Housing Levy and PAYE on top of the base BASIC/GROSS/NET rules. Built-in rates: NSSF 6% (tier-capped), SHIF 2.75% (min KES 300), AHL 1.5%, PAYE per the Finance Act 2023 bands with the KES 2,400 personal relief. Review rates periodically — Kenyan statutory rates change with Finance Acts and NSSF Act phase-ins.</field>
+        </record>
+    </data>
+</odoo>

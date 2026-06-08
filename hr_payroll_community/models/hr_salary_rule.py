@@ -198,8 +198,7 @@ class HrSalaryRule(models.Model):
                             rec.name, rec.code))
             else:
                 try:
-                    safe_eval(rec.amount_python_compute, localdict, mode='exec',
-                              nocopy=True)
+                    safe_eval(rec.amount_python_compute, localdict, mode='exec')
                     return (float(localdict['result']),
                             'result_qty' in localdict and
                             localdict['result_qty'] or 1.0, 'result_rate'
@@ -231,8 +230,7 @@ class HrSalaryRule(models.Model):
                         self.name, self.code))
         else:  # python code
             try:
-                safe_eval(self.condition_python, localdict, mode='exec',
-                          nocopy=True)
+                safe_eval(self.condition_python, localdict, mode='exec')
                 return 'result' in localdict and localdict['result'] or False
             except:
                 raise UserError(
