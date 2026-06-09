@@ -1,5 +1,8 @@
 .o_web_client {
 	display: grid !important;
+    // Anchor height so the 1fr content row always resolves correctly,
+    // regardless of viewport DPI or percentage-height chain breaks.
+    height: 100vh !important;
     grid-template-areas:
         "banner banner"
         "navbar navbar"
@@ -12,6 +15,7 @@
     }
     > .o_navbar {
     	grid-area: navbar;
+        min-height: 0;
     }
 
     // Navbar: solid brand background for clarity
@@ -22,12 +26,20 @@
     }
     > .mk_apps_sidebar_panel {
     	grid-area: sidebar;
+        min-height: 0;
     }
     > .o_action_manager {
     	grid-area: content;
+        // Prevent grid item from expanding beyond its 1fr cell — without
+        // min-height: 0, a grid item defaults to min-height: auto which
+        // lets it grow past the cell boundary and hides content via overflow.
+        min-height: 0;
+        min-width: 0;
+        overflow: hidden;
     }
     > .o-main-components-container {
     	grid-area: components;
+        min-height: 0;
     }
     > iframe {
         grid-column: 1 / -1;
