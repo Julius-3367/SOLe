@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 class SoleMpesaController(http.Controller):
 
     # ── STK Push callback ─────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/stk/callback", type="json", auth="public", csrf=False)
+    @http.route("/sole/mpesa/stk/callback", type="jsonrpc", auth="public", csrf=False)
     def stk_callback(self, **kwargs):
         try:
             body = request.get_json_data()
@@ -54,7 +54,7 @@ class SoleMpesaController(http.Controller):
         return {"ResultCode": 0, "ResultDesc": "Accepted"}
 
     # ── C2B Validation ────────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/c2b/validation", type="json", auth="public", csrf=False)
+    @http.route("/sole/mpesa/c2b/validation", type="jsonrpc", auth="public", csrf=False)
     def c2b_validation(self, **kwargs):
         try:
             body = request.get_json_data()
@@ -65,7 +65,7 @@ class SoleMpesaController(http.Controller):
         return {"ResultCode": 0, "ResultDesc": "Accepted"}
 
     # ── C2B Confirmation ──────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/c2b/confirmation", type="json", auth="public", csrf=False)
+    @http.route("/sole/mpesa/c2b/confirmation", type="jsonrpc", auth="public", csrf=False)
     def c2b_confirmation(self, **kwargs):
         try:
             body = request.get_json_data()
