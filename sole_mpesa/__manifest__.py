@@ -25,6 +25,7 @@ Features
     'data': [
         'security/ir.model.access.csv',
         'data/mpesa_config_data.xml',
+        'data/cron_data.xml',
         'views/mpesa_config_views.xml',
         'views/mpesa_transaction_views.xml',
         'wizard/stk_push_wizard_views.xml',

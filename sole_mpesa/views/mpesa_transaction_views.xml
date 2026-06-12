@@ -11,6 +11,10 @@
                             string="Create Payment"
                             invisible="state != 'completed'"
                             class="btn-primary"/>
+                    <button name="action_check_status" type="object"
+                            string="Check Status"
+                            invisible="state != 'pending' or transaction_type != 'stk_push'"
+                            class="btn-secondary"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="pending,completed,failed"/>
                 </header>

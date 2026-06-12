@@ -5,8 +5,12 @@ sole.mpesa.transaction — M-Pesa STK Push and C2B transaction records.
 import logging
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
+
+# Daraja STK Push query ResultCode meaning the user cancelled the prompt.
+STK_CANCELLED_RESULT_CODE = "1032"
 
 
 class SoleMpesaTransaction(models.Model):
@@ -71,7 +75,6 @@ class SoleMpesaTransaction(models.Model):
     def action_create_journal_entry(self):
         """Create an inbound payment for completed M-Pesa transactions."""
         self.ensure_one()
-        from odoo.exceptions import UserError
         if self.state != "completed":
             raise UserError(_("Only completed transactions can be posted."))
         if self.move_id:
@@ -90,7 +93,7 @@ class SoleMpesaTransaction(models.Model):
             "partner_id": self.partner_id.id if self.partner_id else False,
             "amount": self.amount,
             "date": fields.Date.today(),
-            "ref": self.mpesa_receipt_number or self.checkout_request_id,
+            "payment_reference": self.mpesa_receipt_number or self.checkout_request_id,
             "journal_id": journal.id,
             "payment_method_line_id": payment_method_line.id if payment_method_line else False,
             "memo": f"M-Pesa {self.transaction_type.upper()} — {self.account_ref or self.phone}",
@@ -116,5 +119,73 @@ class SoleMpesaTransaction(models.Model):
                 ).reconcile()
 
         return payment.move_id.get_formview_action()
+
+    # ── Status polling / auto-reconciliation ──────────────────────────────────
+    def action_check_status(self):
+        """Query Daraja for the latest status of pending STK Push transactions.
+
+        Safe to call on any selection: non-pending and C2B records are skipped.
+        Used by the "Check Status" button and by :meth:`_cron_auto_reconcile`.
+        """
+        for tx in self:
+            if tx.transaction_type != "stk_push" or tx.state != "pending":
+                continue
+            if not tx.checkout_request_id:
+                continue
+            try:
+                result = tx.config_id.action_query_stk_status(tx.checkout_request_id)
+            except UserError as exc:
+                _logger.warning(
+                    "M-Pesa status check failed for %s: %s",
+                    tx.checkout_request_id, exc,
+                )
+                continue
+            result_code = result.get("ResultCode")
+            if result_code is None:
+                # Daraja responds with an errorCode (no ResultCode) while the
+                # transaction is still being processed — leave as pending.
+                continue
+            result_code = str(result_code)
+            vals = {
+                "result_code": result_code,
+                "result_desc": result.get("ResultDesc", ""),
+            }
+            if result_code == "0":
+                vals["state"] = "completed"
+            elif result_code == STK_CANCELLED_RESULT_CODE:
+                vals["state"] = "cancelled"
+            else:
+                vals["state"] = "failed"
+            tx.write(vals)
+
+    @api.model
+    def _cron_auto_reconcile(self):
+        """Periodic job: refresh pending STK statuses and post payments.
+
+        1. For pending STK Push transactions, poll Daraja for the result.
+        2. For any completed transaction without a journal entry yet
+           (including ones just confirmed above, and C2B confirmations
+           received via the webhook), create the inbound payment and
+           reconcile it against a matching invoice.
+        """
+        pending = self.search([
+            ("transaction_type", "=", "stk_push"),
+            ("state", "=", "pending"),
+        ])
+        if pending:
+            pending.action_check_status()
+
+        completed = self.search([
+            ("state", "=", "completed"),
+            ("move_id", "=", False),
+        ])
+        for tx in completed:
+            try:
+                tx.action_create_journal_entry()
+            except UserError as exc:
+                _logger.warning(
+                    "M-Pesa auto-reconcile failed for %s: %s",
+                    tx.checkout_request_id, exc,
+                )
 
 

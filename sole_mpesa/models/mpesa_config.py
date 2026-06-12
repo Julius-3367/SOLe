@@ -164,6 +164,42 @@ class SoleMpesaConfig(models.Model):
             raise UserError(_("STK Push failed: %s") % exc) from exc
         return resp.json()
 
+    # ── STK Push Query ───────────────────────────────────────────────────────
+    def action_query_stk_status(self, checkout_request_id):
+        """Query the result of a previously-initiated STK Push.
+
+        Returns the raw Daraja JSON response dict (includes ResultCode /
+        ResultDesc once the customer has responded to the prompt).
+        """
+        self.ensure_one()
+        if not self.passkey:
+            raise UserError(_("Lipa Na M-Pesa Passkey is required for STK Push."))
+        token = self._get_access_token()
+        timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        password = base64.b64encode(
+            f"{self.shortcode}{self.passkey}{timestamp}".encode()
+        ).decode()
+        payload = {
+            "BusinessShortCode": self.shortcode,
+            "Password": password,
+            "Timestamp": timestamp,
+            "CheckoutRequestID": checkout_request_id,
+        }
+        try:
+            resp = requests.post(
+                f"{self._base_url}/mpesa/stkpushquery/v1/query",
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=30,
+            )
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            raise UserError(_("STK Push status query failed: %s") % exc) from exc
+        return resp.json()
+
     # ── C2B URL Registration ──────────────────────────────────────────────────
     def action_register_c2b_urls(self):
         """Register C2B validation and confirmation URLs with Safaricom."""
