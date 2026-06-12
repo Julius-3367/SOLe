@@ -9,3 +9,4 @@ access_sole_sms_batch_user,sole.sms.batch user,model_sole_sms_batch,base.group_u
 access_sole_sms_batch_admin,sole.sms.batch admin,model_sole_sms_batch,base.group_system,1,1,1,1
 access_sole_sms_batch_line_user,sole.sms.batch.line user,model_sole_sms_batch_line,base.group_user,1,1,1,1
 access_sole_send_sms_wizard,sole.send.sms.wizard,model_sole_send_sms_wizard,base.group_user,1,1,1,1
+access_sole_sms_add_recipients_wizard,sole.sms.add.recipients.wizard,model_sole_sms_add_recipients_wizard,base.group_user,1,1,1,1

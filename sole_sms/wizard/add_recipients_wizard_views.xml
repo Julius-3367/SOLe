@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_sms_add_recipients_wizard_form" model="ir.ui.view">
+        <field name="name">sole.sms.add.recipients.wizard.form</field>
+        <field name="model">sole.sms.add.recipients.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Recipients">
+                <field name="batch_id" invisible="1"/>
+                <group>
+                    <field name="source" widget="radio"/>
+                </group>
+                <group invisible="source != 'filter'">
+                    <field name="customers_only"/>
+                    <field name="category_ids" widget="many2many_tags"/>
+                </group>
+                <group invisible="source != 'manual'">
+                    <field name="partner_ids" widget="many2many_tags"/>
+                </group>
+                <group>
+                    <field name="skip_existing"/>
+                </group>
+                <group string="Preview">
+                    <field name="match_count"/>
+                    <field name="with_phone_count"/>
+                </group>
+                <footer>
+                    <button name="action_add" type="object" string="Add Recipients"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_sms_add_recipients_wizard" model="ir.actions.act_window">
+        <field name="name">Add Recipients from Contacts</field>
+        <field name="res_model">sole.sms.add.recipients.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

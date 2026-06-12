@@ -9,6 +9,10 @@
                     <button name="action_send_all" type="object" string="Send Now"
                             invisible="state != 'draft'"
                             class="btn-primary"/>
+                    <button name="%(action_sole_sms_add_recipients_wizard)d" type="action"
+                            string="Add Recipients from Contacts"
+                            invisible="state != 'draft'"
+                            context="{'default_batch_id': id}"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,running,done"/>
                 </header>
