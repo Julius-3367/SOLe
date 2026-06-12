@@ -7,6 +7,7 @@ Supports Onfon Media (primary) and a generic HTTP adapter.
 import json
 import logging
 import re
+import uuid
 
 import requests
 from odoo import _, api, fields, models
@@ -34,6 +35,14 @@ class SoleSmsProvider(models.Model):
     username = fields.Char(string="Username")
     sender_id = fields.Char(string="Sender ID", required=True)
     is_active = fields.Boolean(string="Active", default=True)
+    test_mode = fields.Boolean(
+        string="Test Mode",
+        default=False,
+        help="When enabled, no SMS is actually sent. Each message is recorded "
+             "as sent with a simulated provider message ID, so campaigns, "
+             "recipients and logs can be exercised end-to-end without "
+             "credentials or live credit.",
+    )
     timeout_s = fields.Integer(string="Timeout (s)", default=30)
     company_id = fields.Many2one(
         "res.company",
@@ -59,9 +68,20 @@ class SoleSmsProvider(models.Model):
         """Send a single SMS. Returns (success: bool, provider_msg_id: str, error: str)."""
         self.ensure_one()
         phone = self._normalize_phone(phone)
+        if self.test_mode:
+            return self._send_sandbox(phone, message)
         if self.provider_type == "onfon":
             return self._send_onfon(phone, message)
         return self._send_generic(phone, message)
+
+    def _send_sandbox(self, phone, message):
+        """Simulate a successful send without calling any external API."""
+        msg_id = "SANDBOX-%s" % uuid.uuid4().hex[:12]
+        _logger.info(
+            "[sole_sms][test_mode] Simulated send via %s to %s (msg_id=%s): %s",
+            self.name, phone, msg_id, message,
+        )
+        return True, msg_id, ""
 
     def _send_onfon(self, phone, message):
         """Send via OnfonMedia BulkSMS API."""
@@ -82,11 +102,18 @@ class SoleSmsProvider(models.Model):
             data = resp.json()
             # Onfon returns Data[0].MessageId on success
             msg_id = ""
+            item = {}
             if isinstance(data.get("Data"), list) and data["Data"]:
-                msg_id = str(data["Data"][0].get("MessageId", ""))
+                item = data["Data"][0]
+                msg_id = str(item.get("MessageId", ""))
             code = data.get("ErrorCode", "")
             if str(code) not in ("", "0", "100", "101", "200"):
                 return False, msg_id, data.get("ErrorDescription", str(data))
+            # Top-level ErrorCode can be 0/ok while the per-message status
+            # in Data[0].MessageErrorCode reports the actual delivery rejection.
+            item_code = item.get("MessageErrorCode", 0)
+            if str(item_code) not in ("", "0"):
+                return False, msg_id, item.get("MessageErrorDescription", str(data))
             return True, msg_id, ""
         except requests.RequestException as exc:
             return False, "", str(exc)
