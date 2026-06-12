@@ -6,11 +6,9 @@ SKIP_SUPPORT_PROJECT_SYNC = 'skip_support_project_sync'
 
 # Maps sole_support stage xml ids → sole_support_project task stage xml ids.
 SUPPORT_TO_TASK_STAGE = {
-    'stage_new': 'task_stage_new',
+    'stage_backlog': 'task_stage_backlog',
     'stage_in_progress': 'task_stage_in_progress',
-    'stage_waiting': 'task_stage_waiting',
-    'stage_resolved': 'task_stage_resolved',
-    'stage_closed': 'task_stage_closed',
+    'stage_complete': 'task_stage_complete',
 }
 TASK_TO_SUPPORT_STAGE = {v: k for k, v in SUPPORT_TO_TASK_STAGE.items()}
 

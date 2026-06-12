@@ -47,6 +47,7 @@ class SoleSupportTicket(models.Model):
         string="Stage",
         required=True,
         default=lambda self: self._default_stage(),
+        group_expand="_read_group_stage_ids",
         tracking=True,
     )
     category_id = fields.Many2one(
@@ -100,6 +101,12 @@ class SoleSupportTicket(models.Model):
             [("is_closed", "=", False)], order="sequence", limit=1
         )
         return stage.id if stage else False
+
+    # ── Kanban grouping ──────────────────────────────────────────────────────
+    @api.model
+    def _read_group_stage_ids(self, stages, domain):
+        """Always show every stage as a kanban column, even when empty."""
+        return stages.search([], order="sequence, id")
 
     # ── Sequence ──────────────────────────────────────────────────────────────
     @api.model_create_multi

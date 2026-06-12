@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe Support ↔ Projects',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Services/Helpdesk',
     'summary': 'Sync support ticket assignments and stages with the Projects app',
     'description': """

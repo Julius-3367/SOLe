@@ -8,8 +8,8 @@
         <field name="description">Team board for support tickets assigned to staff. Changes here sync with Support.</field>
     </record>
 
-    <record id="task_stage_new" model="project.task.type">
-        <field name="name">New</field>
+    <record id="task_stage_backlog" model="project.task.type">
+        <field name="name">Backlog</field>
         <field name="sequence">10</field>
         <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
     </record>
@@ -18,20 +18,9 @@
         <field name="sequence">20</field>
         <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
     </record>
-    <record id="task_stage_waiting" model="project.task.type">
-        <field name="name">Waiting on Customer</field>
+    <record id="task_stage_complete" model="project.task.type">
+        <field name="name">Complete</field>
         <field name="sequence">30</field>
-        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
-    </record>
-    <record id="task_stage_resolved" model="project.task.type">
-        <field name="name">Resolved</field>
-        <field name="sequence">40</field>
-        <field name="fold" eval="True"/>
-        <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
-    </record>
-    <record id="task_stage_closed" model="project.task.type">
-        <field name="name">Closed</field>
-        <field name="sequence">50</field>
         <field name="fold" eval="True"/>
         <field name="project_ids" eval="[(4, ref('project_support_duties'))]"/>
     </record>

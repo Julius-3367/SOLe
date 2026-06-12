@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe Support Center',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Services/Helpdesk',
     'summary': 'Customer support ticket management — stages, categories, SLA tracking and portal submission',
     'description': """
@@ -11,7 +11,7 @@ A lightweight helpdesk/support-ticket system built for Odoo 19.
 
 Features
 --------
-* Support tickets with stage pipeline (New → In Progress → Resolved → Closed).
+* Support tickets with stage pipeline (Backlog → In Progress → Complete).
 * Categories and priority levels.
 * Assignment to internal users.
 * SLA deadline tracking.
