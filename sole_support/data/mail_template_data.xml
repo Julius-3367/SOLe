@@ -4,8 +4,8 @@
         <field name="name">Support Ticket: Assigned Notification</field>
         <field name="model_id" ref="sole_support.model_sole_support_ticket"/>
         <field name="subject">You have been assigned ticket [{{ object.name }}]: {{ object.subject }}</field>
-        <field name="email_from">{{ (object.company_id.email or user.email) | safe }}</field>
-        <field name="email_to">{{ object.assigned_to.email | safe }}</field>
+        <field name="email_from">{{ object.company_id.email or user.email }}</field>
+        <field name="email_to">{{ object.assigned_to.email }}</field>
         <field name="body_html" type="html">
 <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
     <p>Hi {{ object.assigned_to.name }},</p>
@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Priority</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ dict(object.fields_get(['priority'])['priority']['selection'])[object.priority] }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ dict([('0','Low'),('1','Normal'),('2','High'),('3','Critical')]).get(object.priority, object.priority) }}</td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Stage</td>
@@ -41,7 +41,7 @@
     {% if object.description %}
     <p><strong>Description:</strong></p>
     <div style="background: #f9f9f9; padding: 12px; border-left: 4px solid #ccc;">
-        {{ object.description | safe }}
+        {{ object.description }}
     </div>
     {% endif %}
     <p style="margin-top: 24px;">
