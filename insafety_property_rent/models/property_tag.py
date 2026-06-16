@@ -8,5 +8,5 @@ class PropertyTag(models.Model):
     name = fields.Char(string="Name", required=True)
     color = fields.Integer(string="Color")
 
-    name_uniq = models.Constraint('UNIQUE(name)', 'Property tag already exists')
+    _name_uniq = models.Constraint('UNIQUE(name)', 'Property tag already exists')
     

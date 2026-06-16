@@ -7,7 +7,7 @@ class PropertyType(models.Model):
     _description = 'Real Estate Property Types'
     name = fields.Char(string="Name", required=True)
 
-    name_uniq = models.Constraint('UNIQUE(name)', 'Property type already exists')
+    _name_uniq = models.Constraint('UNIQUE(name)', 'Property type already exists')
     
    
 

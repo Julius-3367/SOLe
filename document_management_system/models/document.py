@@ -32,7 +32,7 @@ class Document(models.Model):
     child_ids = fields.One2many('document.document', 'parent_id', string='Child')
     child_count = fields.Integer(compute='_compute_child_count', string='Child Count')
 
-    parent_id_name_uniq = models.Constraint('UNIQUE(parent_id, name)', 'Name already exists!')
+    _parent_id_name_uniq = models.Constraint('UNIQUE(parent_id, name)', 'Name already exists!')
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
