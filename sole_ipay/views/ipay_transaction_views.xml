@@ -47,10 +47,14 @@
                         </group>
                     </group>
 
+                    <group string="Linked Invoice" invisible="not invoice_id">
+                        <field name="invoice_id" readonly="1"/>
+                    </group>
+
                     <group string="Payment Result" invisible="state in ['draft', 'sent']">
                         <field name="ipay_status"/>
                         <field name="ipay_txn_ref"/>
-                        <field name="move_id"/>
+                        <field name="move_id" string="Payment Entry"/>
                     </group>
 
                     <notebook invisible="not payment_url">

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Smart button + action button on confirmed customer invoices -->
+    <record id="view_account_move_ipay_button" model="ir.ui.view">
+        <field name="name">account.move.ipay.button</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Smart button showing transaction count -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_ipay_transactions" type="object"
+                        class="oe_stat_button" icon="fa-credit-card"
+                        invisible="ipay_transaction_count == 0">
+                    <field name="ipay_transaction_count" widget="statinfo"
+                           string="iPay Payments"/>
+                </button>
+            </xpath>
+
+            <!-- "Request iPay Payment" in the action buttons area -->
+            <xpath expr="//div[@name='button_box']" position="before">
+                <button name="action_request_ipay_payment" type="object"
+                        string="Request iPay Payment"
+                        class="btn-primary"
+                        invisible="move_type not in ['out_invoice'] or state != 'posted' or payment_state == 'paid'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

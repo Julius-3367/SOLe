@@ -26,6 +26,7 @@ Features
         'data/ipay_config_data.xml',
         'views/ipay_config_views.xml',
         'views/ipay_transaction_views.xml',
+        'views/account_move_views.xml',
         'views/menus.xml',
     ],
     'installable': True,
