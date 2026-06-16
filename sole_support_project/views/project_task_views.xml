@@ -8,8 +8,6 @@
             <field name="project_id" position="after">
                 <field name="support_ticket_id" readonly="1"
                        invisible="not support_ticket_id"/>
-                <field name="sla_deadline" readonly="1"
-                       invisible="not support_ticket_id"/>
             </field>
         </field>
     </record>

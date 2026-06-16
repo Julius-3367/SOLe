@@ -89,3 +89,34 @@ class TestSupportProjectSync(common.TransactionCase):
         })
         self.assertFalse(task.support_ticket_id)
         self.assertFalse(task.sla_deadline)
+
+    # ── Deadline sync ────────────────────────────────────────────────────────
+    def test_task_date_deadline_set_from_sla_on_create(self):
+        """date_deadline on the task is populated from the ticket's sla_deadline at creation."""
+        ticket = self._create_ticket()
+        deadline = "2026-07-01 09:00:00"
+        ticket.sla_deadline = deadline
+        # sla_deadline write triggers a sync
+        self.assertEqual(str(ticket.task_id.date_deadline), deadline)
+
+    def test_task_date_deadline_updates_when_sla_changes(self):
+        """Changing sla_deadline on an existing ticket propagates to the task's date_deadline."""
+        ticket = self._create_ticket()
+        ticket.sla_deadline = "2026-07-01 09:00:00"
+        ticket.sla_deadline = "2026-07-15 17:00:00"
+        self.assertEqual(str(ticket.task_id.date_deadline), "2026-07-15 17:00:00")
+
+    # ── Priority 1:1 mapping ─────────────────────────────────────────────────
+    def test_priority_three_syncs_as_three(self):
+        """Support priority '3' (Critical) must arrive on the task as '3', not '2'."""
+        ticket = self._create_ticket(priority="3")
+        self.assertEqual(ticket.task_id.priority, "3")
+
+    def test_priority_two_syncs_as_two(self):
+        ticket = self._create_ticket(priority="2")
+        self.assertEqual(ticket.task_id.priority, "2")
+
+    def test_priority_change_syncs_to_task(self):
+        ticket = self._create_ticket(priority="1")
+        ticket.write({"priority": "3"})
+        self.assertEqual(ticket.task_id.priority, "3")

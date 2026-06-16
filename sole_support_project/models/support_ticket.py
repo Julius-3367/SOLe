@@ -35,6 +35,7 @@ class SoleSupportTicket(models.Model):
             'stage_id': task_stage.id if task_stage else False,
             'user_ids': [Command.set(self.assigned_to.ids)] if self.assigned_to else [Command.clear()],
             'priority': self._priority_to_task(self.priority),
+            'date_deadline': self.sla_deadline,
             'support_ticket_id': self.id,
         }
 
@@ -52,6 +53,7 @@ class SoleSupportTicket(models.Model):
             'stage_id': task_stage.id if task_stage else False,
             'user_ids': [Command.set(self.assigned_to.ids)] if self.assigned_to else [Command.clear()],
             'priority': self._priority_to_task(self.priority),
+            'date_deadline': self.sla_deadline,
         }
 
     def _sync_to_project_task(self):
@@ -87,7 +89,7 @@ class SoleSupportTicket(models.Model):
         if self._is_syncing_support_project():
             return super().write(vals)
         res = super().write(vals)
-        sync_fields = {'assigned_to', 'stage_id', 'subject', 'description', 'partner_id', 'priority'}
+        sync_fields = {'assigned_to', 'stage_id', 'subject', 'description', 'partner_id', 'priority', 'sla_deadline'}
         if sync_fields & set(vals):
             self._ensure_project_task()
             self.filtered('task_id')._sync_to_project_task()

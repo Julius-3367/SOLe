@@ -71,11 +71,11 @@ class SupportProjectSyncMixin(models.AbstractModel):
 
     @staticmethod
     def _priority_to_task(priority):
-        return '2' if priority in ('2', '3') else priority or '1'
+        return priority or '0'
 
     @staticmethod
     def _priority_to_support(priority):
-        return priority or '1'
+        return priority or '0'
 
     @staticmethod
     def _diff_vals(record, vals):
