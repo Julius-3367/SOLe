@@ -205,6 +205,7 @@ class SoleIpayTransaction(models.Model):
                     "res_model": self._name,
                     "res_id": self.id,
                     "view_mode": "form",
+                    "views": [(False, "form")],
                     "target": "current",
                 },
             },

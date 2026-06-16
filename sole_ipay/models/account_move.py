@@ -32,6 +32,7 @@ class AccountMove(models.Model):
             "name": _("iPay Transactions"),
             "res_model": "sole.ipay.transaction",
             "view_mode": "list,form",
+            "views": [(False, "list"), (False, "form")],
             "domain": [("invoice_id", "=", self.id)],
             "context": {"default_invoice_id": self.id},
         }
@@ -74,6 +75,7 @@ class AccountMove(models.Model):
                 "res_model": "sole.ipay.transaction",
                 "res_id": existing.id,
                 "view_mode": "form",
+                "views": [(False, "form")],
                 "target": "current",
             }
 
@@ -102,5 +104,6 @@ class AccountMove(models.Model):
             "res_model": "sole.ipay.transaction",
             "res_id": tx.id,
             "view_mode": "form",
+            "views": [(False, "form")],
             "target": "current",
         }

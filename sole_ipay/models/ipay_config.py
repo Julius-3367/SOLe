@@ -129,6 +129,7 @@ class SoleIpayConfig(models.Model):
             "name": _("iPay Transactions"),
             "res_model": "sole.ipay.transaction",
             "view_mode": "list,form",
+            "views": [(False, "list"), (False, "form")],
             "domain": [("config_id", "=", self.id)],
             "context": {"default_config_id": self.id},
         }
