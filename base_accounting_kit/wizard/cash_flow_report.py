@@ -24,19 +24,9 @@ from odoo import api, fields, models
 
 class AccountingReport(models.TransientModel):
     _name = "cash.flow.report"
-    _inherit = "account.report"
+    _inherit = "account.kit.common.report"
     _description = "Cash Flow Report"
 
-    section_main_report_ids = fields.Many2many(string="Section Of",
-                                               comodel_name='account.report',
-                                               relation="account_cash_flow_report_section_rel",
-                                               column1="sub_report_id",
-                                               column2="main_report_id")
-    section_report_ids = fields.Many2many(string="Sections",
-                                          comodel_name='account.report',
-                                          relation="account_cash_flow_report_section_rel",
-                                          column1="main_report_id",
-                                          column2="sub_report_id")
     name = fields.Char(string="Cash Flow Report", default="Cash Flow Report", required=True, translate=True)
     date_from = fields.Date(string='Start Date')
     date_to = fields.Date(string='End Date')

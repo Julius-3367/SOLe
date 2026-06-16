@@ -33,16 +33,6 @@ class AccountAgedTrialBalance(models.TransientModel):
     _inherit = 'account.common.partner.report'
     _description = 'Account Aged Trial balance Report'
 
-    section_main_report_ids = fields.Many2many(string="Section Of",
-                                               comodel_name='account.report',
-                                               relation="account_aged_trail_report_section_rel",
-                                               column1="sub_report_id",
-                                               column2="main_report_id")
-    section_report_ids = fields.Many2many(string="Sections",
-                                          comodel_name='account.report',
-                                          relation="account_aged_trail_report_section_rel",
-                                          column1="main_report_id",
-                                          column2="sub_report_id")
     name = fields.Char(string="Account Aged Trial balance Report", default="Account Aged Trial balance Report", required=True, translate=True)
 
     journal_ids = fields.Many2many('account.journal', string='Journals',

@@ -26,19 +26,9 @@ from odoo import api, models, fields
 
 class FinancialReport(models.TransientModel):
     _name = "financial.report"
-    _inherit = "account.report"
+    _inherit = "account.kit.common.report"
     _description = "Financial Reports"
 
-    section_main_report_ids = fields.Many2many(string="Section Of",
-                                               comodel_name='account.report',
-                                               relation="account_financial_report_section_rel",
-                                               column1="sub_report_id",
-                                               column2="main_report_id")
-    section_report_ids = fields.Many2many(string="Sections",
-                                          comodel_name='account.report',
-                                          relation="account_financial_report_section_rel",
-                                          column1="main_report_id",
-                                          column2="sub_report_id")
     name = fields.Char(string="Financial Report", default="Financial Report", required=True, translate=True)
 
     target_move = fields.Selection([('posted', 'All Posted Entries'),
