@@ -41,6 +41,7 @@
         'data/account_financial_report_data.xml',
         'data/cash_flow_data.xml',
         'data/followup_levels.xml',
+        'data/followup_mail_template.xml',
         'data/multiple_invoice_data.xml',
         'data/recurring_entry_cron.xml',
         'data/account_pdc_data.xml',

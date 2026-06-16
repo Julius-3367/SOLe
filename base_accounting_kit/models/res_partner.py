@@ -1,28 +1,8 @@
 # -*- coding: utf-8 -*-
-#############################################################################
-#
-#    Cybrosys Technologies Pvt. Ltd.
-#
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
-#    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
-#
-#    You can modify it under the terms of the GNU LESSER
-#    GENERAL PUBLIC LICENSE (LGPL v3), Version 3.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU LESSER GENERAL PUBLIC LICENSE (LGPL v3) for more details.
-#
-#    You should have received a copy of the GNU LESSER GENERAL PUBLIC LICENSE
-#    (LGPL v3) along with this program.
-#    If not, see <http://www.gnu.org/licenses/>.
-#
-#############################################################################
-
 from datetime import date, timedelta
 
-from odoo import fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
@@ -31,26 +11,20 @@ class ResPartner(models.Model):
     invoice_list = fields.One2many('account.move', 'partner_id',
                                    string="Invoice Details",
                                    readonly=True,
-                                   domain=(
-                                   [('payment_state', '=', 'not_paid'),
-                                    ('move_type', '=', 'out_invoice')]))
-    total_due = fields.Monetary(compute='_compute_for_followup', store=False,
-                                readonly=True)
-    next_reminder_date = fields.Date(compute='_compute_for_followup',
-                                     store=False, readonly=True)
-    total_overdue = fields.Monetary(compute='_compute_for_followup',
-                                    store=False, readonly=True)
+                                   domain=[('payment_state', '=', 'not_paid'),
+                                           ('move_type', '=', 'out_invoice')])
+    total_due = fields.Monetary(compute='_compute_for_followup', store=False, readonly=True)
+    next_reminder_date = fields.Date(compute='_compute_for_followup', store=False, readonly=True)
+    total_overdue = fields.Monetary(compute='_compute_for_followup', store=False, readonly=True)
     followup_status = fields.Selection(
         [('in_need_of_action', 'In need of action'),
          ('with_overdue_invoices', 'With overdue invoices'),
          ('no_action_needed', 'No action needed')],
         string='Followup status',
-        )
+    )
+    followup_reminder_sent = fields.Date(string='Last Reminder Sent', readonly=True)
 
     def _compute_for_followup(self):
-        """
-        Compute the fields 'total_due', 'total_overdue' , 'next_reminder_date' and 'followup_status'
-        """
         for record in self:
             total_due = 0
             total_overdue = 0
@@ -59,7 +33,6 @@ class ResPartner(models.Model):
                 if am.company_id == self.env.company:
                     amount = am.amount_residual
                     total_due += amount
-
                     is_overdue = today > am.invoice_date_due if am.invoice_date_due else today > am.date
                     if is_overdue:
                         total_overdue += amount or 0
@@ -67,8 +40,7 @@ class ResPartner(models.Model):
             action = record.action_after()
             if min_date:
                 date_reminder = min_date + timedelta(days=action)
-                if date_reminder:
-                    record.next_reminder_date = date_reminder
+                record.next_reminder_date = date_reminder
             else:
                 date_reminder = today
                 record.next_reminder_date = date_reminder
@@ -86,28 +58,63 @@ class ResPartner(models.Model):
         today = date.today()
         for this in self:
             if this.invoice_list:
-                min_list = this.invoice_list.mapped('invoice_date_due')
-                while False in min_list:
-                    min_list.remove(False)
-                return min(min_list)
-            else:
-                return today
+                min_list = [d for d in this.invoice_list.mapped('invoice_date_due') if d]
+                return min(min_list) if min_list else today
+            return today
 
     def get_delay(self):
-        delay = """select id,delay from followup_line where followup_id =
-        (select id from account_followup where company_id = %s)
-         order by delay limit 1"""
-        self._cr.execute(delay, [self.env.company.id])
-        record = self._cr.dictfetchall()
-
-        return record
-
+        delay = """SELECT id, delay FROM followup_line WHERE followup_id =
+        (SELECT id FROM account_followup WHERE company_id = %s)
+         ORDER BY delay LIMIT 1"""
+        self.env.cr.execute(delay, [self.env.company.id])
+        return self.env.cr.dictfetchall()
 
     def action_after(self):
-        lines = self.env['followup.line'].search([(
-            'followup_id.company_id', '=', self.env.company.id)])
-
+        lines = self.env['followup.line'].search([
+            ('followup_id.company_id', '=', self.env.company.id)])
         if lines:
             record = self.get_delay()
             for i in record:
                 return i['delay']
+        return 0
+
+    def action_send_followup_email(self):
+        """Send a follow-up reminder email to the customer."""
+        self.ensure_one()
+        if not self.email:
+            raise UserError(_("Customer %s has no email address configured.") % self.name)
+        template = self.env.ref(
+            'base_accounting_kit.mail_template_followup_reminder',
+            raise_if_not_found=False)
+        if not template:
+            raise UserError(_("Follow-up email template not found. Please reinstall base_accounting_kit."))
+        template.send_mail(self.id, force_send=True)
+        self.followup_reminder_sent = fields.Date.today()
+        self.message_post(
+            body=_("Follow-up reminder email sent to %s") % self.email,
+            subtype_xmlid='mail.mt_note',
+        )
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Reminder Sent'),
+                'message': _('Follow-up email sent to %s') % self.email,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    @api.model
+    def _cron_send_followup_reminders(self):
+        """Cron: send follow-up reminders to all partners in 'in_need_of_action' status."""
+        partners = self.search([('customer_rank', '>', 0)])
+        partners._compute_for_followup()
+        for partner in partners:
+            if partner.followup_status == 'in_need_of_action' and partner.email:
+                last_sent = partner.followup_reminder_sent
+                if not last_sent or (fields.Date.today() - last_sent).days >= 7:
+                    try:
+                        partner.action_send_followup_email()
+                    except Exception:
+                        pass

@@ -5,62 +5,56 @@
             <field name="name">customer.statements.followup</field>
             <field name="model">res.partner</field>
             <field name="arch" type="xml">
-                <form string="report" create="false" edit="false">
+                <form string="Follow-up Report" create="false" edit="false">
                     <header>
+                        <button name="action_send_followup_email"
+                                string="Send Reminder Email"
+                                type="object"
+                                class="oe_highlight"
+                                invisible="not email or followup_status == 'no_action_needed'"/>
                         <field name="followup_status" widget="statusbar"/>
                     </header>
-                    <div class="alert alert-info" role="alert"
-                         style="font-size: 15px;display: inline-block; margin-top:10px;margin-left: 201px;">
-                        <span>Wonder how to Send Followup mails and Print Followup Reports ? Download our
-                            <a target="_blank"
-                               href="https://apps.odoo.com/apps/modules/16.0/customer_followup_community">
-                                <b>Customer Followup</b>
-                            </a>
-                            Module !
-                        </span>
-                    </div>
                     <sheet>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
-                        <br/>
 
-                        <div class="alert alert-warning o_account_reports_followup-no-action"
+                        <div class="alert alert-warning"
                              invisible="invoice_list != []"
-                             id='no-action' role="alert">
-                            <p>
-                                <strong>
-                                    <field name="name"/>
-                                </strong>
-                                has no due amount.
-                            </p>
+                             role="alert">
+                            <p><strong><field name="name"/></strong> has no outstanding invoices.</p>
                         </div>
 
-                        <div invisible="invoice_list != []">
+                        <div invisible="invoice_list == []">
                             <group>
-                                <field name="next_reminder_date"/>
+                                <field name="email" readonly="1"/>
+                                <field name="next_reminder_date" readonly="1"/>
+                                <field name="followup_reminder_sent" readonly="1"/>
                             </group>
                             <notebook colspan="4">
-                                <page string="Invoice Details">
-                                    <field name="invoice_list"/>
+                                <page string="Outstanding Invoices">
+                                    <field name="invoice_list" readonly="1">
+                                        <list>
+                                            <field name="name"/>
+                                            <field name="invoice_date"/>
+                                            <field name="invoice_date_due"/>
+                                            <field name="amount_total"/>
+                                            <field name="amount_residual"/>
+                                            <field name="payment_state"/>
+                                        </list>
+                                    </field>
                                 </page>
-
                             </notebook>
                         </div>
                         <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
-                            <field name="total_due" class="oe_subtotal_footer_separator" widget="monetary"
-                                   />
-<!--                             <field name="total_due" class="oe_subtotal_footer_separator" widget="monetary"-->
-<!--                                   options="{'currency_field': 'currency_id'}"/>-->
+                            <field name="total_due" class="oe_subtotal_footer_separator" widget="monetary"/>
                             <div class="oe_subtotal_footer_separator oe_inline o_td_label">
                                 <label for="total_overdue"/>
                             </div>
                             <field name="total_overdue" nolabel="1" class="oe_subtotal_footer_separator"
                                    widget="monetary"/>
-<!--                              <field name="total_overdue" nolabel="1" class="oe_subtotal_footer_separator"-->
-<!--                                   widget="monetary" options="{'currency_field': 'currency_id'}"/>-->
                         </group>
                     </sheet>
                     <chatter/>
