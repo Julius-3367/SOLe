@@ -45,7 +45,7 @@ class Property(models.Model):
     calculated_extra_costs = fields.Integer("Calculated Cost Paid",  compute="_compute_empty_days")
     rent_contract_ids = fields.One2many('insafety.property.rent.contract','property_id', string="Rent Contracts")
     
-    _sql_constraints = [('name_uniq', 'unique(name)', 'Property already exists')] 
+    name_uniq = models.Constraint('UNIQUE(name)', 'Property already exists')
 
     
     @api.depends('rent_contract_ids.rent_date_from','rent_contract_ids.rent_date_to')
