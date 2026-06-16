@@ -91,7 +91,7 @@ class RecurringPayments(models.Model):
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         """Onchange partner field for updating the credit account value"""
-        if self.partner_id.property_account_receivable_id:
+        if self.partner_id.property_account_payable_id:
             self.credit_account = self.partner_id.property_account_payable_id
 
     @api.model
@@ -135,7 +135,7 @@ class RecurringPayments(models.Model):
                             'amount': line.amount,
                             'tmpl_id': line.id,
                         })
-        child_ids = self.recurring_lines.create(remaining_dates)
+        child_ids = self.env['account.recurring.entries.line'].create(remaining_dates)
         for line in child_ids:
             tmpl_id = line.tmpl_id
             recurr_code = str(tmpl_id.id) + '/' + str(line.date)
@@ -161,7 +161,7 @@ class RecurringPayments(models.Model):
             }
             move_id = self.env['account.move'].create(vals)
             if tmpl_id.journal_state == 'posted':
-                move_id.post()
+                move_id.action_post()
 
 
 class GetAllRecurringEntries(models.TransientModel):

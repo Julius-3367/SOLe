@@ -110,7 +110,7 @@ class AccountInvoiceLine(models.Model):
                     raise UserError(_(
                         'The number of depreciations or the period length of your asset category cannot be null.'))
                 months = cat.method_number * cat.method_period
-                if record.move_id in ['out_invoice', 'out_refund']:
+                if record.move_id.move_type in ['out_invoice', 'out_refund']:
                     record.asset_mrr = record.price_subtotal_signed / months
                 if record.move_id.invoice_date:
                     start_date = datetime.strptime(

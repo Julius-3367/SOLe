@@ -115,9 +115,6 @@ class AccountingReport(models.TransientModel):
         return res
 
     def _print_report(self, data):
-        raise NotImplementedError()
-
-    def _print_report(self, data):
         data['form'].update(self.read(
             ['date_from_cmp', 'debit_credit', 'date_to_cmp', 'filter_cmp',
              'account_report_id', 'enable_filter', 'label_filter',
