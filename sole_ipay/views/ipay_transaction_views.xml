@@ -12,10 +12,23 @@
                     <button name="action_open_payment_url" type="object"
                             string="Open Payment Page" class="btn-secondary"
                             invisible="not payment_url"/>
+                    <button name="action_send_url_email" type="object"
+                            string="Send URL to Customer" class="btn-secondary"
+                            invisible="not payment_url"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,sent,paid,failed"/>
                 </header>
                 <sheet>
+                    <!-- Payment link banner: only shown after URL is generated -->
+                    <div class="alert alert-success o_field_widget" role="alert"
+                         invisible="not payment_url"
+                         style="margin-bottom: 16px;">
+                        <strong>Payment Link:</strong>
+                        <div style="margin-top: 6px; word-break: break-all;">
+                            <field name="payment_url" widget="url" nolabel="1"/>
+                        </div>
+                    </div>
+
                     <group>
                         <group string="Order Info">
                             <field name="order_id"/>
@@ -27,26 +40,38 @@
                         <group string="Customer">
                             <field name="phone"/>
                             <field name="email"/>
-                            <field name="p1"/>
-                            <field name="p2"/>
-                            <field name="p3"/>
-                            <field name="p4"/>
+                            <field name="p1" invisible="not p1" optional="hide"/>
+                            <field name="p2" invisible="not p2" optional="hide"/>
+                            <field name="p3" invisible="not p3" optional="hide"/>
+                            <field name="p4" invisible="not p4" optional="hide"/>
                         </group>
                     </group>
-                    <group string="Result" invisible="state == 'draft'">
+
+                    <group string="Payment Result" invisible="state in ['draft', 'sent']">
                         <field name="ipay_status"/>
                         <field name="ipay_txn_ref"/>
                         <field name="move_id"/>
                     </group>
-                    <notebook>
-                        <page string="Payment URL">
-                            <field name="payment_url" widget="url"/>
+
+                    <notebook invisible="not payment_url">
+                        <page string="Hash / Debug">
+                            <group>
+                                <field name="hash_value" string="Hash"/>
+                            </group>
                         </page>
                         <page string="Callback Data" invisible="not raw_callback">
                             <field name="raw_callback" widget="text"/>
                         </page>
                     </notebook>
+
+                    <div class="o_form_statusbar" invisible="payment_url">
+                        <span class="text-muted">
+                            Fill in Order ID, Amount, Phone and Email, then click
+                            <strong>Generate Payment URL</strong>.
+                        </span>
+                    </div>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -62,6 +87,7 @@
                 <field name="invoice_no"/>
                 <field name="amount"/>
                 <field name="phone"/>
+                <field name="email"/>
                 <field name="partner_id"/>
                 <field name="ipay_txn_ref"/>
                 <field name="state"/>
@@ -77,6 +103,7 @@
                 <field name="order_id"/>
                 <field name="invoice_no"/>
                 <field name="phone"/>
+                <field name="email"/>
                 <field name="partner_id"/>
                 <filter name="paid" string="Paid" domain="[('state','=','paid')]"/>
                 <filter name="pending" string="Pending" domain="[('state','in',['draft','sent'])]"/>
