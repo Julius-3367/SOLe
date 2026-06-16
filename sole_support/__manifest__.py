@@ -26,6 +26,7 @@ Features
         'security/ir.model.access.csv',
         'data/support_stage_data.xml',
         'data/support_category_data.xml',
+        'data/mail_template_data.xml',
         'views/support_stage_views.xml',
         'views/support_category_views.xml',
         'views/support_ticket_views.xml',

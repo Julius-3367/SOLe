@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_template_ticket_assigned" model="mail.template">
+        <field name="name">Support Ticket: Assigned Notification</field>
+        <field name="model_id" ref="sole_support.model_sole_support_ticket"/>
+        <field name="subject">You have been assigned ticket [{{ object.name }}]: {{ object.subject }}</field>
+        <field name="email_from">{{ (object.company_id.email or user.email) | safe }}</field>
+        <field name="email_to">{{ object.assigned_to.email | safe }}</field>
+        <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+    <p>Hi {{ object.assigned_to.name }},</p>
+    <p>A support ticket has been assigned to you.</p>
+    <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; width: 160px;">Ticket #</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Subject</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.subject }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Customer</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.partner_id.name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Priority</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ dict(object.fields_get(['priority'])['priority']['selection'])[object.priority] }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Stage</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.stage_id.name }}</td>
+        </tr>
+        {% if object.sla_deadline %}
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">SLA Deadline</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.sla_deadline }}</td>
+        </tr>
+        {% endif %}
+    </table>
+    {% if object.description %}
+    <p><strong>Description:</strong></p>
+    <div style="background: #f9f9f9; padding: 12px; border-left: 4px solid #ccc;">
+        {{ object.description | safe }}
+    </div>
+    {% endif %}
+    <p style="margin-top: 24px;">
+        <a href="/web#id={{ object.id }}&amp;model=sole.support.ticket&amp;view_type=form"
+           style="background: #017e84; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            View Ticket
+        </a>
+    </p>
+    <p style="color: #999; font-size: 12px; margin-top: 32px;">
+        This is an automated message from {{ object.company_id.name }}.
+    </p>
+</div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+</odoo>

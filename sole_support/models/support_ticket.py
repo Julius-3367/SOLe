@@ -114,15 +114,37 @@ class SoleSupportTicket(models.Model):
         for vals in vals_list:
             if vals.get("name", _("New")) == _("New"):
                 vals["name"] = self.env["ir.sequence"].next_by_code("sole.support.ticket") or _("New")
-        return super().create(vals_list)
+        records = super().create(vals_list)
+        for record in records:
+            if record.assigned_to:
+                record._notify_assigned(record.assigned_to)
+        return records
 
     # ── Stage change hooks ────────────────────────────────────────────────────
     def write(self, vals):
+        prev_assigned = {r.id: r.assigned_to for r in self} if "assigned_to" in vals else {}
         if "stage_id" in vals:
             stage = self.env["sole.support.stage"].browse(vals["stage_id"])
             if stage.is_closed:
                 vals["date_closed"] = fields.Datetime.now()
-        return super().write(vals)
+        result = super().write(vals)
+        if "assigned_to" in vals and vals["assigned_to"]:
+            new_user = self.env["res.users"].browse(vals["assigned_to"])
+            for record in self:
+                if record.assigned_to != prev_assigned.get(record.id):
+                    record._notify_assigned(new_user)
+        return result
+
+    def _notify_assigned(self, user):
+        """Subscribe the user as a follower and send the assignment email."""
+        if not user or not user.partner_id:
+            return
+        self.message_subscribe(partner_ids=[user.partner_id.id])
+        template = self.env.ref(
+            "sole_support.mail_template_ticket_assigned", raise_if_not_found=False
+        )
+        if template and user.email:
+            template.send_mail(self.id, force_send=False)
 
     # ── Actions ───────────────────────────────────────────────────────────────
     def action_assign_to_me(self):
