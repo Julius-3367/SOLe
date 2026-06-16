@@ -115,7 +115,7 @@ class ReportBankBook(models.AbstractModel):
         account_res = []
         for account in accounts:
             currency = account.currency_id and \
-                       account.currency_id or account.company_id.currency_id
+                       account.currency_id or account.company_ids[:1].currency_id
             res = dict((fn, 0.0) for fn in ['credit', 'debit', 'balance'])
             res['code'] = account.code
             res['name'] = account.name
