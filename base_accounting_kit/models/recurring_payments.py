@@ -139,16 +139,20 @@ class RecurringPayments(models.Model):
         for line in child_ids:
             tmpl_id = line.tmpl_id
             recurr_code = str(tmpl_id.id) + '/' + str(line.date)
+            analytic = (
+                {str(tmpl_id.analytic_account_id.id): 100}
+                if tmpl_id.analytic_account_id else False
+            )
             line_ids = [(0, 0, {
                 'account_id': tmpl_id.credit_account.id,
                 'partner_id': tmpl_id.partner_id.id,
                 'credit': line.amount,
-                # 'analytic_account_id': tmpl_id.analytic_account_id.id,
+                'analytic_distribution': analytic,
             }), (0, 0, {
                 'account_id': tmpl_id.debit_account.id,
                 'partner_id': tmpl_id.partner_id.id,
                 'debit': line.amount,
-                # 'analytic_account_id': tmpl_id.analytic_account_id.id,
+                'analytic_distribution': analytic,
             })]
             vals = {
                 'date': line.date,

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sole_etims_account_move_form" model="ir.ui.view">
+        <field name="name">sole.etims.account.move.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="l10n_ke_edi_tremol.l10n_ke_inherit_account_move_form"/>
+        <field name="priority" eval="50"/>
+        <field name="arch" type="xml">
+            <!-- Add "Send to eTIMS" button next to the Tremol button. -->
+            <button name="l10n_ke_action_cu_post" position="after">
+                <field name="sole_etims_show_button" invisible="1"/>
+                <button name="action_send_to_etims"
+                        type="object"
+                        class="oe_highlight"
+                        groups="account.group_account_manager"
+                        string="Send to eTIMS"
+                        invisible="not sole_etims_show_button"/>
+            </button>
+            <!-- Rename the Tremol tab to be generic when both coexist. -->
+            <page name="page_tremol_go3_fiscal_device" position="attributes">
+                <attribute name="string">KRA Fiscal Device / eTIMS</attribute>
+            </page>
+        </field>
+    </record>
+</odoo>

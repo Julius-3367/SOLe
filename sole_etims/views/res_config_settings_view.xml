@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sole_etims_config_settings_view" model="ir.ui.view">
+        <field name="name">sole.etims.res.config.settings.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="l10n_ke_edi_tremol.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <block id="l10n_ke_cu_details" position="after">
+                <div invisible="country_code != 'KE'">
+                    <block title="KRA eTIMS VSCU (Software e-Invoice)" id="sole_etims_block">
+                        <setting
+                            string="eTIMS API Integration"
+                            help="Connect directly to the KRA eTIMS API (VSCU). Enable this if you do not have a Tremol hardware device. The Tremol button will be hidden when eTIMS is enabled."
+                            company_dependent="1">
+                            <field name="sole_etims_enabled" widget="boolean_toggle"/>
+                            <div class="content-group" invisible="not sole_etims_enabled">
+                                <div class="row mt8">
+                                    <label for="sole_etims_api_url" class="col-lg-4 o_light_label"/>
+                                    <field name="sole_etims_api_url" class="col-lg-8"
+                                           placeholder="https://etims-sbx.kra.go.ke/etims-api"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label for="sole_etims_branch_id" class="col-lg-4 o_light_label"/>
+                                    <field name="sole_etims_branch_id" class="col-lg-2"
+                                           placeholder="00"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label for="sole_etims_cmc_key" class="col-lg-4 o_light_label"/>
+                                    <field name="sole_etims_cmc_key" class="col-lg-8"
+                                           password="True"/>
+                                </div>
+                                <div class="row mt8">
+                                    <label for="sole_etims_device_serial" class="col-lg-4 o_light_label"/>
+                                    <field name="sole_etims_device_serial" class="col-lg-8"/>
+                                </div>
+                                <div class="row mt8">
+                                    <div class="col-lg-12 text-muted">
+                                        <small>
+                                            KRA PIN (TIN) is taken from your company's VAT number.
+                                            Use the sandbox URL for testing:
+                                            https://etims-sbx.kra.go.ke/etims-api
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </div>
+            </block>
+        </field>
+    </record>
+</odoo>
