@@ -82,6 +82,26 @@ class SoleSupportTicket(models.Model):
         "ir.attachment",
         string="Attachments",
     )
+    # ── Escalation ────────────────────────────────────────────────────────────
+    is_escalated = fields.Boolean(
+        string="Escalated",
+        default=False,
+        tracking=True,
+    )
+    escalated_to = fields.Many2one(
+        "res.users",
+        string="Escalated To",
+        tracking=True,
+    )
+    escalation_reason = fields.Text(
+        string="Escalation Reason",
+        tracking=True,
+    )
+    escalated_date = fields.Datetime(
+        string="Escalated On",
+        readonly=True,
+    )
+
     # Kanban color
     color = fields.Integer(string="Color Index")
     kanban_state = fields.Selection(
@@ -166,3 +186,32 @@ class SoleSupportTicket(models.Model):
 
     def action_set_sla(self, hours=24):
         self.sla_deadline = fields.Datetime.now() + timedelta(hours=hours)
+
+    def action_escalate(self):
+        """Escalate the ticket: set flag, bump priority to at least High, log chatter."""
+        for ticket in self:
+            # Bump priority to at least High if currently Low or Normal
+            if ticket.priority in ("0", "1"):
+                ticket.priority = "2"
+            ticket.write({
+                "is_escalated": True,
+                "escalated_date": fields.Datetime.now(),
+            })
+            ticket.message_post(
+                body=_("Ticket escalated by %s.") % self.env.user.name,
+                subtype_xmlid="mail.mt_note",
+            )
+
+    def action_deescalate(self):
+        """Remove escalation flag and log chatter."""
+        for ticket in self:
+            ticket.write({
+                "is_escalated": False,
+                "escalated_to": False,
+                "escalation_reason": False,
+                "escalated_date": False,
+            })
+            ticket.message_post(
+                body=_("Escalation removed by %s.") % self.env.user.name,
+                subtype_xmlid="mail.mt_note",
+            )
