@@ -41,9 +41,7 @@ class AccountAssetCategory(models.Model):
                                  default=lambda self: self.env.company)
     price = fields.Monetary(string='Price', required=True)
     currency_id = fields.Many2one("res.currency",
-                                  default=lambda self: self.env[
-                                      'res.currency'].search(
-                                      [('name', '=', 'USD')]).id,
+                                  default=lambda self: self.env.company.currency_id.id,
                                   readonly=True)
     account_analytic_id = fields.Many2one('account.analytic.account',
                                           string='Analytic Account',

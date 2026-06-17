@@ -155,39 +155,15 @@ class AccountInvoiceLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_uom_id(self):
-        """Onchange function for product that's call the UOM compute function
-         and the asset category function"""
-        result = super(AccountInvoiceLine, self)._compute_product_uom_id()
         self.onchange_asset_category_id()
-        return result
 
-    @api.depends('product_id')
+    @api.onchange('product_id')
     def _onchange_product_id(self):
-        """Onchange product values and it's associated with the move types"""
-        vals = super(AccountInvoiceLine, self)._compute_price_unit()
         if self.product_id:
             if self.move_id.move_type == 'out_invoice':
                 self.asset_category_id = self.product_id.product_tmpl_id.deferred_revenue_category_id
             elif self.move_id.move_type == 'in_invoice':
                 self.asset_category_id = self.product_id.product_tmpl_id.asset_category_id
-        return vals
-
-    def _set_additional_fields(self, invoice):
-        """The function adds additional fields that based on the invoice
-        move types"""
-        if not self.asset_category_id:
-            if invoice.type == 'out_invoice':
-                self.asset_category_id = self.product_id.product_tmpl_id.deferred_revenue_category_id.id
-            elif invoice.type == 'in_invoice':
-                self.asset_category_id = self.product_id.product_tmpl_id.asset_category_id.id
-            self.onchange_asset_category_id()
-        super(AccountInvoiceLine, self)._set_additional_fields(invoice)
-
-    def get_invoice_line_account(self, type, product, fpos, company):
-        """"It returns the invoice line and callback"""
-        return product.asset_category_id.account_asset_id or super(
-            AccountInvoiceLine, self).get_invoice_line_account(type, product,
-                                                               fpos, company)
 
     @api.model
     def _query_get(self, domain=None):
