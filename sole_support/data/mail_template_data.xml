@@ -8,50 +8,50 @@
         <field name="email_to">{{ object.assigned_to.email }}</field>
         <field name="body_html" type="html">
 <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-    <p>Hi {{ object.assigned_to.name }},</p>
+    <p>Hi <t t-out="object.assigned_to.name or ''">Assignee</t>,</p>
     <p>A support ticket has been assigned to you.</p>
     <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; width: 160px;">Ticket #</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.name }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.name or ''">TKT-00001</t></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Subject</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.subject }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.subject or ''">Ticket Subject</t></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Customer</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.partner_id.name }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.partner_id.name or ''">Customer Name</t></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Priority</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ dict([('0','Low'),('1','Normal'),('2','High'),('3','Critical')]).get(object.priority, object.priority) }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="dict([('0','Low'),('1','Normal'),('2','High'),('3','Critical')]).get(object.priority, object.priority) or ''">Normal</t></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Stage</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.stage_id.name }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.stage_id.name or ''">Backlog</t></td>
         </tr>
-        {% if object.sla_deadline %}
+        <t t-if="object.sla_deadline">
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">SLA Deadline</td>
-            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.sla_deadline }}</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="str(object.sla_deadline) or ''">2024-01-01 00:00:00</t></td>
         </tr>
-        {% endif %}
+        </t>
     </table>
-    {% if object.description %}
+    <t t-if="object.description">
     <p><strong>Description:</strong></p>
     <div style="background: #f9f9f9; padding: 12px; border-left: 4px solid #ccc;">
-        {{ object.description }}
+        <t t-out="object.description or ''">Description text</t>
     </div>
-    {% endif %}
+    </t>
     <p style="margin-top: 24px;">
-        <a href="/web#id={{ object.id }}&amp;model=sole.support.ticket&amp;view_type=form"
+        <a t-att-href="'/web#id=%s&amp;model=sole.support.ticket&amp;view_type=form' % object.id"
            style="background: #017e84; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
             View Ticket
         </a>
     </p>
     <p style="color: #999; font-size: 12px; margin-top: 32px;">
-        This is an automated message from {{ object.company_id.name }}.
+        This is an automated message from <t t-out="object.company_id.name or ''">Company</t>.
     </p>
 </div>
         </field>
