@@ -182,6 +182,10 @@ class SoleSupportTicket(models.Model):
         string="Similar Resolved Tickets",
         compute="_compute_suggestions",
     )
+    suggested_ticket_count = fields.Integer(
+        string="Suggestion Count",
+        compute="_compute_suggestions",
+    )
 
     # ── Default stage ─────────────────────────────────────────────────────────
     def _default_stage(self):
@@ -312,7 +316,9 @@ class SoleSupportTicket(models.Model):
                 domain.append(("id", "!=", db_id))
             if ticket.category_id:
                 domain.append(("category_id", "=", ticket.category_id.id))
-            ticket.suggested_ticket_ids = self.search(domain, order="create_date desc", limit=5)
+            results = self.search(domain, order="create_date desc", limit=5)
+            ticket.suggested_ticket_ids = results
+            ticket.suggested_ticket_count = len(results)
 
     # ── Actions ───────────────────────────────────────────────────────────────
     def action_assign_to_me(self):
