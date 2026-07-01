@@ -72,6 +72,8 @@
                             <field name="priority" widget="priority"/>
                             <field name="assigned_to"/>
                             <field name="sla_deadline"/>
+                            <field name="is_sla_breached" widget="boolean" readonly="1"
+                                  invisible="not sla_deadline"/>
                             <field name="is_portal"/>
                         </group>
                     </group>
@@ -139,7 +141,7 @@
         <field name="model">sole.support.ticket</field>
         <field name="arch" type="xml">
             <list string="Support Tickets"
-                  decoration-danger="is_escalated or priority=='3'"
+                  decoration-danger="is_escalated or priority=='3' or is_sla_breached"
                   decoration-warning="priority=='2'">
                 <field name="name"/>
                 <field name="subject"/>
@@ -147,10 +149,12 @@
                 <field name="category_id"/>
                 <field name="priority" widget="priority"/>
                 <field name="is_escalated" string="Escalated" widget="boolean"/>
+                <field name="is_sla_breached" string="SLA Breached" widget="boolean" optional="show"/>
                 <field name="stage_id"/>
                 <field name="assigned_to"/>
                 <field name="sla_deadline"/>
                 <field name="resolution_time_hours" string="Resolution (hrs)" optional="hide"/>
+                <field name="response_time_hours" string="Response (hrs)" optional="hide"/>
                 <field name="create_date" string="Created"/>
             </list>
         </field>
@@ -214,6 +218,8 @@
                         domain="[('is_escalated', '=', True)]"/>
                 <filter name="critical" string="Critical"
                         domain="[('priority', '=', '3')]"/>
+                <filter name="sla_breached" string="SLA Breached"
+                        domain="[('is_sla_breached', '=', True)]"/>
                 <separator/>
                 <filter name="by_stage" string="Group by Stage"
                         context="{'group_by': 'stage_id'}"/>

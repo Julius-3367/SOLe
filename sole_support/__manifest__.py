@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe Support Center',
-    'version': '19.0.1.3.0',
+    'version': '19.0.1.4.0',
     'category': 'Services/Helpdesk',
     'summary': 'Customer support ticket management — stages, categories, SLA tracking and portal submission',
     'description': """

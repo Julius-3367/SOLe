@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for customer history, resolution suggestions, and time metrics."""
+"""Tests for customer history, resolution suggestions, time metrics, and SLA."""
 from datetime import timedelta
 
 from odoo import fields
@@ -208,3 +208,56 @@ class TestTimeMetrics(common.TransactionCase):
         t = self._make_ticket()
         t.action_close()
         self.assertTrue(t.is_ticket_closed)
+
+
+@tagged("post_install", "-at_install")
+class TestSLABreach(common.TransactionCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.Ticket = cls.env["sole.support.ticket"]
+        cls.partner = cls.env["res.partner"].create({"name": "SLA Test Customer"})
+        cls.backlog = cls.env.ref("sole_support.stage_backlog")
+        cls.complete = cls.env.ref("sole_support.stage_complete")
+
+    def _make_ticket(self, subject="SLA test", sla_hours=None):
+        vals = {"subject": subject, "partner_id": self.partner.id}
+        if sla_hours is not None:
+            vals["sla_deadline"] = fields.Datetime.now() + timedelta(hours=sla_hours)
+        return self.Ticket.create(vals)
+
+    def test_no_sla_deadline_never_breached(self):
+        t = self._make_ticket()
+        self.assertFalse(t.sla_deadline)
+        self.assertFalse(t.is_sla_breached)
+
+    def test_open_ticket_within_deadline_not_breached(self):
+        t = self._make_ticket(sla_hours=24)
+        self.assertFalse(t.is_sla_breached)
+
+    def test_open_ticket_past_deadline_is_breached(self):
+        t = self._make_ticket(sla_hours=-1)   # deadline 1 hour ago
+        self.assertTrue(t.is_sla_breached)
+
+    def test_ticket_closed_before_deadline_not_breached(self):
+        t = self._make_ticket(sla_hours=24)
+        t.action_close()
+        self.assertFalse(t.is_sla_breached)
+
+    def test_ticket_closed_after_deadline_is_breached(self):
+        t = self._make_ticket(sla_hours=-1)   # deadline already past
+        t.action_close()
+        self.assertTrue(t.is_sla_breached)
+
+    def test_sla_breach_clears_when_deadline_removed(self):
+        t = self._make_ticket(sla_hours=-1)
+        self.assertTrue(t.is_sla_breached)
+        t.sla_deadline = False
+        self.assertFalse(t.is_sla_breached)
+
+    def test_sla_breach_updates_when_deadline_extended(self):
+        t = self._make_ticket(sla_hours=-1)   # breached
+        self.assertTrue(t.is_sla_breached)
+        t.sla_deadline = fields.Datetime.now() + timedelta(hours=48)   # moved to future
+        self.assertFalse(t.is_sla_breached)

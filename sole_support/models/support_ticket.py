@@ -116,6 +116,15 @@ class SoleSupportTicket(models.Model):
         tracking=True,
     )
 
+    # ── SLA ───────────────────────────────────────────────────────────────────
+    is_sla_breached = fields.Boolean(
+        string="SLA Breached",
+        compute="_compute_sla_breached",
+        store=True,
+        tracking=True,
+        help="True when the ticket was closed after its SLA deadline, or is still open past it.",
+    )
+
     # ── Stage convenience flags ───────────────────────────────────────────────
     # Used for button visibility — avoids domain lookups in the view.
     is_ticket_resolved = fields.Boolean(
@@ -243,6 +252,18 @@ class SoleSupportTicket(models.Model):
         )
         if template and user.email:
             template.send_mail(self.id, force_send=False)
+
+    # ── Computed: SLA breach ─────────────────────────────────────────────────
+    @api.depends("sla_deadline", "date_closed", "stage_id.is_closed")
+    def _compute_sla_breached(self):
+        now = fields.Datetime.now()
+        for t in self:
+            if not t.sla_deadline:
+                t.is_sla_breached = False
+            elif t.date_closed:
+                t.is_sla_breached = t.date_closed > t.sla_deadline
+            else:
+                t.is_sla_breached = now > t.sla_deadline
 
     # ── Computed: time metrics ────────────────────────────────────────────────
     @api.depends("create_date", "first_response_date")

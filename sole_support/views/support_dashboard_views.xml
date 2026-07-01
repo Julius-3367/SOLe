@@ -1,60 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Graph: tickets by stage over time -->
+    <!--
+        Support Dashboard views.
+        Period coverage: weekly, monthly, quarterly, yearly.
+        Measures: ticket count, avg response time, avg resolution time, SLA breach rate.
+    -->
+
+    <!-- Graph: tickets by stage, defaulting to monthly bars -->
     <record id="view_sole_support_ticket_graph" model="ir.ui.view">
         <field name="name">sole.support.ticket.graph</field>
         <field name="model">sole.support.ticket</field>
         <field name="arch" type="xml">
             <graph string="Support Tickets" type="bar" stacked="0">
-                <field name="create_date" interval="month" type="row" string="Month"/>
+                <field name="create_date" interval="month" type="row" string="Period"/>
                 <field name="stage_id" type="col"/>
             </graph>
         </field>
     </record>
 
-    <!-- Pivot: detailed metrics -->
+    <!-- Pivot: category × period with time and SLA measures -->
     <record id="view_sole_support_ticket_pivot" model="ir.ui.view">
         <field name="name">sole.support.ticket.pivot</field>
         <field name="model">sole.support.ticket</field>
         <field name="arch" type="xml">
             <pivot string="Support Metrics" display_quantity="1">
+                <field name="create_date" interval="month" type="col" string="Month"/>
                 <field name="category_id" type="row"/>
-                <field name="stage_id" type="col"/>
                 <field name="response_time_hours" type="measure" string="Avg Response (hrs)"/>
                 <field name="resolution_time_hours" type="measure" string="Avg Resolution (hrs)"/>
+                <field name="is_sla_breached" type="measure" string="SLA Breaches"/>
             </pivot>
         </field>
     </record>
 
-    <!-- Dashboard search: adds quick filters for open/resolved/assigned-to-me -->
+    <!--
+        Extended search view for the dashboard.
+        Inherits the base ticket search and adds:
+          - Period range filters: This Week / Month / Quarter / Year
+          - Group-by: Week / Month / Quarter / Year
+          - Status filters: Resolved, Closed, SLA Breached
+    -->
     <record id="view_sole_support_dashboard_search" model="ir.ui.view">
         <field name="name">sole.support.ticket.dashboard.search</field>
         <field name="model">sole.support.ticket</field>
         <field name="inherit_id" ref="view_sole_support_ticket_search"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
+
+                <!-- ── Status filters ─────────────────────────────────── -->
+                <separator/>
                 <filter name="resolved" string="Resolved"
                         domain="[('stage_id.is_resolved', '=', True)]"/>
                 <filter name="closed" string="Closed"
                         domain="[('stage_id.is_closed', '=', True)]"/>
-                <filter name="this_month" string="This Month"
-                        domain="[('create_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="sla_breached" string="SLA Breached"
+                        domain="[('is_sla_breached', '=', True)]"/>
+
+                <!-- ── Period quick-select ────────────────────────────── -->
                 <separator/>
-                <filter name="by_category" string="Group by Category"
-                        context="{'group_by': 'category_id'}"/>
+                <!--
+                    This Week: Monday of the current ISO week.
+                    relativedelta(weeks=-1, days=1, weekday=0) steps back 6 days
+                    then forward to the next/same Monday, giving this week's start.
+                -->
+                <filter name="this_week" string="This Week"
+                        domain="[('create_date', '&gt;=', (context_today() + relativedelta(weeks=-1, days=1, weekday=0)).strftime('%Y-%m-%d'))]"/>
+                <!--
+                    This Month: first day of the current calendar month.
+                -->
+                <filter name="this_month" string="This Month"
+                        domain="[('create_date', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+                <!--
+                    This Quarter: first day of the current quarter (Jan/Apr/Jul/Oct).
+                    Formula: month = ((current_month - 1) // 3) * 3 + 1
+                -->
+                <filter name="this_quarter" string="This Quarter"
+                        domain="[('create_date', '&gt;=', context_today().replace(day=1, month=((context_today().month - 1) // 3) * 3 + 1).strftime('%Y-%m-%d'))]"/>
+                <!--
+                    This Year: January 1 of the current year.
+                -->
+                <filter name="this_year" string="This Year"
+                        domain="[('create_date', '&gt;=', context_today().replace(day=1, month=1).strftime('%Y-%m-%d'))]"/>
+
+                <!-- ── Period group-by ────────────────────────────────── -->
+                <separator/>
+                <filter name="by_week" string="Group by Week"
+                        context="{'group_by': 'create_date:week'}"/>
                 <filter name="by_month" string="Group by Month"
                         context="{'group_by': 'create_date:month'}"/>
+                <filter name="by_quarter" string="Group by Quarter"
+                        context="{'group_by': 'create_date:quarter'}"/>
+                <filter name="by_year" string="Group by Year"
+                        context="{'group_by': 'create_date:year'}"/>
+
+                <!-- ── Other group-by ─────────────────────────────────── -->
+                <filter name="by_category_dash" string="Group by Category"
+                        context="{'group_by': 'category_id'}"/>
+                <filter name="by_assignee_dash" string="Group by Assignee"
+                        context="{'group_by': 'assigned_to'}"/>
+
             </xpath>
         </field>
     </record>
 
-    <!-- Dashboard action: graph → pivot → list -->
+    <!-- Dashboard action: graph → pivot → list with the full search view -->
     <record id="action_sole_support_dashboard" model="ir.actions.act_window">
         <field name="name">Support Dashboard</field>
         <field name="res_model">sole.support.ticket</field>
         <field name="view_mode">graph,pivot,list</field>
         <field name="search_view_id" ref="view_sole_support_ticket_search"/>
-        <field name="context">{}</field>
+        <field name="context">{'search_default_this_month': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No tickets yet — start by creating one.
