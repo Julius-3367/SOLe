@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Graph: tickets by stage over time -->
+    <record id="view_sole_support_ticket_graph" model="ir.ui.view">
+        <field name="name">sole.support.ticket.graph</field>
+        <field name="model">sole.support.ticket</field>
+        <field name="arch" type="xml">
+            <graph string="Support Tickets" type="bar" stacked="0">
+                <field name="create_date" interval="month" type="row" string="Month"/>
+                <field name="stage_id" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot: detailed metrics -->
+    <record id="view_sole_support_ticket_pivot" model="ir.ui.view">
+        <field name="name">sole.support.ticket.pivot</field>
+        <field name="model">sole.support.ticket</field>
+        <field name="arch" type="xml">
+            <pivot string="Support Metrics" display_quantity="1">
+                <field name="category_id" type="row"/>
+                <field name="stage_id" type="col"/>
+                <field name="response_time_hours" type="measure" string="Avg Response (hrs)"/>
+                <field name="resolution_time_hours" type="measure" string="Avg Resolution (hrs)"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard search: adds quick filters for open/resolved/assigned-to-me -->
+    <record id="view_sole_support_dashboard_search" model="ir.ui.view">
+        <field name="name">sole.support.ticket.dashboard.search</field>
+        <field name="model">sole.support.ticket</field>
+        <field name="inherit_id" ref="view_sole_support_ticket_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="resolved" string="Resolved"
+                        domain="[('stage_id.is_resolved', '=', True)]"/>
+                <filter name="closed" string="Closed"
+                        domain="[('stage_id.is_closed', '=', True)]"/>
+                <filter name="this_month" string="This Month"
+                        domain="[('create_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="by_category" string="Group by Category"
+                        context="{'group_by': 'category_id'}"/>
+                <filter name="by_month" string="Group by Month"
+                        context="{'group_by': 'create_date:month'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Dashboard action: graph → pivot → list -->
+    <record id="action_sole_support_dashboard" model="ir.actions.act_window">
+        <field name="name">Support Dashboard</field>
+        <field name="res_model">sole.support.ticket</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="search_view_id" ref="view_sole_support_ticket_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No tickets yet — start by creating one.
+            </p>
+        </field>
+    </record>
+</odoo>

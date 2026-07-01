@@ -7,6 +7,10 @@
               parent="menu_sole_support_root"
               action="action_sole_support_ticket" sequence="10"/>
 
+    <menuitem id="menu_sole_support_dashboard" name="Reports"
+              parent="menu_sole_support_root"
+              action="action_sole_support_dashboard" sequence="20"/>
+
     <menuitem id="menu_sole_support_config" name="Configuration"
               parent="menu_sole_support_root" sequence="90"
               groups="base.group_system"/>

@@ -82,6 +82,7 @@ class SoleSupportTicket(models.Model):
         "ir.attachment",
         string="Attachments",
     )
+
     # ── Escalation ────────────────────────────────────────────────────────────
     is_escalated = fields.Boolean(
         string="Escalated",
@@ -115,6 +116,64 @@ class SoleSupportTicket(models.Model):
         tracking=True,
     )
 
+    # ── Stage convenience flags ───────────────────────────────────────────────
+    # Used for button visibility — avoids domain lookups in the view.
+    is_ticket_resolved = fields.Boolean(
+        string="Is Resolved",
+        related="stage_id.is_resolved",
+        store=False,
+    )
+    is_ticket_closed = fields.Boolean(
+        string="Is Closed",
+        related="stage_id.is_closed",
+        store=False,
+    )
+
+    # ── Time metrics ──────────────────────────────────────────────────────────
+    first_response_date = fields.Datetime(
+        string="First Response Date",
+        readonly=True,
+        help="Set automatically when the ticket first leaves the initial stage.",
+    )
+    response_time_hours = fields.Float(
+        string="Response Time (hrs)",
+        compute="_compute_response_time",
+        store=True,
+        digits=(16, 2),
+        help="Hours from ticket creation to first agent response (stage move).",
+    )
+    resolution_time_hours = fields.Float(
+        string="Resolution Time (hrs)",
+        compute="_compute_resolution_time",
+        store=True,
+        digits=(16, 2),
+        help="Hours from ticket creation to close.",
+    )
+
+    # ── Customer history ──────────────────────────────────────────────────────
+    previous_ticket_count = fields.Integer(
+        string="Prior Tickets",
+        compute="_compute_customer_history",
+    )
+    previous_ticket_ids = fields.Many2many(
+        "sole.support.ticket",
+        relation="sole_support_ticket_history_rel",
+        column1="ticket_id",
+        column2="history_id",
+        string="Previous Tickets",
+        compute="_compute_customer_history",
+    )
+
+    # ── Resolution suggestions ────────────────────────────────────────────────
+    suggested_ticket_ids = fields.Many2many(
+        "sole.support.ticket",
+        relation="sole_support_ticket_suggestion_rel",
+        column1="ticket_id",
+        column2="suggestion_id",
+        string="Similar Resolved Tickets",
+        compute="_compute_suggestions",
+    )
+
     # ── Default stage ─────────────────────────────────────────────────────────
     def _default_stage(self):
         stage = self.env["sole.support.stage"].search(
@@ -142,12 +201,31 @@ class SoleSupportTicket(models.Model):
 
     # ── Stage change hooks ────────────────────────────────────────────────────
     def write(self, vals):
+        prev_stages = {r.id: r.stage_id.id for r in self} if "stage_id" in vals else {}
         prev_assigned = {r.id: r.assigned_to for r in self} if "assigned_to" in vals else {}
+
         if "stage_id" in vals:
             stage = self.env["sole.support.stage"].browse(vals["stage_id"])
             if stage.is_closed:
                 vals["date_closed"] = fields.Datetime.now()
+
         result = super().write(vals)
+
+        # Auto-set first_response_date when ticket first leaves the initial stage
+        if "stage_id" in vals:
+            first_stage = self.env["sole.support.stage"].search(
+                [], order="sequence, id", limit=1
+            )
+            now = fields.Datetime.now()
+            to_mark = self.filtered(
+                lambda t: not t.first_response_date
+                and prev_stages.get(t.id) == first_stage.id
+                and t.stage_id.id != first_stage.id
+            )
+            if to_mark:
+                # Use super() to avoid recursion — only writing first_response_date
+                super(SoleSupportTicket, to_mark).write({"first_response_date": now})
+
         if "assigned_to" in vals and vals["assigned_to"]:
             new_user = self.env["res.users"].browse(vals["assigned_to"])
             for record in self:
@@ -165,6 +243,55 @@ class SoleSupportTicket(models.Model):
         )
         if template and user.email:
             template.send_mail(self.id, force_send=False)
+
+    # ── Computed: time metrics ────────────────────────────────────────────────
+    @api.depends("create_date", "first_response_date")
+    def _compute_response_time(self):
+        for t in self:
+            if t.create_date and t.first_response_date:
+                t.response_time_hours = round(
+                    (t.first_response_date - t.create_date).total_seconds() / 3600, 2
+                )
+            else:
+                t.response_time_hours = 0.0
+
+    @api.depends("create_date", "date_closed")
+    def _compute_resolution_time(self):
+        for t in self:
+            if t.create_date and t.date_closed:
+                t.resolution_time_hours = round(
+                    (t.date_closed - t.create_date).total_seconds() / 3600, 2
+                )
+            else:
+                t.resolution_time_hours = 0.0
+
+    # ── Computed: customer history ────────────────────────────────────────────
+    @api.depends("partner_id")
+    def _compute_customer_history(self):
+        for ticket in self:
+            if not ticket.partner_id:
+                ticket.previous_ticket_ids = self.env["sole.support.ticket"]
+                ticket.previous_ticket_count = 0
+                continue
+            db_id = ticket._origin.id
+            domain = [("partner_id", "=", ticket.partner_id.id)]
+            if db_id:
+                domain.append(("id", "!=", db_id))
+            history = self.search(domain, order="create_date desc", limit=20)
+            ticket.previous_ticket_ids = history
+            ticket.previous_ticket_count = len(history)
+
+    # ── Computed: smart resolution suggestions ────────────────────────────────
+    @api.depends("category_id")
+    def _compute_suggestions(self):
+        for ticket in self:
+            db_id = ticket._origin.id
+            domain = [("stage_id.is_resolved", "=", True)]
+            if db_id:
+                domain.append(("id", "!=", db_id))
+            if ticket.category_id:
+                domain.append(("category_id", "=", ticket.category_id.id))
+            ticket.suggested_ticket_ids = self.search(domain, order="create_date desc", limit=5)
 
     # ── Actions ───────────────────────────────────────────────────────────────
     def action_assign_to_me(self):
@@ -190,7 +317,6 @@ class SoleSupportTicket(models.Model):
     def action_escalate(self):
         """Escalate the ticket: set flag, bump priority to at least High, log chatter."""
         for ticket in self:
-            # Bump priority to at least High if currently Low or Normal
             if ticket.priority in ("0", "1"):
                 ticket.priority = "2"
             ticket.write({
@@ -215,3 +341,19 @@ class SoleSupportTicket(models.Model):
                 body=_("Escalation removed by %s.") % self.env.user.name,
                 subtype_xmlid="mail.mt_note",
             )
+
+    def action_view_customer_tickets(self):
+        """Open all tickets for this customer in a new window."""
+        self.ensure_one()
+        db_id = self._origin.id or self.id
+        domain = [("partner_id", "=", self.partner_id.id)]
+        if db_id:
+            domain.append(("id", "!=", db_id))
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Tickets — %s" % self.partner_id.name,
+            "res_model": "sole.support.ticket",
+            "view_mode": "list,form",
+            "domain": domain,
+            "context": {"default_partner_id": self.partner_id.id},
+        }

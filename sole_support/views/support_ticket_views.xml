@@ -22,14 +22,35 @@
                     <button name="action_deescalate" type="object"
                             string="Remove Escalation" class="btn-secondary"
                             invisible="not is_escalated"/>
+                    <!-- Mark Resolved: hidden once ticket is resolved or closed -->
                     <button name="action_resolve" type="object"
-                            string="Mark Resolved" class="btn-primary"/>
+                            string="Mark Resolved" class="btn-primary"
+                            invisible="is_ticket_resolved or is_ticket_closed"/>
+                    <!-- Close Ticket: hidden once ticket is closed -->
                     <button name="action_close" type="object"
-                            string="Close Ticket" class="btn-secondary"/>
+                            string="Close Ticket" class="btn-secondary"
+                            invisible="is_ticket_closed"/>
                     <field name="stage_id" widget="statusbar"
                            options="{'clickable': '1'}"/>
                 </header>
                 <sheet>
+                    <!-- Hidden fields used in invisible expressions -->
+                    <field name="is_ticket_resolved" invisible="1"/>
+                    <field name="is_ticket_closed" invisible="1"/>
+                    <field name="previous_ticket_count" invisible="1"/>
+
+                    <!-- Smart buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_customer_tickets" type="object"
+                                class="oe_stat_button" icon="fa-ticket"
+                                invisible="not partner_id or previous_ticket_count == 0">
+                            <div class="o_stat_info">
+                                <field name="previous_ticket_count" class="o_stat_value"/>
+                                <span class="o_stat_text">Prior Tickets</span>
+                            </div>
+                        </button>
+                    </div>
+
                     <div class="alert alert-danger" role="alert"
                          invisible="not is_escalated">
                         <strong>&#x26A0; Escalated</strong>
@@ -67,6 +88,44 @@
                         <page string="Attachments">
                             <field name="attachment_ids" widget="many2many_binary"/>
                         </page>
+                        <!-- Customer history: auto-loads when partner is selected -->
+                        <page string="Customer History" invisible="not partner_id">
+                            <div class="text-muted mb-2" invisible="previous_ticket_ids">
+                                No previous tickets found for this customer.
+                            </div>
+                            <field name="previous_ticket_ids" readonly="1"
+                                   invisible="not previous_ticket_ids">
+                                <list string="Previous Tickets"
+                                      decoration-danger="is_escalated or priority == '3'"
+                                      decoration-warning="priority == '2'">
+                                    <field name="name" string="Ticket #"/>
+                                    <field name="subject"/>
+                                    <field name="stage_id" string="Stage"/>
+                                    <field name="priority" widget="priority"/>
+                                    <field name="category_id" string="Category"/>
+                                    <field name="create_date" string="Opened"/>
+                                    <field name="date_closed" string="Closed"/>
+                                    <field name="is_escalated" widget="boolean" string="Escalated"/>
+                                </list>
+                            </field>
+                        </page>
+                        <!-- Smart suggestions: resolved tickets in the same category -->
+                        <page string="Suggested Resolutions">
+                            <div class="text-muted mb-2" invisible="suggested_ticket_ids">
+                                No similar resolved tickets found.
+                                <span invisible="not category_id"> Try selecting a category to narrow suggestions.</span>
+                            </div>
+                            <field name="suggested_ticket_ids" readonly="1"
+                                   invisible="not suggested_ticket_ids">
+                                <list string="Similar Resolved Tickets">
+                                    <field name="name" string="Ticket #"/>
+                                    <field name="subject"/>
+                                    <field name="category_id" string="Category"/>
+                                    <field name="description" string="Resolution Notes" optional="show"/>
+                                    <field name="date_closed" string="Resolved On"/>
+                                </list>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>
@@ -91,6 +150,7 @@
                 <field name="stage_id"/>
                 <field name="assigned_to"/>
                 <field name="sla_deadline"/>
+                <field name="resolution_time_hours" string="Resolution (hrs)" optional="hide"/>
                 <field name="create_date" string="Created"/>
             </list>
         </field>

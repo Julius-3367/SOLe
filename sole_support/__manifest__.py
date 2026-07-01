@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe Support Center',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'category': 'Services/Helpdesk',
     'summary': 'Customer support ticket management — stages, categories, SLA tracking and portal submission',
     'description': """
@@ -30,6 +30,7 @@ Features
         'views/support_stage_views.xml',
         'views/support_category_views.xml',
         'views/support_ticket_views.xml',
+        'views/support_dashboard_views.xml',
         'views/menus.xml',
         'views/portal_templates.xml',
     ],
