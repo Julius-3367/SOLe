@@ -58,4 +58,4 @@ export class AccountAssetDeprecToggler extends Component {
     }
 }
 
-registry.category("fields").add("deprec_lines_toggler", AccountAssetDeprecToggler);
+registry.category("fields").add("deprec_lines_toggler", { component: AccountAssetDeprecToggler, supportedTypes: ["boolean"] });
