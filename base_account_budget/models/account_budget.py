@@ -131,6 +131,9 @@ class BudgetLines(models.Model):
             # Used for the report
 
             if self.env.context.get('wizard_date_from') and self.env.context.get('wizard_date_to'):
+                if not line.date_from or not line.date_to:
+                    line.theoretical_amount = 0.00
+                    continue
                 date_from = fields.Datetime.from_string(self.env.context.get('wizard_date_from'))
                 date_to = fields.Datetime.from_string(self.env.context.get('wizard_date_to'))
                 if date_from < fields.Datetime.from_string(line.date_from):
@@ -158,21 +161,22 @@ class BudgetLines(models.Model):
                     else:
                         theo_amt = line.planned_amount
                 else:
-                    line_timedelta = fields.Datetime.from_string(line.date_to) - fields.Datetime.from_string(
-                        line.date_from)
-                    elapsed_timedelta = fields.Datetime.from_string(today) - (
-                        fields.Datetime.from_string(line.date_from))
-
-                    if elapsed_timedelta.days < 0:
-                        # If the budget line has not started yet, theoretical amount should be zero
+                    if not line.date_from or not line.date_to:
                         theo_amt = 0.00
-                    elif line_timedelta.days > 0 and fields.Datetime.from_string(today) < fields.Datetime.from_string(
-                            line.date_to):
-                        # If today is between the budget line date_from and date_to
-                        theo_amt = (
-                                           elapsed_timedelta.total_seconds() / line_timedelta.total_seconds()) * line.planned_amount
                     else:
-                        theo_amt = line.planned_amount
+                        line_timedelta = fields.Datetime.from_string(line.date_to) - fields.Datetime.from_string(
+                            line.date_from)
+                        elapsed_timedelta = fields.Datetime.from_string(today) - (
+                            fields.Datetime.from_string(line.date_from))
+
+                        if elapsed_timedelta.days < 0:
+                            theo_amt = 0.00
+                        elif line_timedelta.days > 0 and fields.Datetime.from_string(today) < fields.Datetime.from_string(
+                                line.date_to):
+                            theo_amt = (
+                                               elapsed_timedelta.total_seconds() / line_timedelta.total_seconds()) * line.planned_amount
+                        else:
+                            theo_amt = line.planned_amount
 
             line.theoretical_amount = theo_amt
 
