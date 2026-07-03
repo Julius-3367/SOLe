@@ -72,6 +72,46 @@ class SoleMpesaTransaction(models.Model):
     def action_mark_failed(self):
         self.write({"state": "failed"})
 
+    def action_view_payment(self):
+        self.ensure_one()
+        if not self.move_id:
+            raise UserError(_("No journal entry linked to this transaction."))
+        return self.move_id.get_formview_action()
+
+    def action_bulk_create_journal_entries(self):
+        """Create journal entries for all selected completed transactions that don't have one yet."""
+        created = 0
+        skipped = 0
+        for tx in self:
+            if tx.state != "completed":
+                skipped += 1
+                continue
+            if tx.move_id:
+                skipped += 1
+                continue
+            try:
+                tx.action_create_journal_entry()
+                created += 1
+            except UserError as exc:
+                _logger.warning(
+                    "M-Pesa bulk post failed for %s: %s",
+                    tx.checkout_request_id, exc,
+                )
+                skipped += 1
+        msg = _("%d journal entr%s created.") % (created, "ies" if created != 1 else "y")
+        if skipped:
+            msg += " " + _("%d skipped (not completed or already posted).") % skipped
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Journal Entries"),
+                "message": msg,
+                "type": "success" if created else "warning",
+                "sticky": False,
+            },
+        }
+
     def action_create_journal_entry(self):
         """Create an inbound payment for completed M-Pesa transactions."""
         self.ensure_one()

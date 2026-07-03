@@ -4,6 +4,9 @@ M-Pesa Daraja webhook controllers:
   POST /sole/mpesa/stk/callback      — STK Push result callback
   POST /sole/mpesa/c2b/validation    — C2B validation URL
   POST /sole/mpesa/c2b/confirmation  — C2B confirmation URL
+
+NOTE: Safaricom sends plain JSON (not JSON-RPC), so all routes use type="http"
+and read the raw request body directly.
 """
 import json
 import logging
@@ -13,16 +16,26 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
+_JSON_HEADERS = [("Content-Type", "application/json")]
+
+
+def _read_body():
+    try:
+        return json.loads(request.httprequest.data or b"{}")
+    except (ValueError, TypeError):
+        return {}
+
+
+def _json_response(data):
+    return request.make_response(json.dumps(data), headers=_JSON_HEADERS)
+
 
 class SoleMpesaController(http.Controller):
 
     # ── STK Push callback ─────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/stk/callback", type="jsonrpc", auth="public", csrf=False)
+    @http.route("/sole/mpesa/stk/callback", type="http", auth="public", csrf=False, methods=["POST"])
     def stk_callback(self, **kwargs):
-        try:
-            body = request.get_json_data()
-        except Exception:
-            body = {}
+        body = _read_body()
         _logger.info("M-Pesa STK callback: %s", json.dumps(body))
         try:
             stk_body = body.get("Body", {}).get("stkCallback", {})
@@ -40,9 +53,7 @@ class SoleMpesaController(http.Controller):
                     "state": "completed" if result_code == "0" else "failed",
                 }
                 if result_code == "0":
-                    items = (
-                        stk_body.get("CallbackMetadata", {}).get("Item", [])
-                    )
+                    items = stk_body.get("CallbackMetadata", {}).get("Item", [])
                     meta = {i["Name"]: i.get("Value") for i in items}
                     vals["mpesa_receipt_number"] = str(meta.get("MpesaReceiptNumber", ""))
                     vals["mpesa_transaction_date"] = str(meta.get("TransactionDate", ""))
@@ -51,26 +62,20 @@ class SoleMpesaController(http.Controller):
                 tx.sudo().write(vals)
         except Exception as exc:
             _logger.exception("M-Pesa STK callback processing error: %s", exc)
-        return {"ResultCode": 0, "ResultDesc": "Accepted"}
+        return _json_response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
     # ── C2B Validation ────────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/c2b/validation", type="jsonrpc", auth="public", csrf=False)
+    @http.route("/sole/mpesa/c2b/validation", type="http", auth="public", csrf=False, methods=["POST"])
     def c2b_validation(self, **kwargs):
-        try:
-            body = request.get_json_data()
-        except Exception:
-            body = {}
+        body = _read_body()
         _logger.info("M-Pesa C2B validation: %s", json.dumps(body))
         # Accept all by default; add custom rejection logic here
-        return {"ResultCode": 0, "ResultDesc": "Accepted"}
+        return _json_response({"ResultCode": 0, "ResultDesc": "Accepted"})
 
     # ── C2B Confirmation ──────────────────────────────────────────────────────
-    @http.route("/sole/mpesa/c2b/confirmation", type="jsonrpc", auth="public", csrf=False)
+    @http.route("/sole/mpesa/c2b/confirmation", type="http", auth="public", csrf=False, methods=["POST"])
     def c2b_confirmation(self, **kwargs):
-        try:
-            body = request.get_json_data()
-        except Exception:
-            body = {}
+        body = _read_body()
         _logger.info("M-Pesa C2B confirmation: %s", json.dumps(body))
         try:
             config = (
@@ -95,4 +100,4 @@ class SoleMpesaController(http.Controller):
             })
         except Exception as exc:
             _logger.exception("M-Pesa C2B confirmation processing error: %s", exc)
-        return {"ResultCode": 0, "ResultDesc": "Accepted"}
+        return _json_response({"ResultCode": 0, "ResultDesc": "Accepted"})
