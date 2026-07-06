@@ -12,6 +12,26 @@
                             <field name="transaction_count" widget="statinfo" string="Transactions"/>
                         </button>
                     </div>
+
+                    <!-- First-time setup guide -->
+                    <div class="alert alert-info" role="alert" invisible="vendor_id">
+                        <strong>Setup steps:</strong>
+                        1. Enter your iPay <b>Vendor ID</b> and <b>Hash Key</b> (from your
+                        iPay merchant dashboard).
+                        2. Set the <b>Callback URL</b> to
+                        <code>https://workspace.softlinkoptions.co.ke/sole/ipay/callback</code>.
+                        3. Set the <b>Payment Journal</b> — required for automatic reconciliation.
+                        4. Switch <b>Environment</b> to Live when ready to accept real payments.
+                    </div>
+
+                    <!-- Warning when journal is not set -->
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not vendor_id or account_journal_id">
+                        <strong>Payment Journal not set.</strong>
+                        Paid transactions will be recorded but no journal entry will be created
+                        until you select a Payment Journal below.
+                    </div>
+
                     <group>
                         <group string="General">
                             <field name="name"/>
@@ -19,7 +39,7 @@
                             <field name="is_active"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
-                        <group string="Credentials">
+                        <group string="iPay Credentials">
                             <field name="vendor_id"/>
                             <field name="hash_key" password="True"/>
                             <field name="currency"/>
@@ -27,8 +47,10 @@
                     </group>
                     <group>
                         <group string="Integration">
-                            <field name="callback_url"/>
-                            <field name="account_journal_id"/>
+                            <field name="callback_url"
+                                   help="Must be a public HTTPS URL. iPay will POST payment results here."/>
+                            <field name="account_journal_id"
+                                   help="Bank or iPay journal. Required for automatic payment reconciliation."/>
                         </group>
                     </group>
                 </sheet>
@@ -45,6 +67,7 @@
                 <field name="environment"/>
                 <field name="vendor_id"/>
                 <field name="currency"/>
+                <field name="account_journal_id"/>
                 <field name="is_active"/>
                 <field name="transaction_count"/>
             </list>
@@ -55,5 +78,13 @@
         <field name="name">iPay Configuration</field>
         <field name="res_model">sole.ipay.config</field>
         <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Opens a blank new-transaction form directly (used by "New Payment" menu) -->
+    <record id="action_sole_ipay_new_transaction" model="ir.actions.act_window">
+        <field name="name">New iPay Payment</field>
+        <field name="res_model">sole.ipay.transaction</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
     </record>
 </odoo>

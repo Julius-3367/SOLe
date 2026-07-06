@@ -16,11 +16,11 @@
                 </button>
             </xpath>
 
-            <!-- "Request iPay Payment" in the action buttons area -->
-            <xpath expr="//div[@name='button_box']" position="before">
+            <!-- "Request iPay Payment" in the form header next to Register Payment -->
+            <xpath expr="//header" position="inside">
                 <button name="action_request_ipay_payment" type="object"
                         string="Request iPay Payment"
-                        class="btn-primary"
+                        class="btn-secondary"
                         invisible="move_type not in ['out_invoice'] or state != 'posted' or payment_state == 'paid'"/>
             </xpath>
         </field>

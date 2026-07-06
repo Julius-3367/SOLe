@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe iPay Payment Gateway',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Accounting/Payment',
     'summary': 'iPay Kenya payment gateway integration — generate payment links and receive webhook callbacks',
     'description': """

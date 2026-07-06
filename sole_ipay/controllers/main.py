@@ -41,15 +41,22 @@ class SoleIpayController(http.Controller):
             _logger.warning("iPay callback: missing order ID")
             return request.make_response("Missing order ID", status=400)
 
+        # Match config by vendor ID (iPay posts vid in every callback)
+        vid = post.get("vid", "").strip()
+        domain = [("is_active", "=", True)]
+        if vid:
+            domain.append(("vendor_id", "=", vid))
         config = (
             request.env["sole.ipay.config"]
             .sudo()
-            .search([("is_active", "=", True)], limit=1)
+            .search(domain, limit=1)
         )
 
         # Reject if no config: we cannot validate the hash
         if not config:
-            _logger.error("iPay callback: no active config found — cannot validate")
+            _logger.error(
+                "iPay callback: no active config found for vid=%s — cannot validate", vid
+            )
             return request.make_response("No active config", status=500)
 
         # Always validate the hash — reject mismatches

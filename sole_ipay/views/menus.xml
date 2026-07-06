@@ -9,11 +9,10 @@
 
     <menuitem id="menu_sole_ipay_new" name="New Payment"
               parent="menu_sole_ipay_root"
-              action="action_sole_ipay_transaction" sequence="20"/>
+              action="action_sole_ipay_new_transaction" sequence="20"/>
 
     <menuitem id="menu_sole_ipay_config" name="Configuration"
               parent="menu_sole_ipay_root"
-              action="action_sole_ipay_config" sequence="90"
-              groups="base.group_system"/>
+              action="action_sole_ipay_config" sequence="90"/>
 
 </odoo>
