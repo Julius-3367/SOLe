@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe WHMCS Connector',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Sales/CRM',
     'summary': 'Sync clients and invoices between WHMCS billing platform and Odoo',
     'description': """
 SOLe WHMCS Connector
 =====================
-Two-way integration between WHMCS and Odoo 19.
+One-way integration: WHMCS → Odoo 19.
 
 Features
 --------
 * Configure WHMCS API URL, API Identifier and Secret.
-* Import WHMCS clients as Odoo partners (res.partner).
-* Import WHMCS invoices as Odoo customer invoices (account.move).
-* Sync products/services from WHMCS to Odoo product catalogue.
+* Import WHMCS clients as Odoo partners with country mapping.
+* Import WHMCS invoices as Odoo customer invoices (draft by default).
+* Auto-post Paid invoices option; Cancelled/Refunded invoices auto-cancelled.
+* Partner deduplication via dedicated whmcs_client_id field (not comment field).
 * Manual sync wizard and scheduled automatic sync.
 * Sync log to track import history and errors.
     """,
