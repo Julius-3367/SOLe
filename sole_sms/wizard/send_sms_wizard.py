@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,6 +21,7 @@ class SoleSendSmsWizard(models.TransientModel):
     message = fields.Text(string="Message", required=True)
     partner_id = fields.Many2one("res.partner", string="Customer")
 
+    @api.onchange("template_id")
     def _onchange_template(self):
         if self.template_id:
             self.message = self.template_id.body

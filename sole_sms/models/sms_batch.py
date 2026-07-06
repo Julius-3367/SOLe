@@ -58,8 +58,19 @@ class SoleSmsBatch(models.Model):
         if not self.line_ids:
             raise UserError(_("Add at least one recipient before sending."))
         self.state = "running"
+        company_name = self.env.company.name or ""
+        today = fields.Date.today().strftime("%Y-%m-%d")
         for line in self.line_ids.filtered(lambda l: l.state == "draft"):
-            msg = self.message.replace("{customer_name}", line.name or "")
+            ctx = {
+                "customer_name": line.name or "",
+                "company_name": company_name,
+                "date": today,
+                "amount": "",
+                "ref": "",
+            }
+            msg = self.message
+            for k, v in ctx.items():
+                msg = msg.replace("{" + k + "}", v)
             success, msg_id, error = self.provider_id.send_sms(line.phone, msg)
             log_vals = {
                 "provider_id": self.provider_id.id,

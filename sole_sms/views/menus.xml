@@ -21,7 +21,6 @@
 
     <menuitem id="menu_sole_sms_config" name="Providers"
               parent="menu_sole_sms_root"
-              action="action_sole_sms_provider" sequence="90"
-              groups="base.group_system"/>
+              action="action_sole_sms_provider" sequence="90"/>
 
 </odoo>

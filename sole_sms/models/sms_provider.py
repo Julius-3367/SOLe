@@ -91,9 +91,10 @@ class SoleSmsProvider(models.Model):
             "ApiKey": self.api_key,
             "ClientId": self.username or "",
         }
+        url = self.api_url or ONFON_SEND_URL
         try:
             resp = requests.post(
-                ONFON_SEND_URL,
+                url,
                 json=payload,
                 headers={"Content-Type": "application/json", "Accept": "application/json"},
                 timeout=self.timeout_s,
