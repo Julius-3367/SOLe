@@ -14,7 +14,7 @@
                             invisible="state != 'draft'"
                             context="{'default_batch_id': id}"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,running,done,partial,failed"/>
+                           statusbar_visible="draft,queued,running,done,partial,failed"/>
                 </header>
                 <sheet>
                     <div class="oe_stat_buttons" name="stat_buttons">
@@ -72,7 +72,7 @@
         <field name="model">sole.sms.batch</field>
         <field name="arch" type="xml">
             <list string="SMS Batches" decoration-success="state=='done'"
-                  decoration-warning="state=='partial'"
+                  decoration-warning="state=='partial' or state=='queued'"
                   decoration-danger="state=='failed'"
                   decoration-muted="state=='running'">
                 <field name="name"/>
