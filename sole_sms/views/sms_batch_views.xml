@@ -41,6 +41,8 @@
                         <field name="name"/>
                         <field name="provider_id"/>
                         <field name="template_id"/>
+                        <field name="scheduled_at"
+                               help="Leave blank to send immediately with 'Send Now'. Set a future date/time to send automatically."/>
                         <field name="company_id" groups="base.group_multi_company"/>
                     </group>
                     <group string="Message">
@@ -73,6 +75,7 @@
                   decoration-muted="state=='running'">
                 <field name="name"/>
                 <field name="provider_id"/>
+                <field name="scheduled_at"/>
                 <field name="total_count"/>
                 <field name="sent_count"/>
                 <field name="failed_count"/>

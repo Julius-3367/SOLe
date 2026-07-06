@@ -24,6 +24,10 @@ class SoleSmsBatch(models.Model):
     )
     template_id = fields.Many2one("sole.sms.template", string="Template")
     message = fields.Text(string="Message Body", required=True)
+    scheduled_at = fields.Datetime(
+        string="Schedule Send At",
+        help="Leave blank to send manually. Set a date/time to have the cron send automatically.",
+    )
     state = fields.Selection(
         [("draft", "Draft"), ("running", "Running"), ("done", "Done"), ("failed", "Failed")],
         string="Status",
@@ -51,6 +55,21 @@ class SoleSmsBatch(models.Model):
     def _onchange_template(self):
         if self.template_id:
             self.message = self.template_id.body
+
+    @api.model
+    def _cron_send_scheduled(self):
+        """Called by the hourly cron. Only processes batches whose scheduled_at has passed."""
+        now = fields.Datetime.now()
+        due = self.search([
+            ("state", "=", "draft"),
+            ("scheduled_at", "!=", False),
+            ("scheduled_at", "<=", now),
+        ])
+        for batch in due:
+            try:
+                batch.action_send_all()
+            except Exception:
+                _logger.exception("SMS cron: failed to send batch %s (%s)", batch.id, batch.name)
 
     def action_send_all(self):
         """Send SMS to all recipients in this batch."""
