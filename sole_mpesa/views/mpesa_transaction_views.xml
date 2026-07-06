@@ -7,33 +7,50 @@
         <field name="arch" type="xml">
             <form string="M-Pesa Transaction">
                 <header>
+                    <!-- Primary action: post to accounting once completed -->
                     <button name="action_create_journal_entry" type="object"
                             string="Post to Accounting"
                             invisible="state != 'completed' or move_id"
                             class="btn-primary"/>
+                    <!-- Once posted: navigate to the journal entry -->
                     <button name="action_view_payment" type="object"
                             string="View Journal Entry"
                             invisible="not move_id"
                             class="btn-secondary"/>
+                    <!-- STK Push: poll Safaricom for result -->
                     <button name="action_check_status" type="object"
                             string="Check Status"
                             invisible="state != 'pending' or transaction_type != 'stk_push'"
                             class="btn-secondary"/>
+                    <!-- Manual entry: confirm the payment was received -->
                     <button name="action_mark_completed" type="object"
-                            string="Mark Completed"
+                            string="Confirm Payment Received"
                             invisible="state == 'completed'"
-                            groups="base.group_no_one"/>
+                            class="btn-primary"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="pending,completed,failed"/>
                 </header>
                 <sheet>
+                    <!-- Guide for new manual transactions -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="checkout_request_id or state != 'pending'">
+                        <strong>Recording a manual M-Pesa payment?</strong>
+                        Fill in Phone, Amount, M-Pesa Receipt No., and Customer below,
+                        then click <b>Confirm Payment Received</b> to mark it completed,
+                        then <b>Post to Accounting</b> to create the journal entry.
+                        <br/><br/>
+                        To send a payment request to a customer's phone instead,
+                        use <b>M-Pesa → Send STK Push</b>.
+                    </div>
+
                     <group>
                         <group string="Transaction Info">
-                            <field name="checkout_request_id"/>
-                            <field name="merchant_request_id"/>
-                            <field name="mpesa_receipt_number"/>
                             <field name="transaction_type"/>
                             <field name="config_id"/>
+                            <field name="checkout_request_id"/>
+                            <field name="merchant_request_id"
+                                   invisible="not merchant_request_id"/>
+                            <field name="mpesa_receipt_number"/>
                         </group>
                         <group string="Payment Details">
                             <field name="phone"/>
@@ -44,13 +61,16 @@
                             <field name="mpesa_transaction_date"/>
                         </group>
                     </group>
-                    <group string="Result">
+                    <group string="Result" invisible="not result_code">
                         <field name="result_code"/>
                         <field name="result_desc"/>
                         <field name="move_id"/>
                     </group>
+                    <group string="Journal Entry" invisible="result_code or not move_id">
+                        <field name="move_id"/>
+                    </group>
                     <notebook>
-                        <page string="Raw Payload">
+                        <page string="Raw Payload" invisible="not raw_payload">
                             <field name="raw_payload" widget="text"/>
                         </page>
                     </notebook>
@@ -98,6 +118,7 @@
                 <field name="phone"/>
                 <field name="account_ref"/>
                 <field name="mpesa_receipt_number"/>
+                <filter name="no_entry" string="Not Posted" domain="[('state','=','completed'),('move_id','=',False)]"/>
                 <filter name="completed" string="Completed" domain="[('state','=','completed')]"/>
                 <filter name="pending" string="Pending" domain="[('state','=','pending')]"/>
                 <filter name="failed" string="Failed" domain="[('state','=','failed')]"/>

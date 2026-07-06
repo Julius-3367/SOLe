@@ -72,6 +72,26 @@ class SoleMpesaConfig(models.Model):
         string="Transactions",
         compute="_compute_transaction_count",
     )
+    stk_callback_url = fields.Char(
+        string="STK Callback URL",
+        compute="_compute_callback_urls",
+        help="Register this URL with Safaricom for STK Push callbacks.",
+    )
+    c2b_validation_url = fields.Char(
+        string="C2B Validation URL",
+        compute="_compute_callback_urls",
+    )
+    c2b_confirmation_url = fields.Char(
+        string="C2B Confirmation URL",
+        compute="_compute_callback_urls",
+    )
+
+    def _compute_callback_urls(self):
+        for rec in self:
+            base = (rec.callback_url_base or "").rstrip("/")
+            rec.stk_callback_url = f"{base}/sole/mpesa/stk/callback" if base else ""
+            rec.c2b_validation_url = f"{base}/sole/mpesa/c2b/validation" if base else ""
+            rec.c2b_confirmation_url = f"{base}/sole/mpesa/c2b/confirmation" if base else ""
 
     def _compute_transaction_count(self):
         for rec in self:

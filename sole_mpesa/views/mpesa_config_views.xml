@@ -19,6 +19,19 @@
                             <field name="transaction_count" widget="statinfo" string="Transactions"/>
                         </button>
                     </div>
+
+                    <!-- Setup guide for new configs -->
+                    <div class="alert alert-info" role="alert"
+                         invisible="consumer_key">
+                        <strong>Setup steps:</strong>
+                        1. Enter your Daraja API credentials (from
+                        <a href="https://developer.safaricom.co.ke" target="_blank">developer.safaricom.co.ke</a>).
+                        2. Set the Callback Base URL to your public Odoo URL.
+                        3. Click <b>Test Connection</b> to verify credentials.
+                        4. For C2B Paybill, click <b>Register C2B URLs</b> to push the callback
+                        URLs to Safaricom.
+                    </div>
+
                     <group>
                         <group string="General">
                             <field name="name"/>
@@ -35,21 +48,22 @@
                     </group>
                     <group>
                         <group string="C2B Paybill">
-                            <field name="c2b_shortcode"/>
+                            <field name="c2b_shortcode"
+                                   help="Only needed if your C2B Paybill number differs from your STK Push shortcode."/>
                         </group>
                         <group string="Integration">
-                            <field name="callback_url_base"/>
-                            <field name="account_journal_id"/>
+                            <field name="callback_url_base"
+                                   help="Public HTTPS base URL of this Odoo instance, e.g. https://workspace.softlinkoptions.co.ke"/>
+                            <field name="account_journal_id"
+                                   help="Bank or M-Pesa journal where confirmed payments will be posted."/>
                         </group>
                     </group>
-                    <group string="Callback URLs (register these with Safaricom)">
-                        <div class="o_field_widget">
-                            <p class="text-muted">
-                                STK Push: <code>&lt;callback_url_base&gt;/sole/mpesa/stk/callback</code><br/>
-                                C2B Validation: <code>&lt;callback_url_base&gt;/sole/mpesa/c2b/validation</code><br/>
-                                C2B Confirmation: <code>&lt;callback_url_base&gt;/sole/mpesa/c2b/confirmation</code>
-                            </p>
-                        </div>
+
+                    <!-- Live computed callback URLs — copy these to Safaricom -->
+                    <group string="Callback URLs — copy these to Safaricom" invisible="not callback_url_base">
+                        <field name="stk_callback_url" readonly="1" string="STK Push Callback"/>
+                        <field name="c2b_validation_url" readonly="1" string="C2B Validation"/>
+                        <field name="c2b_confirmation_url" readonly="1" string="C2B Confirmation"/>
                     </group>
                 </sheet>
             </form>
@@ -66,6 +80,7 @@
                 <field name="environment"/>
                 <field name="shortcode"/>
                 <field name="callback_url_base"/>
+                <field name="account_journal_id"/>
                 <field name="is_active"/>
                 <field name="transaction_count"/>
             </list>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe M-Pesa Integration',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Accounting/Payment',
     'summary': 'M-Pesa STK Push (Lipa Na M-Pesa) and C2B Paybill integration via Safaricom Daraja API',
     'description': """
