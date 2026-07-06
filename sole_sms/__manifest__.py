@@ -25,6 +25,7 @@ Features
     'external_dependencies': {'python': ['requests']},
     'data': [
         'security/ir.model.access.csv',
+        'security/record_rules.xml',
         'data/sms_provider_data.xml',
         'data/cron_data.xml',
         'views/sms_provider_views.xml',

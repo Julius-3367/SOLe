@@ -2,6 +2,9 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
+SMS_SINGLE_LIMIT = 160
+SMS_MULTI_LIMIT = 153  # per segment when message is multi-part
+
 
 class SoleSendSmsWizard(models.TransientModel):
     _name = "sole.send.sms.wizard"
@@ -20,6 +23,19 @@ class SoleSendSmsWizard(models.TransientModel):
     phone = fields.Char(string="Phone Number", required=True)
     message = fields.Text(string="Message", required=True)
     partner_id = fields.Many2one("res.partner", string="Customer")
+    char_count = fields.Integer(string="Characters", compute="_compute_char_info")
+    sms_segments = fields.Integer(string="SMS Parts", compute="_compute_char_info")
+
+    @api.depends("message")
+    def _compute_char_info(self):
+        for rec in self:
+            length = len(rec.message or "")
+            rec.char_count = length
+            if length <= SMS_SINGLE_LIMIT:
+                rec.sms_segments = 1 if length > 0 else 0
+            else:
+                import math
+                rec.sms_segments = math.ceil(length / SMS_MULTI_LIMIT)
 
     @api.onchange("template_id")
     def _onchange_template(self):

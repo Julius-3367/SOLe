@@ -7,6 +7,7 @@ Supports Onfon Media (primary) and a generic HTTP adapter.
 import json
 import logging
 import re
+import secrets
 import uuid
 
 import requests
@@ -54,6 +55,31 @@ class SoleSmsProvider(models.Model):
     # Generic HTTP extra config
     auth_header_name = fields.Char(string="Auth Header Name", default="apiKey")
     extra_params = fields.Text(string="Extra Params (JSON)", help='e.g. {"Type": 1}')
+
+    dlr_token = fields.Char(
+        string="DLR Webhook Token",
+        copy=False,
+        help="Secret token appended to the DLR callback URL (?token=…). "
+             "Onfon must be configured to send this token so forged callbacks are rejected.",
+    )
+    dlr_url = fields.Char(string="DLR Callback URL", compute="_compute_dlr_url", store=False)
+
+    def _compute_dlr_url(self):
+        base = self.env["ir.config_parameter"].sudo().get_param("web.base.url", "")
+        for rec in self:
+            if rec.dlr_token:
+                rec.dlr_url = "%s/sole/sms/dlr?token=%s" % (base, rec.dlr_token)
+            else:
+                rec.dlr_url = "%s/sole/sms/dlr  (generate a token first)" % base
+
+    def action_generate_dlr_token(self):
+        self.ensure_one()
+        self.dlr_token = secrets.token_urlsafe(32)
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {"title": _("Token Generated"), "message": _("DLR token refreshed. Update your Onfon callback URL."), "type": "success"},
+        }
 
     log_count = fields.Integer(string="Logs", compute="_compute_log_count")
 

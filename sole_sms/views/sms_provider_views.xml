@@ -33,6 +33,15 @@
                         <field name="auth_header_name"/>
                         <field name="extra_params" widget="text"/>
                     </group>
+                    <group string="Delivery Receipts (DLR)">
+                        <field name="dlr_token" password="True"/>
+                        <field name="dlr_url" readonly="1"
+                               widget="CopyClipboardChar"
+                               help="Configure this URL as the DLR callback in your Onfon account."/>
+                        <button name="action_generate_dlr_token" type="object"
+                                string="Generate New Token" class="btn-secondary"
+                                confirm="This will invalidate the current token. Update your Onfon callback URL afterwards."/>
+                    </group>
                 </sheet>
             </form>
         </field>

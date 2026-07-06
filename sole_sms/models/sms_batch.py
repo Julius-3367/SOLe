@@ -8,6 +8,8 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
+CHUNK_SIZE = 50  # commit to DB every N sends so a mid-batch crash doesn't lose progress
+
 
 class SoleSmsBatch(models.Model):
     _name = "sole.sms.batch"
@@ -29,7 +31,7 @@ class SoleSmsBatch(models.Model):
         help="Leave blank to send manually. Set a date/time to have the cron send automatically.",
     )
     state = fields.Selection(
-        [("draft", "Draft"), ("running", "Running"), ("done", "Done"), ("failed", "Failed")],
+        [("draft", "Draft"), ("running", "Running"), ("done", "Done"), ("partial", "Partial"), ("failed", "Failed")],
         string="Status",
         default="draft",
     )
@@ -72,14 +74,27 @@ class SoleSmsBatch(models.Model):
                 _logger.exception("SMS cron: failed to send batch %s (%s)", batch.id, batch.name)
 
     def action_send_all(self):
-        """Send SMS to all recipients in this batch."""
+        """Send SMS to all pending recipients, committing every CHUNK_SIZE sends."""
         self.ensure_one()
         if not self.line_ids:
             raise UserError(_("Add at least one recipient before sending."))
-        self.state = "running"
+        self.write({"state": "running"})
+        self.env.cr.commit()
+
         company_name = self.env.company.name or ""
         today = fields.Date.today().strftime("%Y-%m-%d")
-        for line in self.line_ids.filtered(lambda l: l.state == "draft"):
+        pending_lines = self.line_ids.filtered(lambda l: l.state == "draft")
+        chunk = []
+        log_vals_bulk = []
+
+        def _flush(lines, logs):
+            if logs:
+                self.env["sole.sms.log"].create(logs)
+            for line, state, err in lines:
+                line.write({"state": state, "error": err})
+            self.env.cr.commit()
+
+        for line in pending_lines:
             ctx = {
                 "customer_name": line.name or "",
                 "company_name": company_name,
@@ -90,8 +105,10 @@ class SoleSmsBatch(models.Model):
             msg = self.message
             for k, v in ctx.items():
                 msg = msg.replace("{" + k + "}", v)
+
             success, msg_id, error = self.provider_id.send_sms(line.phone, msg)
-            log_vals = {
+            chunk.append((line, "sent" if success else "failed", error))
+            log_vals_bulk.append({
                 "provider_id": self.provider_id.id,
                 "phone": line.phone,
                 "message": msg,
@@ -100,17 +117,35 @@ class SoleSmsBatch(models.Model):
                 "error": error,
                 "batch_id": self.id,
                 "partner_id": line.partner_id.id if line.partner_id else False,
-            }
-            self.env["sole.sms.log"].create(log_vals)
-            line.state = "sent" if success else "failed"
-        self.state = "done"
+            })
+
+            if len(chunk) >= CHUNK_SIZE:
+                _flush(chunk, log_vals_bulk)
+                chunk = []
+                log_vals_bulk = []
+
+        if chunk:
+            _flush(chunk, log_vals_bulk)
+
+        # Recompute stats and set final state
+        self._compute_stats()
+        if self.failed_count == 0:
+            final_state = "done"
+        elif self.sent_count == 0:
+            final_state = "failed"
+        else:
+            final_state = "partial"
+        self.write({"state": final_state})
+        self.env.cr.commit()
+
+        notif_type = "success" if final_state == "done" else ("warning" if final_state == "partial" else "danger")
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
                 "title": _("Batch Complete"),
                 "message": _("Sent: %d  Failed: %d") % (self.sent_count, self.failed_count),
-                "type": "success" if self.failed_count == 0 else "warning",
+                "type": notif_type,
             },
         }
 

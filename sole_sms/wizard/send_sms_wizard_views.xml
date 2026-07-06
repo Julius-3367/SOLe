@@ -13,6 +13,11 @@
                 </group>
                 <group string="Message">
                     <field name="message" widget="text" nolabel="1"/>
+                    <div class="text-muted small">
+                        <field name="char_count" readonly="1" nolabel="1" class="d-inline"/> chars ·
+                        <field name="sms_segments" readonly="1" nolabel="1" class="d-inline"/> SMS part(s)
+                        <span invisible="sms_segments &lt;= 1" class="text-warning"> — multi-part message, billed per part</span>
+                    </div>
                 </group>
                 <footer>
                     <button name="action_send" type="object" string="Send SMS"
