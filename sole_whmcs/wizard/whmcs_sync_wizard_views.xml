@@ -5,13 +5,20 @@
         <field name="model">sole.whmcs.sync.wizard</field>
         <field name="arch" type="xml">
             <form string="WHMCS Sync">
+                <div class="alert alert-warning" role="alert"
+                     invisible="config_id">
+                    <strong>No WHMCS configuration found.</strong>
+                    Go to <b>WHMCS → Configuration</b> and create one first,
+                    then come back here to sync.
+                </div>
                 <group>
                     <field name="config_id"/>
-                    <field name="sync_clients"/>
-                    <field name="sync_invoices"/>
+                    <field name="sync_clients" invisible="not config_id"/>
+                    <field name="sync_invoices" invisible="not config_id"/>
                 </group>
                 <footer>
                     <button name="action_sync" type="object" string="Start Sync"
+                            invisible="not config_id"
                             class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
