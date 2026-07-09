@@ -60,7 +60,7 @@ class Document(models.Model):
     # ── Attachments ───────────────────────────────────────────────────────────
     attachment_count = fields.Integer(compute='_compute_attachment_count', string='Files')
 
-    name_parent_uniq = models.Constraint(
+    _name_parent_uniq = models.Constraint(
         'UNIQUE(parent_id, name)',
         'A document with this name already exists in this folder.',
     )
