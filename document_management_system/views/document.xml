@@ -27,7 +27,7 @@
                     <filter name="inactive" string="Archived"
                             domain="[('active', '=', False)]"/>
                     <!-- Group by -->
-                    <group expand="0">
+                    <group>
                         <filter name="group_by_parent" string="Folder"
                                 context="{'group_by': 'parent_id'}"/>
                         <filter name="group_by_owner" string="Owner"
@@ -35,6 +35,15 @@
                         <filter name="group_by_tags" string="Tags"
                                 context="{'group_by': 'tag_ids'}"/>
                     </group>
+                    <!-- Sidebar folder/tag/owner navigation panel -->
+                    <searchpanel>
+                        <field name="parent_id" string="Folders" icon="fa-folder"
+                               enable_counters="1" select="one" expand="1"/>
+                        <field name="tag_ids" string="Tags" icon="fa-tag"
+                               enable_counters="1" select="multi"/>
+                        <field name="user_id" string="Owner" icon="fa-user"
+                               enable_counters="1" select="one"/>
+                    </searchpanel>
                 </search>
             </field>
         </record>
