@@ -45,7 +45,7 @@
             <field name="name">Document Kanban</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
-                <kanban class="o_kanban_document">
+                <kanban class="o_kanban_document" color="color">
                     <field name="id"/>
                     <field name="color"/>
                     <field name="name"/>
@@ -61,7 +61,7 @@
                             <ul class="oe_kanban_colorpicker" data-field="color"/>
                         </t>
                         <t t-name="card">
-                            <div t-attf-class="#{kanban_color(record.color.raw_value)}">
+                            <div t-attf-class="oe_kanban_color_#{record.color.raw_value}">
                                 <div t-attf-class="oe_kanban_content">
                                     <div class="o_kanban_image">
                                         <a class="d-block position-relative" type="object" name="action" t-attf-context="{'module_action_id': 'document_management_system.action_document_open', 'search_default_parent_id': {{record.id.raw_value}}, 'default_parent_id': {{record.id.raw_value}}}" title="Child" role="button">
