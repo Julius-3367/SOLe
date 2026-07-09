@@ -10,6 +10,7 @@ class DocumentTag(models.Model):
     name = fields.Char('Tag Name', required=True, translate=True)
     color = fields.Integer('Color Index', default=0)
 
-    _sql_constraints = [
-        ('name_uniq', 'UNIQUE(name)', 'A tag with this name already exists.'),
-    ]
+    name_uniq = models.Constraint(
+        'UNIQUE(name)',
+        'A tag with this name already exists.',
+    )

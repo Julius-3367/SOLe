@@ -17,7 +17,7 @@ class Document(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
-    parent_path = fields.Char(index=True, unaccent=False)
+    parent_path = fields.Char(index=True)
 
     # ── Core ─────────────────────────────────────────────────────────────────
     active = fields.Boolean(default=True, tracking=True)
@@ -60,10 +60,10 @@ class Document(models.Model):
     # ── Attachments ───────────────────────────────────────────────────────────
     attachment_count = fields.Integer(compute='_compute_attachment_count', string='Files')
 
-    _sql_constraints = [
-        ('name_parent_uniq', 'UNIQUE(parent_id, name)',
-         'A document with this name already exists in this folder.'),
-    ]
+    name_parent_uniq = models.Constraint(
+        'UNIQUE(parent_id, name)',
+        'A document with this name already exists in this folder.',
+    )
 
     # ── Constraints ───────────────────────────────────────────────────────────
 
