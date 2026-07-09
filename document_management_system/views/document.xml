@@ -2,85 +2,156 @@
 <odoo>
     <data>
 
-        <record id="action_document_open" model="ir.actions.act_window">
-            <field name="name">Documents</field>
-            <field name="res_model">document.document</field>
-            <field name="view_mode">kanban,list,form</field>
-            <field name="domain">[]</field>
-        </record>
-
+        <!-- ═══════════════════════════════════════════════════════════════════
+             SEARCH VIEW
+        ═══════════════════════════════════════════════════════════════════════ -->
         <record id="view_document_search" model="ir.ui.view">
-            <field name="name">Document Search</field>
+            <field name="name">document.document.search</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
-                <search>
-                    <field name="name"/>
-                    <field name="parent_id"/>
-                    <filter name="filter_is_root" string="Root" domain="[('parent_id', '=', False)]"/>
-                    <group>
-                        <filter name="group_by_parent_id" string="Parent" context="{'group_by': 'parent_id'}"/>
+                <search string="Documents">
+                    <field name="name" string="Title" filter_domain="[('name', 'ilike', self)]"/>
+                    <field name="description" string="Summary"/>
+                    <field name="tag_ids" string="Tag"/>
+                    <field name="user_id" string="Owner"/>
+                    <field name="parent_id" string="Folder" context="{'display_full_name': True}"/>
+                    <!-- Filters -->
+                    <filter name="my_documents" string="My Documents"
+                            domain="[('user_id', '=', uid)]"/>
+                    <filter name="my_favorites" string="My Favorites"
+                            domain="[('is_favorite', '=', True)]"/>
+                    <separator/>
+                    <filter name="filter_is_root" string="Top-level Folders"
+                            domain="[('parent_id', '=', False)]"/>
+                    <separator/>
+                    <filter name="inactive" string="Archived"
+                            domain="[('active', '=', False)]"/>
+                    <!-- Group by -->
+                    <group string="Group By">
+                        <filter name="group_by_parent" string="Folder"
+                                context="{'group_by': 'parent_id'}"/>
+                        <filter name="group_by_owner" string="Owner"
+                                context="{'group_by': 'user_id'}"/>
+                        <filter name="group_by_tags" string="Tags"
+                                context="{'group_by': 'tag_ids'}"/>
                     </group>
+                    <!-- Default: show only root-level items -->
+                    <searchpanel>
+                        <field name="parent_id" string="Folders" icon="fa-folder"
+                               enable_counters="1" select="one" expand="1"/>
+                        <field name="tag_ids" string="Tags" icon="fa-tag"
+                               enable_counters="1" select="multi"/>
+                        <field name="user_id" string="Owner" icon="fa-user"
+                               enable_counters="1" select="one"/>
+                    </searchpanel>
                 </search>
             </field>
         </record>
 
-        <record id="view_document_tree" model="ir.ui.view">
-            <field name="name">Document Tree</field>
+        <!-- ═══════════════════════════════════════════════════════════════════
+             LIST VIEW
+        ═══════════════════════════════════════════════════════════════════════ -->
+        <record id="view_document_list" model="ir.ui.view">
+            <field name="name">document.document.list</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
-                <list>
+                <list multi_edit="1" decoration-muted="not active">
                     <field name="sequence" widget="handle"/>
+                    <field name="is_favorite" widget="boolean_favorite" nolabel="1"/>
                     <field name="name"/>
-                    <field name="parent_full_name" invisible="'default_parent_id' in context"/>
-                    <field name="child_count"/>
-                    <field name="create_uid"/>
-                    <field name="create_date"/>
-                    <field name="write_uid"/>
-                    <field name="write_date"/>
+                    <field name="parent_id" context="{'display_full_name': True}"
+                           invisible="'default_parent_id' in context" optional="show"/>
+                    <field name="tag_ids" widget="many2many_tags"
+                           options="{'color_field': 'color'}" optional="show"/>
+                    <field name="user_id" optional="show"/>
+                    <field name="child_count" string="Children" optional="show"/>
+                    <field name="attachment_count" string="Files" optional="show"/>
+                    <field name="write_uid" optional="hide"/>
+                    <field name="write_date" optional="hide"/>
+                    <field name="create_date" optional="hide"/>
                 </list>
             </field>
         </record>
 
+        <!-- ═══════════════════════════════════════════════════════════════════
+             KANBAN VIEW
+        ═══════════════════════════════════════════════════════════════════════ -->
         <record id="view_document_kanban" model="ir.ui.view">
-            <field name="name">Document Kanban</field>
+            <field name="name">document.document.kanban</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
-                <kanban class="o_kanban_document" color="color">
+                <kanban class="o_kanban_document" color="color"
+                        default_order="sequence, name">
                     <field name="id"/>
                     <field name="color"/>
                     <field name="name"/>
                     <field name="description"/>
-                    <field name="write_date"/>
+                    <field name="tag_ids"/>
+                    <field name="user_id"/>
                     <field name="child_count"/>
+                    <field name="attachment_count"/>
+                    <field name="is_favorite"/>
+                    <field name="write_date"/>
                     <templates>
                         <t t-name="kanban-menu">
-                            <a role="menuitem" type="open" class="dropdown-item">Open</a>
-                            <a t-if="widget.editable" role="menuitem" type="edit" class="dropdown-item">Edit</a>
-                            <a t-if="widget.deletable" role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                            <a role="menuitem" type="open" class="dropdown-item">
+                                <i class="fa fa-external-link me-1"/>Open
+                            </a>
+                            <a role="menuitem" type="edit" class="dropdown-item">
+                                <i class="fa fa-pencil me-1"/>Edit
+                            </a>
+                            <a role="menuitem" type="delete" class="dropdown-item text-danger">
+                                <i class="fa fa-trash me-1"/>Delete
+                            </a>
                             <div role="separator" class="dropdown-divider"/>
                             <ul class="oe_kanban_colorpicker" data-field="color"/>
                         </t>
                         <t t-name="card">
-                            <div t-attf-class="oe_kanban_color_#{record.color.raw_value}">
-                                <div t-attf-class="oe_kanban_content">
-                                    <div class="o_kanban_image">
-                                        <a class="d-block position-relative" type="object" name="action" t-attf-context="{'module_action_id': 'document_management_system.action_document_open', 'search_default_parent_id': {{record.id.raw_value}}, 'default_parent_id': {{record.id.raw_value}}}" title="Child" role="button">
-                                            <span class="position-absolute top-0 start-0 badge rounded-pill text-bg-dark"><t t-esc="record.child_count.raw_value || ''"/></span>
-                                            <img src="/document_management_system/static/description/document.png" alt="icon"/>
-                                        </a>
-                                    </div>
-                                    <div class="oe_kanban_details">
-                                        <ul>
-                                            <li>
-                                                <a type="open" t-att-title="record.name.value">
-                                                    <strong><t t-esc="record.name.value"/></strong>
-                                                </a>
-                                            </li>
-                                            <li t-if="record.description.value">
-                                                <t t-esc="record.description.value" />
-                                            </li>
-                                        </ul>
-                                    </div>
+                            <!-- Folder icon + child-count badge -->
+                            <div class="o_kanban_image position-relative mb-2">
+                                <a type="object" name="action_open_children"
+                                   class="d-inline-block text-decoration-none"
+                                   t-att-title="'Open ' + record.name.value">
+                                    <i class="fa fa-folder-open-o fa-3x text-primary"/>
+                                    <span t-if="record.child_count.raw_value"
+                                          class="badge rounded-pill bg-dark position-absolute top-0 start-100 translate-middle">
+                                        <t t-esc="record.child_count.raw_value"/>
+                                    </span>
+                                </a>
+                            </div>
+                            <!-- Title -->
+                            <strong class="o_kanban_record_title">
+                                <a type="open" t-att-title="record.name.value">
+                                    <t t-esc="record.name.value"/>
+                                </a>
+                            </strong>
+                            <!-- Summary -->
+                            <div t-if="record.description.value"
+                                 class="text-muted small text-truncate">
+                                <t t-esc="record.description.value"/>
+                            </div>
+                            <!-- Tags -->
+                            <div t-if="record.tag_ids.raw_value.length" class="mt-1">
+                                <field name="tag_ids" widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
+                            </div>
+                            <!-- Footer: owner + attachments + favorite -->
+                            <div class="o_kanban_record_bottom mt-2 d-flex align-items-center justify-content-between">
+                                <div class="o_kanban_record_headings">
+                                    <field name="user_id" widget="many2one_avatar_user"
+                                           options="{'size': 16}"/>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span t-if="record.attachment_count.raw_value"
+                                          class="text-muted small">
+                                        <i class="fa fa-paperclip"/>
+                                        <t t-esc="record.attachment_count.raw_value"/>
+                                    </span>
+                                    <a type="object" name="action_toggle_favorite"
+                                       class="o_priority_star"
+                                       t-att-title="record.is_favorite.raw_value ? 'Remove from favorites' : 'Add to favorites'">
+                                        <i t-attf-class="fa fa-star#{record.is_favorite.raw_value ? '' : '-o'} text-warning"/>
+                                    </a>
                                 </div>
                             </div>
                         </t>
@@ -89,39 +160,83 @@
             </field>
         </record>
 
+        <!-- ═══════════════════════════════════════════════════════════════════
+             FORM VIEW
+        ═══════════════════════════════════════════════════════════════════════ -->
         <record id="view_document_form" model="ir.ui.view">
-            <field name="name">Document Form</field>
+            <field name="name">document.document.form</field>
             <field name="model">document.document</field>
             <field name="arch" type="xml">
                 <form class="o_form_document">
                     <sheet>
-                        <field name="id" invisible="1"/>
+                        <!-- Stat buttons -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_children" type="object"
+                                    class="oe_stat_button" icon="fa-folder-open-o"
+                                    invisible="child_count == 0">
+                                <field name="child_count" widget="statinfo"
+                                       string="Sub-documents"/>
+                            </button>
+                            <button name="action_open_attachments" type="object"
+                                    class="oe_stat_button" icon="fa-paperclip">
+                                <field name="attachment_count" widget="statinfo"
+                                       string="Files"/>
+                            </button>
+                            <button name="action_toggle_favorite" type="object"
+                                    class="oe_stat_button">
+                                <field name="is_favorite" widget="boolean_favorite"
+                                       nolabel="1"/>
+                                <span class="o_stat_text">Favorite</span>
+                            </button>
+                        </div>
+
+                        <!-- Title -->
                         <div class="oe_title">
-                            <label for="name"/>
+                            <label for="name" string="Document Title"/>
                             <h1>
-                                <field name="name"/>
+                                <field name="name" placeholder="e.g. Company Policies"/>
                             </h1>
                         </div>
-                        <div class="oe_title">
-                            <label for="description"/>
-                            <h1>
-                                <field name="description"/>
-                            </h1>
-                        </div>
-                        <label for="content"/>
-                        <field name="content" options="{'collaborative': false}" style="min-height: 300px;"/>
-                        <separator/>
-                        <label for="child_ids"/>
-                        <field name="child_ids" context="{'default_parent_id': id}"/>
+
+                        <!-- Summary + Tags + Owner + Parent -->
                         <group>
-                            <group>
-                                <field name="parent_id" options="{'no_create': True}" domain="[('id', '!=', id)]" context="{'display_full_name': True}"/>
+                            <group string="Details">
+                                <field name="parent_id"
+                                       context="{'display_full_name': True}"
+                                       options="{'no_create': True}"
+                                       domain="[('id', '!=', id)]"/>
+                                <field name="user_id"/>
+                                <field name="tag_ids" widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
                             </group>
-                            <group>
-                                <field name="parent_full_name"/>
+                            <group string="Summary">
+                                <field name="description" nolabel="1"
+                                       placeholder="Short summary of this document…"/>
                             </group>
                         </group>
-                        <group>
+
+                        <separator string="Content"/>
+                        <field name="content" options="{'collaborative': false}"
+                               style="min-height: 300px;"/>
+
+                        <!-- Inline sub-documents -->
+                        <separator string="Sub-documents" invisible="not id"/>
+                        <field name="child_ids" invisible="not id"
+                               context="{'default_parent_id': id}"
+                               mode="list">
+                            <list>
+                                <field name="name"/>
+                                <field name="tag_ids" widget="many2many_tags"
+                                       options="{'color_field': 'color'}"/>
+                                <field name="user_id"/>
+                                <field name="child_count" string="Children"/>
+                                <field name="attachment_count" string="Files"/>
+                                <field name="write_date"/>
+                            </list>
+                        </field>
+
+                        <!-- Audit info -->
+                        <group class="mt-4">
                             <group>
                                 <field name="create_uid" readonly="1"/>
                                 <field name="write_uid" readonly="1"/>
@@ -137,15 +252,59 @@
             </field>
         </record>
 
+        <!-- ═══════════════════════════════════════════════════════════════════
+             ACTIONS
+        ═══════════════════════════════════════════════════════════════════════ -->
+
+        <!-- Reusable sub-action: browse into a folder (called from kanban card) -->
+        <record id="action_document_open" model="ir.actions.act_window">
+            <field name="name">Documents</field>
+            <field name="res_model">document.document</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <!-- Main entry: top-level folders -->
         <record id="action_document_main" model="ir.actions.act_window">
             <field name="name">Documents</field>
             <field name="res_model">document.document</field>
             <field name="view_mode">kanban,list,form</field>
             <field name="domain">[]</field>
-            <field name="context" eval="{'search_default_filter_is_root':1}"/>
+            <field name="context" eval="{'search_default_filter_is_root': 1}"/>
         </record>
 
-        <menuitem id="menu_documents" sequence="4" groups="group_document_user" action="action_document_main" web_icon="document_management_system,static/description/icon.png"/>
+        <!-- My favorites shortcut -->
+        <record id="action_document_favorites" model="ir.actions.act_window">
+            <field name="name">My Favorites</field>
+            <field name="res_model">document.document</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="domain">[]</field>
+            <field name="context" eval="{'search_default_my_favorites': 1}"/>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             MENU
+        ═══════════════════════════════════════════════════════════════════════ -->
+        <menuitem
+            id="menu_documents"
+            sequence="4"
+            groups="group_document_user"
+            action="action_document_main"
+            web_icon="document_management_system,static/description/icon.png"/>
+
+        <menuitem
+            id="menu_document_favorites"
+            name="My Favorites"
+            parent="menu_documents"
+            sequence="10"
+            action="action_document_favorites"/>
+
+        <menuitem
+            id="menu_document_all"
+            name="All Documents"
+            parent="menu_documents"
+            sequence="20"
+            action="action_document_main"/>
 
     </data>
 </odoo>

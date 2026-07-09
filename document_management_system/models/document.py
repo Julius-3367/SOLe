@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import logging
 
 from odoo import api, fields, models, _
@@ -9,75 +8,159 @@ _logger = logging.getLogger(__name__)
 
 
 class Document(models.Model):
-    _name = "document.document"
+    _name = 'document.document'
     _description = 'Document'
-    _parent_name = "parent_id"
+    _parent_name = 'parent_id'
     _parent_store = True
-    _parent_order = 'sequence,id'
-    _order = 'parent_id,sequence,id'
+    _parent_order = 'sequence, name'
+    _order = 'sequence, name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'name'
 
-    parent_path = fields.Char(index=True)
-    parent_left = fields.Integer(index=True)
-    parent_right = fields.Integer(index=True)
-    active = fields.Boolean(default=True)
-    sequence = fields.Integer(default=0)
+    parent_path = fields.Char(index=True, unaccent=False)
+
+    # ── Core ─────────────────────────────────────────────────────────────────
+    active = fields.Boolean(default=True, tracking=True)
+    sequence = fields.Integer(default=10)
     color = fields.Integer()
-    name = fields.Char('Name', required=True)
-    full_name = fields.Char('Full Name', compute='_compute_full_name')
-    description = fields.Char('Description')
-    content = fields.Html('Content')
-    parent_id = fields.Many2one('document.document', "Parent", ondelete="cascade", index=True)
-    parent_full_name = fields.Char("Path", related='parent_id.full_name')
-    child_ids = fields.One2many('document.document', 'parent_id', string='Child')
-    child_count = fields.Integer(compute='_compute_child_count', string='Child Count')
+    name = fields.Char('Title', required=True, tracking=True)
+    description = fields.Text('Summary')
+    content = fields.Html('Content', sanitize=True)
 
-    _parent_id_name_uniq = models.Constraint('UNIQUE(parent_id, name)', 'Name already exists!')
+    # ── Hierarchy ─────────────────────────────────────────────────────────────
+    parent_id = fields.Many2one(
+        'document.document', 'Parent Folder',
+        ondelete='cascade', index=True,
+        domain="[('id', '!=', id)]",
+        tracking=True,
+    )
+    child_ids = fields.One2many('document.document', 'parent_id', string='Children')
+    child_count = fields.Integer(compute='_compute_child_count', string='Sub-documents')
+
+    # ── Metadata ──────────────────────────────────────────────────────────────
+    user_id = fields.Many2one(
+        'res.users', 'Owner',
+        default=lambda self: self.env.user,
+        index=True, tracking=True,
+    )
+    tag_ids = fields.Many2many('document.tag', string='Tags')
+
+    # ── Favorites ─────────────────────────────────────────────────────────────
+    favorite_user_ids = fields.Many2many(
+        'res.users', 'document_favorite_rel', 'document_id', 'user_id',
+        string='Favorited By', copy=False,
+    )
+    is_favorite = fields.Boolean(
+        compute='_compute_is_favorite',
+        inverse='_inverse_is_favorite',
+        search='_search_is_favorite',
+        string='Favorite',
+    )
+
+    # ── Attachments ───────────────────────────────────────────────────────────
+    attachment_count = fields.Integer(compute='_compute_attachment_count', string='Files')
+
+    _sql_constraints = [
+        ('name_parent_uniq', 'UNIQUE(parent_id, name)',
+         'A document with this name already exists in this folder.'),
+    ]
+
+    # ── Constraints ───────────────────────────────────────────────────────────
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
         if not self._check_recursion():
-            raise ValidationError(_('Parent already recursive!'))
+            raise ValidationError(_('Cannot set a document as its own ancestor.'))
+
+    # ── Computed fields ───────────────────────────────────────────────────────
 
     def _compute_child_count(self):
-        relative_field = self._fields.get("child_ids")
-        comodel_name = relative_field.comodel_name
-        inverse_name = relative_field.inverse_name
-        count_data = self.env[comodel_name].read_group([(inverse_name, 'in', self.ids)], [inverse_name], [inverse_name])
-        mapped_data = dict([(count_item[inverse_name][0], count_item['%s_count' % inverse_name]) for count_item in count_data])
+        count_data = self.env['document.document']._read_group(
+            [('parent_id', 'in', self.ids)],
+            ['parent_id'],
+            ['__count'],
+        )
+        mapped = {parent.id: count for parent, count in count_data}
         for record in self:
-            record.child_count = mapped_data.get(record.id, 0)
+            record.child_count = mapped.get(record.id, 0)
 
-    def name_get(self):
-        if self.env.context.get('display_full_name', False):
-            pass
-        else:
-            return super(Document, self).name_get()
-        def get_names(record):
-            res = []
-            while record:
-                res.append(record.name or '')
-                record = record.parent_id
-            return res
-        return [(record.id, " / ".join(reversed(get_names(record)))) for record in self]
+    def _compute_is_favorite(self):
+        for doc in self:
+            doc.is_favorite = self.env.user in doc.favorite_user_ids
 
-    def _compute_full_name(self):
-        res_dict = dict(self.with_context({'display_full_name': True}).name_get())
+    def _inverse_is_favorite(self):
+        for doc in self:
+            if doc.is_favorite:
+                doc.sudo().favorite_user_ids |= self.env.user
+            else:
+                doc.sudo().favorite_user_ids -= self.env.user
+
+    def _search_is_favorite(self, operator, value):
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            raise UserError(_('Operation not supported.'))
+        if (operator == '=' and value) or (operator == '!=' and not value):
+            return [('favorite_user_ids', 'in', [self.env.uid])]
+        return [('favorite_user_ids', 'not in', [self.env.uid])]
+
+    def _compute_attachment_count(self):
+        count_data = self.env['ir.attachment']._read_group(
+            [('res_model', '=', 'document.document'), ('res_id', 'in', self.ids)],
+            ['res_id'],
+            ['__count'],
+        )
+        mapped = {res_id: count for res_id, count in count_data}
+        for doc in self:
+            doc.attachment_count = mapped.get(doc.id, 0)
+
+    def _compute_display_name(self):
+        if not self.env.context.get('display_full_name'):
+            return super()._compute_display_name()
         for record in self:
-            record.full_name = res_dict.get(record.id, "")
+            parts = []
+            current = record
+            while current:
+                parts.append(current.name or '')
+                current = current.parent_id
+            record.display_name = ' / '.join(reversed(parts))
+
+    # ── ORM ──────────────────────────────────────────────────────────────────
 
     def copy(self, default=None):
         default = dict(default or {})
-        default.update(name=_("%s (copy)") % (self.name or ''))
-        return super(Document, self).copy(default)
+        default['name'] = _('%s (copy)') % (self.name or '')
+        return super().copy(default)
 
-    def action(self):
+    # ── Actions ───────────────────────────────────────────────────────────────
+
+    def action_open_children(self):
+        """Open this document's children in kanban/list/form."""
         self.ensure_one()
-        context = self.env.context
-        action_id = context.get('module_action_id')
-        if action_id:
-            action_dict = self.env.ref(action_id).read([
-                "type", "res_model", "view_mode", "domain"
-            ])[0]
-            action_dict["name"] = self.name
-        return action_dict
+        return {
+            'name': self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'document.document',
+            'view_mode': 'kanban,list,form',
+            'domain': [('parent_id', '=', self.id)],
+            'context': dict(
+                self.env.context,
+                default_parent_id=self.id,
+            ),
+        }
+
+    def action_toggle_favorite(self):
+        self.ensure_one()
+        self.is_favorite = not self.is_favorite
+
+    def action_open_attachments(self):
+        self.ensure_one()
+        return {
+            'name': _('Files — %s') % self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'ir.attachment',
+            'view_mode': 'list,form',
+            'domain': [('res_model', '=', 'document.document'), ('res_id', '=', self.id)],
+            'context': {
+                'default_res_model': 'document.document',
+                'default_res_id': self.id,
+            },
+        }
