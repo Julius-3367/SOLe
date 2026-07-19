@@ -34,6 +34,8 @@ class ReportCashBook(models.AbstractModel):
 
         cr = self.env.cr
         move_line = self.env['account.move.line']
+        if not accounts.ids:
+            return []
         move_lines = {x: [] for x in accounts.ids}
 
         # Prepare initial sql query and Get the initial move lines

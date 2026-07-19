@@ -37,11 +37,12 @@ class ReportPartnerLedger(models.AbstractModel):
             data['form'].get('used_context', {}))._query_get()
         reconcile_clause = "" if data['form'][
             'reconciled'] else ' AND "account_move_line".full_reconcile_id IS NULL '
-        params = [partner.id, tuple(data['computed']['move_state']),
+        company_id = str(self.env.company.root_id.id)
+        params = [company_id, partner.id, tuple(data['computed']['move_state']),
                   tuple(data['computed']['account_ids'])] + \
                  query_get_data[2]
         query = """
-            SELECT "account_move_line".id, "account_move_line".date, j.code, acc.code as a_code, acc.name as a_name, "account_move_line".ref, m.name as move_name, "account_move_line".name, "account_move_line".debit, "account_move_line".credit, "account_move_line".amount_currency,"account_move_line".currency_id, c.symbol AS currency_code
+            SELECT "account_move_line".id, "account_move_line".date, j.code, (acc.code_store::jsonb->>%s) as a_code, acc.name as a_name, "account_move_line".ref, m.name as move_name, "account_move_line".name, "account_move_line".debit, "account_move_line".credit, "account_move_line".amount_currency,"account_move_line".currency_id, c.symbol AS currency_code
             FROM """ + query_get_data[0] + """
             LEFT JOIN account_journal j ON ("account_move_line".journal_id = j.id)
             LEFT JOIN account_account acc ON ("account_move_line".account_id = acc.id)
@@ -122,8 +123,7 @@ class ReportPartnerLedger(models.AbstractModel):
         self.env.cr.execute("""
             SELECT a.id
             FROM account_account a
-            WHERE a.account_type IN %s
-            AND a.account_type IN %s""",
+            WHERE a.account_type IN %s""",
                             (tuple(data['computed']['ACCOUNT_TYPE']),))
         data['computed']['account_ids'] = [a for (a,) in
                                            self.env.cr.fetchall()]

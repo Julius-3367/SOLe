@@ -46,7 +46,8 @@ class ReportJournal(models.AbstractModel):
             query += '"account_move_line".date'
         else:
             query += 'am.name'
-        query += ', "account_move_line".move_id, acc.code'
+        query += ', "account_move_line".move_id, (acc.code_store::jsonb->>%s)'
+        params.append(str(self.env.company.root_id.id))
         self.env.cr.execute(query, tuple(params))
         ids = (x[0] for x in self.env.cr.fetchall())
         return self.env['account.move.line'].browse(ids)
