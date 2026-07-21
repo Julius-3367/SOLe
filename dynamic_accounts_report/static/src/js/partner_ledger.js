@@ -51,7 +51,7 @@ class PartnerLedger extends Component {
             var self = this;
             self.state.data = await self.orm.call("account.partner.ledger", "view_report", [[this.wizard_id], action_title,]);
             // Extract partner information from the data
-            $.each(self.state.data, function (index, value) {
+            Object.entries(self.state.data).forEach(([index, value]) => {
                 if (index !== 'partner_totals') {
                     partner_list.push(index)
                 }
@@ -348,7 +348,7 @@ class PartnerLedger extends Component {
             }
         }
         let filtered_data = await this.orm.call("account.partner.ledger", "get_filter_values", [this.state.selected_partner, this.state.date_range, this.state.account, this.state.options,]);
-        $.each(filtered_data, function (index, value) {
+        Object.entries(filtered_data).forEach(([index, value]) => {
             if (index !== 'partner_totals') {
                 partner_list.push(index)
             }
@@ -365,7 +365,7 @@ class PartnerLedger extends Component {
         this.state.total = partner_totals
         this.state.total_debit = totalDebitSum
         this.state.total_credit = totalCreditSum
-        if ($(this.unfoldButton.el.classList).find("selected-filter")) {
+        if (this.unfoldButton.el.classList.contains("selected-filter")) {
             this.unfoldButton.el.classList.remove("selected-filter")
         }
     }
@@ -381,12 +381,12 @@ class PartnerLedger extends Component {
          */
         if (!ev.target.classList.contains("selected-filter")) {
             for (var length = 0; length < this.tbody.el.children.length; length++) {
-                $(this.tbody.el.children[length])[0].classList.add('show')
+                this.tbody.el.children[length].classList.add('show')
             }
             ev.target.classList.add("selected-filter");
         } else {
             for (var length = 0; length < this.tbody.el.children.length; length++) {
-                $(this.tbody.el.children[length])[0].classList.remove('show')
+                this.tbody.el.children[length].classList.remove('show')
             }
             ev.target.classList.remove("selected-filter");
         }

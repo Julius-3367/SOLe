@@ -59,7 +59,7 @@ class TrialBalance extends Component {
             self.start_date.el.value = startOfMonth.getFullYear() + '-' + String(startOfMonth.getMonth() + 1).padStart(2, '0') + '-' + String(startOfMonth.getDate()).padStart(2, '0');
             self.end_date.el.value = endOfMonth.getFullYear() + '-' + String(endOfMonth.getMonth() + 1).padStart(2, '0') + '-' + String(endOfMonth.getDate()).padStart(2, '0');
             self.state.date_viewed.push(monthNamesShort[today.getMonth()] + '  ' + today.getFullYear())
-            $.each(self.state.data, function (index, value) {
+            Object.entries(self.state.data).forEach(([index, value]) => {
                 self.state.journals = value.journal_ids
             })
         }
@@ -240,14 +240,15 @@ class TrialBalance extends Component {
         }
         this.state.data = await this.orm.call("account.trial.balance", "get_filter_values", [this.start_date.el.value, this.end_date.el.value, this.state.comparison_number, this.state.comparison_type, this.state.selected_journal_list, this.state.selected_analytic, this.state.options,this.state.method,]);
         var date_viewed = []
-        $.each(this.state.data, function (index, value) {
+        const self = this;
+        Object.entries(this.state.data).forEach(([index, value]) => {
             if (index == 'journal_ids') {
-                this.state.journals = value
+                self.state.journals = value
             }
-            if (value.dynamic_date_num) {
-                $.each(value.dynamic_date_num, function (index, value) {
-                    if (!date_viewed.includes(value)) {
-                        date_viewed.push(value)
+            if (value && value.dynamic_date_num) {
+                value.dynamic_date_num.forEach((v) => {
+                    if (!date_viewed.includes(v)) {
+                        date_viewed.push(v)
                     }
                 })
             }

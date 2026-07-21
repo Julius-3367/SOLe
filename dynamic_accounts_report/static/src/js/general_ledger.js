@@ -49,7 +49,7 @@ class GeneralLedger extends Component {
         try {
             var self = this;
             self.state.account_data = await self.orm.call("account.general.ledger", "view_report", [[this.wizard_id], action_title,]);
-            $.each(self.state.account_data, function (index, value) {
+            Object.entries(self.state.account_data).forEach(([index, value]) => {
                 if (index !== 'account_totals' && index !== 'journal_ids' && index !== 'analytic_ids') {
                     account_list.push(index)
                 } else if (index == 'journal_ids') {
@@ -279,7 +279,7 @@ class GeneralLedger extends Component {
             }
         }
         let filtered_data = await this.orm.call("account.general.ledger", "get_filter_values", [this.state.selected_journal_list, this.state.date_range, this.state.options, this.state.selected_analytic_list,this.state.method]);
-        $.each(filtered_data, function (index, value) {
+        Object.entries(filtered_data).forEach(([index, value]) => {
             if (index !== 'account_totals' && index !== 'journal_ids' && index !== 'analytic_ids') {
                 account_list.push(index)
             }

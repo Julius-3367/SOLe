@@ -65,10 +65,10 @@ class TaxReport extends Component {
             self.start_date.el.value = startOfMonth.getFullYear() + '-' + String(startOfMonth.getMonth() + 1).padStart(2, '0') + '-' + String(startOfMonth.getDate()).padStart(2, '0');
             self.end_date.el.value = endOfMonth.getFullYear() + '-' + String(endOfMonth.getMonth() + 1).padStart(2, '0') + '-' + String(endOfMonth.getDate()).padStart(2, '0');
             self.state.date_viewed.push(monthNamesShort[today.getMonth()] + '  ' + today.getFullYear())
-            $.each(self.state.data.sale, function (index, value) {
+            self.state.data.sale.forEach((value) => {
                     self.state.sale_total += value.tax
             })
-            $.each(self.state.data.purchase, function (index, value) {
+            self.state.data.purchase.forEach((value) => {
                     self.state.purchase_total += value.tax
             })
         }
@@ -250,14 +250,14 @@ class TaxReport extends Component {
         var date_viewed = []
         var sale_total = 0.0
         var purchase_total = 0.0
-        $.each(this.state.data.sale, function (index, value) {
+        this.state.data.sale.forEach((value) => {
                 sale_total += value.tax
         })
-        $.each(this.state.data.purchase, function (index, value) {
+        this.state.data.purchase.forEach((value) => {
                 purchase_total += value.tax
         })
         var date_viewed = []
-        $.each(this.state.data.dynamic_date_num, function (index, value) {
+        this.state.data.dynamic_date_num.forEach((value) => {
             if (!date_viewed.includes(value)) {
                 date_viewed.push(value)
             }
