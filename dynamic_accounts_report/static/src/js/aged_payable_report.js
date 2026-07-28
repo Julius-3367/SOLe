@@ -141,12 +141,12 @@ class AgedPayable extends Component {
          */
         if (!ev.target.classList.contains("selected-filter")) {
             for (var length = 0; length < this.tbody.el.children.length; length++) {
-                $(this.tbody.el.children[length])[0].classList.add('show')
+                this.tbody.el.children[length].classList.add('show')
             }
             ev.target.classList.add("selected-filter");
         } else {
             for (var length = 0; length < this.tbody.el.children.length; length++) {
-                $(this.tbody.el.children[length])[0].classList.remove('show')
+                this.tbody.el.children[length].classList.remove('show')
             }
             ev.target.classList.remove("selected-filter");
         }

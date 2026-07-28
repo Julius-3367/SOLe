@@ -183,10 +183,10 @@ class TaxReport extends Component {
                     'account': true
                 };
                 val.target.classList.add("selected-filter");
-                if($(this.tax.el.classList.contains("selected-filter"))) {
+                if(this.tax.el.classList.contains("selected-filter")) {
                     this.tax.el.classList.remove("selected-filter");
                 }
-                if($(this.global.el.classList.contains("selected-filter"))) {
+                if(this.global.el.classList.contains("selected-filter")) {
                     this.global.el.classList.remove("selected-filter");
                 }
             }
@@ -200,10 +200,10 @@ class TaxReport extends Component {
                     'tax': true
                 };
                 val.target.classList.add("selected-filter");
-                if($(this.account.el.classList.contains("selected-filter"))) {
+                if(this.account.el.classList.contains("selected-filter")) {
                     this.account.el.classList.remove("selected-filter");
                 }
-                if($(this.global.el.classList.contains("selected-filter"))) {
+                if(this.global.el.classList.contains("selected-filter")) {
                     this.global.el.classList.remove("selected-filter");
                 }
             }
@@ -215,10 +215,10 @@ class TaxReport extends Component {
             } else {
                 this.state.report_type = null
                 val.target.classList.add("selected-filter");
-                if($(this.account.el.classList.contains("selected-filter"))) {
+                if(this.account.el.classList.contains("selected-filter")) {
                     this.account.el.classList.remove("selected-filter");
                 }
-                if($(this.tax.el.classList.contains("selected-filter"))) {
+                if(this.tax.el.classList.contains("selected-filter")) {
                     this.tax.el.classList.remove("selected-filter");
                 }
             }
