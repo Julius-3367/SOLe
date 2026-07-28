@@ -4,10 +4,7 @@
         <field name="name">sole.whmcs.sync.log.list</field>
         <field name="model">sole.whmcs.sync.log</field>
         <field name="arch" type="xml">
-            <list string="WHMCS Sync Logs"
-                  decoration-success="state == 'ok'"
-                  decoration-warning="state == 'warning'"
-                  decoration-danger="state == 'error'">
+            <list string="Sync Logs" decoration-danger="state == 'error'" decoration-warning="state == 'warning'">
                 <field name="create_date" string="Date"/>
                 <field name="config_id"/>
                 <field name="sync_type"/>
@@ -23,7 +20,7 @@
         <field name="name">sole.whmcs.sync.log.form</field>
         <field name="model">sole.whmcs.sync.log</field>
         <field name="arch" type="xml">
-            <form string="Sync Log">
+            <form string="Sync Log" create="false" edit="false">
                 <sheet>
                     <group>
                         <group>
@@ -38,7 +35,7 @@
                         </group>
                     </group>
                     <group string="Error Details" invisible="not errors">
-                        <field name="errors" widget="text" nolabel="1"/>
+                        <field name="errors" nolabel="1"/>
                     </group>
                 </sheet>
             </form>
@@ -57,18 +54,11 @@
                 <separator/>
                 <filter string="Clients" name="clients" domain="[('sync_type', '=', 'clients')]"/>
                 <filter string="Invoices" name="invoices" domain="[('sync_type', '=', 'invoices')]"/>
-                <group expand="0" string="Group By">
-                    <filter string="Config" name="group_config" context="{'group_by': 'config_id'}"/>
-                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
-                    <filter string="Type" name="group_type" context="{'group_by': 'sync_type'}"/>
-                </group>
+                <separator/>
+                <filter string="Config" name="group_config" context="{'group_by': 'config_id'}"/>
+                <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                <filter string="Type" name="group_type" context="{'group_by': 'sync_type'}"/>
             </search>
         </field>
-    </record>
-
-    <record id="action_sole_whmcs_sync_log" model="ir.actions.act_window">
-        <field name="name">WHMCS Sync Logs</field>
-        <field name="res_model">sole.whmcs.sync.log</field>
-        <field name="view_mode">list,form</field>
     </record>
 </odoo>

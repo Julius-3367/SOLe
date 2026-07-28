@@ -5,7 +5,7 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='internal']" position="inside">
+            <xpath expr="//notebook" position="inside">
                 <group string="WHMCS" invisible="not whmcs_client_id">
                     <field name="whmcs_client_id" readonly="True"/>
                 </group>
