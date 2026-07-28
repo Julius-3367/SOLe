@@ -246,7 +246,7 @@ class TrialBalance extends Component {
                 self.state.journals = value
             }
             if (value && value.dynamic_date_num) {
-                value.dynamic_date_num.forEach((v) => {
+                Object.values(value.dynamic_date_num).forEach((v) => {
                     if (!date_viewed.includes(v)) {
                         date_viewed.push(v)
                     }

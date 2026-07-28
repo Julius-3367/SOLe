@@ -257,11 +257,13 @@ class TaxReport extends Component {
                 purchase_total += value.tax
         })
         var date_viewed = []
-        this.state.data.dynamic_date_num.forEach((value) => {
-            if (!date_viewed.includes(value)) {
-                date_viewed.push(value)
-            }
-        })
+        if (this.state.data.dynamic_date_num) {
+            Object.values(this.state.data.dynamic_date_num).forEach((value) => {
+                if (!date_viewed.includes(value)) {
+                    date_viewed.push(value)
+                }
+            })
+        }
         if (date_viewed.length !== 0) {
             this.state.date_viewed = date_viewed.reverse()
         }
