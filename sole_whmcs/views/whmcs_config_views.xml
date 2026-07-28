@@ -7,7 +7,10 @@
             <form string="WHMCS Configuration">
                 <header>
                     <button name="action_test_connection" type="object"
-                            string="Test Connection" class="btn-primary"/>
+                            string="Test Connection" class="btn-secondary"/>
+                    <button name="action_sync_full" type="object"
+                            string="Sync Now" class="btn-primary"
+                            confirm="This will sync all clients and invoices from WHMCS. Continue?"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -16,24 +19,27 @@
                             <field name="sync_log_count" widget="statinfo" string="Sync Logs"/>
                         </button>
                     </div>
+                    <widget name="web_ribbon" title="Inactive" bg_color="bg-danger"
+                            invisible="is_active"/>
                     <group>
                         <group string="Connection">
                             <field name="name"/>
-                            <field name="api_url"/>
+                            <field name="api_url" placeholder="https://billing.yourdomain.com/includes/api.php"/>
                             <field name="api_identifier"/>
                             <field name="api_secret" password="True"/>
                             <field name="is_active"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id"/>
                         </group>
                         <group string="Accounting">
                             <field name="default_journal_id"/>
-                            <field name="default_account_id"/>
+                            <field name="default_account_id"
+                                   domain="[('company_id', '=', company_id), ('account_type', 'in', ['income', 'income_other'])]"/>
                             <field name="auto_post_paid"/>
                         </group>
                     </group>
                     <group string="Last Sync">
-                        <field name="last_client_sync" readonly="1"/>
-                        <field name="last_invoice_sync" readonly="1"/>
+                        <field name="last_client_sync" readonly="True"/>
+                        <field name="last_invoice_sync" readonly="True"/>
                     </group>
                 </sheet>
             </form>
@@ -47,6 +53,7 @@
             <list string="WHMCS Configurations">
                 <field name="name"/>
                 <field name="api_url"/>
+                <field name="company_id" optional="show"/>
                 <field name="is_active"/>
                 <field name="last_client_sync"/>
                 <field name="last_invoice_sync"/>

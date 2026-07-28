@@ -5,10 +5,14 @@
         <field name="model_id" ref="sole_whmcs.model_sole_whmcs_config"/>
         <field name="state">code</field>
         <field name="code">
-config = model.search([('is_active', '=', True)], limit=1)
-if config:
-    config.sync_clients()
-    config.sync_invoices()
+try:
+    config = model.search([('is_active', '=', True)], limit=1)
+    if config:
+        config.sync_clients()
+        config.sync_invoices()
+except Exception as e:
+    import logging
+    logging.getLogger(__name__).exception("SOLe WHMCS scheduled sync failed: %s", e)
         </field>
         <field name="interval_number">12</field>
         <field name="interval_type">hours</field>

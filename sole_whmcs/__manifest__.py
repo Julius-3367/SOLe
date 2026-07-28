@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe WHMCS Connector',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.2.0',
     'category': 'Sales/CRM',
     'summary': 'Sync clients and invoices between WHMCS billing platform and Odoo',
     'description': """
@@ -29,6 +29,7 @@ Features
         'data/cron_data.xml',
         'views/whmcs_config_views.xml',
         'views/whmcs_sync_log_views.xml',
+        'views/res_partner_views.xml',
         'wizard/whmcs_sync_wizard_views.xml',
         'views/menus.xml',
     ],

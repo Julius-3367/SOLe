@@ -4,8 +4,10 @@
         <field name="name">sole.whmcs.sync.log.list</field>
         <field name="model">sole.whmcs.sync.log</field>
         <field name="arch" type="xml">
-            <list string="WHMCS Sync Logs" decoration-success="state=='ok'"
-                  decoration-warning="state=='warning'" decoration-danger="state=='error'">
+            <list string="WHMCS Sync Logs"
+                  decoration-success="state == 'ok'"
+                  decoration-warning="state == 'warning'"
+                  decoration-danger="state == 'error'">
                 <field name="create_date" string="Date"/>
                 <field name="config_id"/>
                 <field name="sync_type"/>
@@ -24,18 +26,43 @@
             <form string="Sync Log">
                 <sheet>
                     <group>
-                        <field name="config_id"/>
-                        <field name="sync_type"/>
-                        <field name="state"/>
-                        <field name="records_created"/>
-                        <field name="records_updated"/>
-                        <field name="error_count"/>
+                        <group>
+                            <field name="config_id"/>
+                            <field name="sync_type"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="records_created"/>
+                            <field name="records_updated"/>
+                            <field name="error_count"/>
+                        </group>
                     </group>
-                    <group string="Errors" invisible="not errors">
+                    <group string="Error Details" invisible="not errors">
                         <field name="errors" widget="text" nolabel="1"/>
                     </group>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="view_sole_whmcs_sync_log_search" model="ir.ui.view">
+        <field name="name">sole.whmcs.sync.log.search</field>
+        <field name="model">sole.whmcs.sync.log</field>
+        <field name="arch" type="xml">
+            <search string="Search Sync Logs">
+                <field name="config_id"/>
+                <filter string="OK" name="ok" domain="[('state', '=', 'ok')]"/>
+                <filter string="Warning" name="warning" domain="[('state', '=', 'warning')]"/>
+                <filter string="Error" name="error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Clients" name="clients" domain="[('sync_type', '=', 'clients')]"/>
+                <filter string="Invoices" name="invoices" domain="[('sync_type', '=', 'invoices')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Config" name="group_config" context="{'group_by': 'config_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'sync_type'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

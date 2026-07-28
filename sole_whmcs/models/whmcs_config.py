@@ -7,13 +7,17 @@ WHMCS API v1 uses POST with action, identifier, secret and responsetype=json.
 import logging
 from datetime import datetime
 
-import requests
+try:
+    import requests
+    _REQUESTS_OK = True
+except ImportError:
+    _REQUESTS_OK = False
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-# WHMCS invoice statuses that should be posted in Odoo
 _PAID_STATUSES = {"Paid"}
 _CANCELLED_STATUSES = {"Cancelled", "Refunded"}
 
@@ -22,6 +26,10 @@ class SoleWhmcsConfig(models.Model):
     _name = "sole.whmcs.config"
     _description = "WHMCS API Configuration"
     _rec_name = "name"
+
+    _sql_constraints = [
+        ("name_company_uniq", "unique(name, company_id)", "A config with this name already exists for this company."),
+    ]
 
     name = fields.Char(string="Config Name", required=True, default="WHMCS Connection")
     api_url = fields.Char(
@@ -57,7 +65,6 @@ class SoleWhmcsConfig(models.Model):
     )
     last_client_sync = fields.Datetime(string="Last Client Sync", readonly=True)
     last_invoice_sync = fields.Datetime(string="Last Invoice Sync", readonly=True)
-
     sync_log_count = fields.Integer(string="Sync Logs", compute="_compute_log_count")
 
     def _compute_log_count(self):
@@ -66,10 +73,21 @@ class SoleWhmcsConfig(models.Model):
                 [("config_id", "=", rec.id)]
             )
 
+    @api.constrains("api_url")
+    def _check_api_url(self):
+        for rec in self:
+            if rec.api_url and not rec.api_url.startswith(("http://", "https://")):
+                raise UserError(_("API URL must start with http:// or https://"))
+
     # ── API Call ─────────────────────────────────────────────────────────────
     def _api_call(self, action, extra_params=None):
         """Execute a WHMCS API call. Returns the decoded JSON response dict."""
         self.ensure_one()
+        if not _REQUESTS_OK:
+            raise UserError(
+                _("The Python 'requests' library is not installed. "
+                  "Run: pip install requests")
+            )
         payload = {
             "action": action,
             "identifier": self.api_identifier,
@@ -103,12 +121,31 @@ class SoleWhmcsConfig(models.Model):
             },
         }
 
+    def action_sync_full(self):
+        """Convenience button: sync clients then invoices, show result."""
+        self.ensure_one()
+        c_created, c_updated, c_errors = self.sync_clients()
+        i_created, i_errors = self.sync_invoices()
+        lines = [
+            _("Clients — Created: %d, Updated: %d, Errors: %d") % (c_created, c_updated, len(c_errors)),
+            _("Invoices — Created: %d, Errors: %d") % (i_created, len(i_errors)),
+        ]
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("WHMCS Sync Complete"),
+                "message": "\n".join(lines),
+                "type": "success" if not (c_errors or i_errors) else "warning",
+                "sticky": True,
+            },
+        }
+
     # ── Client Sync ──────────────────────────────────────────────────────────
     def sync_clients(self, limit_per_page=100):
         """Import WHMCS clients as Odoo partners.
 
-        Deduplication is done on ``res.partner.whmcs_client_id``.
-        Country is mapped from the 2-letter ISO code WHMCS provides.
+        Deduplication: first by whmcs_client_id, then by email as fallback.
         """
         self.ensure_one()
         offset = 0
@@ -117,8 +154,6 @@ class SoleWhmcsConfig(models.Model):
         errors = []
         Partner = self.env["res.partner"].sudo()
         Country = self.env["res.country"].sudo()
-
-        # Cache country lookups to avoid N+1 DB queries
         _country_cache = {}
 
         def _get_country(code):
@@ -140,53 +175,61 @@ class SoleWhmcsConfig(models.Model):
                 errors.append(str(exc))
                 break
 
-            clients = data.get("clients", {}).get("client", [])
+            clients = (data.get("clients") or {}).get("client") or []
             if not clients:
                 break
             if isinstance(clients, dict):
                 clients = [clients]
 
             for client in clients:
-                whmcs_id = str(client.get("id", ""))
+                whmcs_id = str(client.get("id", "")).strip()
                 if not whmcs_id:
                     continue
+                try:
+                    existing = Partner.search(
+                        [("whmcs_client_id", "=", whmcs_id)], limit=1
+                    )
+                    # Fallback: match by email so we don't duplicate known contacts
+                    if not existing and client.get("email"):
+                        existing = Partner.search(
+                            [("email", "=", client["email"]), ("whmcs_client_id", "=", False)],
+                            limit=1,
+                        )
 
-                existing = Partner.search(
-                    [("whmcs_client_id", "=", whmcs_id)], limit=1
-                )
+                    vals = {
+                        "name": (
+                            f"{client.get('firstname', '')} {client.get('lastname', '')}".strip()
+                            or client.get("companyname", "Unknown")
+                        ),
+                        "email": client.get("email", ""),
+                        "phone": client.get("phonenumber", ""),
+                        "street": client.get("address1", ""),
+                        "street2": client.get("address2", ""),
+                        "city": client.get("city", ""),
+                        "zip": client.get("postcode", ""),
+                        "country_id": _get_country(client.get("countrycode", "")),
+                        "is_company": bool(client.get("companyname", "")),
+                        "customer_rank": 1,
+                        "whmcs_client_id": whmcs_id,
+                    }
+                    if client.get("companyname"):
+                        vals["company_name"] = client["companyname"]
 
-                vals = {
-                    "name": (
-                        f"{client.get('firstname', '')} {client.get('lastname', '')}".strip()
-                        or client.get("companyname", "Unknown")
-                    ),
-                    "email": client.get("email", ""),
-                    "phone": client.get("phonenumber", ""),
-                    "street": client.get("address1", ""),
-                    "street2": client.get("address2", ""),
-                    "city": client.get("city", ""),
-                    "zip": client.get("postcode", ""),
-                    "country_id": _get_country(client.get("countrycode", "")),
-                    "is_company": bool(client.get("companyname", "")),
-                    "customer_rank": 1,
-                    "whmcs_client_id": whmcs_id,
-                }
-                if client.get("companyname"):
-                    vals["company_name"] = client["companyname"]
+                    if existing:
+                        existing.write(vals)
+                        total_updated += 1
+                    else:
+                        Partner.create(vals)
+                        total_created += 1
+                except Exception as exc:
+                    errors.append(f"Client {whmcs_id}: {exc}")
 
-                if existing:
-                    existing.write(vals)
-                    total_updated += 1
-                else:
-                    Partner.create(vals)
-                    total_created += 1
-
-            total_results = int(data.get("clients", {}).get("totalresults", 0))
+            total_results = int((data.get("clients") or {}).get("totalresults") or 0)
             offset += limit_per_page
             if offset >= total_results:
                 break
 
-        self.last_client_sync = datetime.utcnow()
+        self.last_client_sync = fields.Datetime.now()
         self._log_sync("clients", total_created, total_updated, errors)
         return total_created, total_updated, errors
 
@@ -194,8 +237,8 @@ class SoleWhmcsConfig(models.Model):
     def sync_invoices(self, limit_per_page=100):
         """Import WHMCS invoices as Odoo customer invoices.
 
-        - Already-imported invoices (matched by ref ``WHMCS-INV-{id}``) are skipped.
-        - When ``auto_post_paid`` is True, Paid invoices are confirmed automatically.
+        - Already-imported invoices (matched by ref WHMCS-INV-{id}) are skipped.
+        - When auto_post_paid is True, Paid invoices are confirmed automatically.
         - Cancelled/Refunded invoices are imported and immediately cancelled.
         """
         self.ensure_one()
@@ -217,32 +260,33 @@ class SoleWhmcsConfig(models.Model):
                 errors.append(str(exc))
                 break
 
-            invoices = data.get("invoices", {}).get("invoice", [])
+            invoices = (data.get("invoices") or {}).get("invoice") or []
             if not invoices:
                 break
             if isinstance(invoices, dict):
                 invoices = [invoices]
 
             for inv in invoices:
-                whmcs_inv_id = str(inv.get("id", ""))
+                whmcs_inv_id = str(inv.get("id", "")).strip()
+                if not whmcs_inv_id:
+                    continue
                 ref = f"WHMCS-INV-{whmcs_inv_id}"
 
                 if Move.search([("ref", "=", ref)], limit=1):
                     continue  # already imported
 
-                # Match partner by whmcs_client_id
-                client_id = str(inv.get("userid", ""))
-                partner = Partner.search(
-                    [("whmcs_client_id", "=", client_id)], limit=1
-                ) if client_id else Partner.browse()
+                client_id = str(inv.get("userid", "")).strip()
+                partner = (
+                    Partner.search([("whmcs_client_id", "=", client_id)], limit=1)
+                    if client_id else Partner.browse()
+                )
 
                 whmcs_status = inv.get("status", "Unpaid")
 
                 try:
                     invoice_lines = self._build_invoice_lines(inv)
-
-                    invoice_date = inv.get("date") or fields.Date.today()
-                    due_date = inv.get("duedate") or invoice_date
+                    invoice_date = self._parse_date(inv.get("date")) or fields.Date.today()
+                    due_date = self._parse_date(inv.get("duedate")) or invoice_date
 
                     move_vals = {
                         "move_type": "out_invoice",
@@ -263,21 +307,22 @@ class SoleWhmcsConfig(models.Model):
                         move.action_post()
 
                 except Exception as exc:
+                    _logger.exception("WHMCS: failed to import invoice %s", whmcs_inv_id)
                     errors.append(f"Invoice {whmcs_inv_id}: {exc}")
 
-            total_results = int(data.get("invoices", {}).get("totalresults", 0))
+            total_results = int((data.get("invoices") or {}).get("totalresults") or 0)
             offset += limit_per_page
             if offset >= total_results:
                 break
 
-        self.last_invoice_sync = datetime.utcnow()
+        self.last_invoice_sync = fields.Datetime.now()
         self._log_sync("invoices", total_created, 0, errors)
         return total_created, errors
 
     def _build_invoice_lines(self, inv):
         """Return invoice_line_ids commands for a WHMCS invoice dict."""
         lines = []
-        items = inv.get("items", {}).get("item", []) or []
+        items = (inv.get("items") or {}).get("item") or []
         if isinstance(items, dict):
             items = [items]
 
@@ -286,19 +331,34 @@ class SoleWhmcsConfig(models.Model):
                 continue
             lines.append((0, 0, {
                 "name": item.get("description") or "WHMCS Service",
-                "quantity": float(item.get("quantity", 1) or 1),
-                "price_unit": float(item.get("amount", 0) or 0),
+                "quantity": float(item.get("quantity") or 1),
+                "price_unit": float(item.get("amount") or 0),
                 "account_id": self.default_account_id.id if self.default_account_id else False,
+                "tax_ids": [(5, 0, 0)],  # clear default taxes; WHMCS manages tax separately
             }))
 
         if not lines:
             lines = [(0, 0, {
                 "name": f"WHMCS Invoice #{inv.get('id', '')}",
                 "quantity": 1,
-                "price_unit": float(inv.get("total", 0) or 0),
+                "price_unit": float(inv.get("total") or 0),
                 "account_id": self.default_account_id.id if self.default_account_id else False,
+                "tax_ids": [(5, 0, 0)],
             })]
         return lines
+
+    @staticmethod
+    def _parse_date(value):
+        """Parse a WHMCS date string (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS) to a date."""
+        if not value:
+            return False
+        for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return datetime.strptime(str(value).strip(), fmt).date()
+            except ValueError:
+                continue
+        _logger.warning("WHMCS: could not parse date %r", value)
+        return False
 
     def _log_sync(self, sync_type, created, updated, errors):
         self.env["sole.whmcs.sync.log"].sudo().create({
