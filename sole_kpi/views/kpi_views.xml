@@ -175,15 +175,15 @@
                 <filter string="No Data" name="no_data"
                         domain="[('status', '=', 'grey')]"/>
                 <separator/>
-                <group expand="0" string="Group By">
+                <group>
                     <filter string="Category" name="group_category"
-                            context="{'group_by': 'indicator_id.category_id'}"/>
+                            domain="[]" context="{'group_by': 'category_id'}"/>
                     <filter string="Period" name="group_period"
-                            context="{'group_by': 'period_id'}"/>
+                            domain="[]" context="{'group_by': 'period_id'}"/>
                     <filter string="Status" name="group_status"
-                            context="{'group_by': 'status'}"/>
+                            domain="[]" context="{'group_by': 'status'}"/>
                     <filter string="Staff Member" name="group_user"
-                            context="{'group_by': 'user_id'}"/>
+                            domain="[]" context="{'group_by': 'user_id'}"/>
                 </group>
             </search>
         </field>

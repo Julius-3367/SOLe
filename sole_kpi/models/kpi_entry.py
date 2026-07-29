@@ -32,6 +32,13 @@ class SoleKpiEntry(models.Model):
         help='Role this entry belongs to',
         ondelete='set null',
     )
+    category_id = fields.Many2one(
+        'sole.kpi.category',
+        string='Category',
+        related='indicator_id.category_id',
+        store=True,
+        readonly=True,
+    )
     target = fields.Float(
         string='Target',
         related='indicator_id.target',
@@ -50,7 +57,8 @@ class SoleKpiEntry(models.Model):
         store=True,
         readonly=True,
     )
-    direction = fields.Char(
+    direction = fields.Selection(
+        [('higher', 'Higher is Better'), ('lower', 'Lower is Better')],
         string='Direction',
         related='indicator_id.direction',
         store=True,
