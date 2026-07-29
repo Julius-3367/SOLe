@@ -10,4 +10,9 @@
         <field name="implied_ids" eval="[(4, ref('group_kpi_user'))]"/>
     </record>
 
+    <!-- Odoo Administrators automatically get KPI Manager -->
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('sole_kpi.group_kpi_manager'))]"/>
+    </record>
+
 </odoo>
