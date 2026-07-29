@@ -12,12 +12,32 @@ const UNIT_LABELS = {
 };
 
 const STATUS_LABELS = {
-    green: "Green ✓",
+    green: "Green",
     amber: "Amber",
     red: "Red",
-    black: "Black ✗",
+    black: "Black",
     grey: "No Data",
 };
+
+function formatNumber(val, unit) {
+    if (unit === "currency") {
+        if (val >= 1_000_000) return (val / 1_000_000).toFixed(1) + "M";
+        if (val >= 1_000) return (val / 1_000).toFixed(0) + "K";
+        return val.toFixed(0);
+    }
+    if (unit === "percentage") return val.toFixed(1);
+    return val % 1 === 0 ? val.toFixed(0) : val.toFixed(1);
+}
+
+// SVG ring: circumference of r=18 circle = 2π×18 ≈ 113.1
+const CIRC = 2 * Math.PI * 18;
+
+function pctToStatus(pct) {
+    if (pct >= 80) return "green";
+    if (pct >= 70) return "amber";
+    if (pct >= 60) return "red";
+    return "black";
+}
 
 export class KpiDashboard extends Component {
     static template = "sole_kpi.KpiDashboard";
@@ -28,6 +48,10 @@ export class KpiDashboard extends Component {
             periods: [],
             currentPeriodId: null,
             categories: [],
+            counts: { green: 0, amber: 0, red: 0, black: 0, grey: 0 },
+            overallPct: 0,
+            overallStatus: "grey",
+            overallDash: "0 " + CIRC,
             loading: true,
         });
 
@@ -69,20 +93,13 @@ export class KpiDashboard extends Component {
                     ["period_id", "=", this.state.currentPeriodId],
                     ["user_id", "=", userId],
                 ],
-                [
-                    "id",
-                    "indicator_id",
-                    "actual",
-                    "target",
-                    "achievement_pct",
-                    "status",
-                    "unit",
-                ],
+                ["id", "indicator_id", "actual", "target", "achievement_pct", "status", "unit"],
                 { order: "indicator_id" }
             );
 
             if (!entries.length) {
                 this.state.categories = [];
+                this._updateSummary([]);
                 return;
             }
 
@@ -94,9 +111,19 @@ export class KpiDashboard extends Component {
             );
 
             const indicatorMap = {};
-            for (const ind of indicators) {
-                indicatorMap[ind.id] = ind;
-            }
+            for (const ind of indicators) indicatorMap[ind.id] = ind;
+
+            // Fetch category colors
+            const catIds = [...new Set(indicators.map((i) => i.category_id[0]).filter(Boolean))];
+            const cats = catIds.length
+                ? await this.orm.searchRead(
+                      "sole.kpi.category",
+                      [["id", "in", catIds]],
+                      ["id", "color"]
+                  )
+                : [];
+            const catColorMap = {};
+            for (const c of cats) catColorMap[c.id] = c.color;
 
             const categoryMap = {};
             for (const entry of entries) {
@@ -105,28 +132,62 @@ export class KpiDashboard extends Component {
                 const catId = ind.category_id[0];
                 const catName = ind.category_id[1];
                 if (!categoryMap[catId]) {
-                    categoryMap[catId] = { id: catId, name: catName, entries: [] };
+                    categoryMap[catId] = {
+                        id: catId,
+                        name: catName,
+                        color: catColorMap[catId] || null,
+                        entries: [],
+                    };
                 }
+                const status = entry.status || "grey";
+                const unit = entry.unit || "count";
                 categoryMap[catId].entries.push({
                     id: entry.id,
                     indicator_name: ind.name,
                     target: entry.target,
-                    target_display: ind.target_display || null,
+                    target_display: formatNumber(entry.target, unit),
+                    actual_display: formatNumber(entry.actual, unit),
                     actual: entry.actual,
                     achievement_pct: entry.achievement_pct || 0,
-                    status: entry.status || "grey",
-                    status_label: STATUS_LABELS[entry.status] || "No Data",
-                    unit: entry.unit,
-                    unit_label: UNIT_LABELS[entry.unit] || "",
+                    status,
+                    status_label: STATUS_LABELS[status] || "No Data",
+                    unit,
+                    unit_label: UNIT_LABELS[unit] || "",
                 });
             }
+
+            const allEntries = entries.map((e) => ({
+                status: e.status || "grey",
+                achievement_pct: e.achievement_pct || 0,
+            }));
 
             this.state.categories = Object.values(categoryMap).sort((a, b) =>
                 a.name.localeCompare(b.name)
             );
+            this._updateSummary(allEntries);
         } finally {
             this.state.loading = false;
         }
+    }
+
+    _updateSummary(entries) {
+        const counts = { green: 0, amber: 0, red: 0, black: 0, grey: 0 };
+        let totalPct = 0;
+        let scorable = 0;
+        for (const e of entries) {
+            counts[e.status] = (counts[e.status] || 0) + 1;
+            if (e.status !== "grey") {
+                totalPct += e.achievement_pct;
+                scorable++;
+            }
+        }
+        const overall = scorable > 0 ? Math.round(totalPct / scorable) : 0;
+        const capped = Math.min(overall, 100);
+        const dash = (capped / 100) * CIRC;
+        this.state.counts = counts;
+        this.state.overallPct = overall;
+        this.state.overallStatus = scorable > 0 ? pctToStatus(overall) : "grey";
+        this.state.overallDash = dash + " " + CIRC;
     }
 
     async onPeriodChange(ev) {

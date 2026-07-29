@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="period_fy2026" model="sole.kpi.period">
+        <field name="name">FY2026</field>
+        <field name="date_start">2026-01-01</field>
+        <field name="date_end">2026-12-31</field>
+        <field name="state">draft</field>
+    </record>
+
+    <record id="period_fy2026_q1" model="sole.kpi.period">
+        <field name="name">FY2026 Q1 (Jan–Mar)</field>
+        <field name="date_start">2026-01-01</field>
+        <field name="date_end">2026-03-31</field>
+        <field name="state">locked</field>
+    </record>
+
+    <record id="period_fy2026_q2" model="sole.kpi.period">
+        <field name="name">FY2026 Q2 (Apr–Jun)</field>
+        <field name="date_start">2026-04-01</field>
+        <field name="date_end">2026-06-30</field>
+        <field name="state">locked</field>
+    </record>
+
+    <record id="period_fy2026_q3" model="sole.kpi.period">
+        <field name="name">FY2026 Q3 (Jul–Sep)</field>
+        <field name="date_start">2026-07-01</field>
+        <field name="date_end">2026-09-30</field>
+        <field name="state">draft</field>
+    </record>
+
+</odoo>

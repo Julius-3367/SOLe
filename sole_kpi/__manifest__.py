@@ -13,6 +13,7 @@
         'data/kpi_categories.xml',
         'data/kpi_roles.xml',
         'data/kpi_indicators.xml',
+        'data/kpi_periods.xml',
         'views/kpi_views.xml',
         'views/tender_views.xml',
         'views/menus.xml',

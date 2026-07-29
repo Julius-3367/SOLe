@@ -1,118 +1,316 @@
-.sole_kpi_status_green {
-    background-color: #28a745;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 8px;
-}
-.sole_kpi_status_amber {
-    background-color: #ffc107;
-    color: #212529;
-    border-radius: 4px;
-    padding: 2px 8px;
-}
-.sole_kpi_status_red {
-    background-color: #dc3545;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 8px;
-}
-.sole_kpi_status_black {
-    background-color: #212529;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 8px;
-}
-.sole_kpi_status_grey {
-    background-color: #6c757d;
-    color: white;
-    border-radius: 4px;
-    padding: 2px 8px;
+/* ================================================================
+   SOLe KPI Dashboard
+================================================================ */
+
+/* ── Root & layout ──────────────────────────────────────────── */
+.skd_root {
+    min-height: 100%;
+    background: #f3f4f8;
+    font-family: inherit;
+    padding-bottom: 32px;
 }
 
-.o_kanban_record.sole_tender_won {
-    border-left: 4px solid #28a745;
-}
-.o_kanban_record.sole_tender_lost {
-    border-left: 4px solid #dc3545;
-}
-.o_kanban_record.sole_tender_urgent {
-    border-left: 4px solid #ffc107;
-}
-
-/* ── KPI Dashboard ─────────────────────────────────────────── */
-.sole_kpi_dashboard {
-    padding: 16px;
-}
-.sole_kpi_dashboard .o_dashboard_header {
+/* ── Header ─────────────────────────────────────────────────── */
+.skd_header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1a237e 0%, #283593 60%, #3949ab 100%);
+    color: #fff;
+    padding: 18px 28px;
     gap: 16px;
-    margin-bottom: 24px;
+    flex-wrap: wrap;
 }
-.sole_kpi_dashboard .o_dashboard_header h2 {
-    margin: 0;
-    font-size: 1.4rem;
+.skd_header_left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.skd_logo {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+.skd_title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+.skd_subtitle {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 1px;
+}
+.skd_period_wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+.skd_period_icon { color: rgba(255,255,255,0.7); font-size: 13px; }
+.skd_period_select {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 0.88rem;
     font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
 }
-.sole_kpi_category_section {
-    margin-bottom: 24px;
+.skd_period_select option { color: #212529; background: #fff; }
+
+/* ── Loading ─────────────────────────────────────────────────── */
+.skd_loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 20px;
+    color: #6c757d;
 }
-.sole_kpi_category_section h4 {
-    font-size: 0.95rem;
+.skd_spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #dee2e6;
+    border-top-color: #3949ab;
+    border-radius: 50%;
+    animation: skd_spin 0.7s linear infinite;
+}
+@keyframes skd_spin { to { transform: rotate(360deg); } }
+
+/* ── Empty state ─────────────────────────────────────────────── */
+.skd_empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px;
+    gap: 10px;
+}
+.skd_empty_icon { font-size: 48px; }
+.skd_empty_title { font-size: 1.1rem; font-weight: 700; color: #343a40; }
+.skd_empty_sub { font-size: 0.9rem; color: #6c757d; max-width: 480px; line-height: 1.6; }
+
+/* ── Summary bar ─────────────────────────────────────────────── */
+.skd_summary_bar {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    flex-wrap: wrap;
+}
+.skd_summary_stat {
+    flex: 1 1 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 10px;
+    border-right: 1px solid #f0f0f0;
+    border-top: 4px solid transparent;
+    min-width: 80px;
+}
+.skd_stat_green  { border-top-color: #28a745; }
+.skd_stat_amber  { border-top-color: #ffc107; }
+.skd_stat_red    { border-top-color: #dc3545; }
+.skd_stat_black  { border-top-color: #212529; }
+.skd_stat_grey   { border-top-color: #9e9e9e; }
+.skd_stat_val {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #212529;
+}
+.skd_stat_lbl {
+    font-size: 0.7rem;
+    color: #6c757d;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-top: 4px;
+    text-align: center;
+}
+.skd_summary_overall {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+.skd_overall_label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
     color: #6c757d;
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 6px;
+    margin-bottom: 8px;
+}
+.skd_overall_ring_wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+.skd_overall_ring {
+    width: 64px; height: 64px;
+    transform: rotate(-90deg);
+}
+.skd_ring_bg { fill: none; stroke: #e9ecef; stroke-width: 4; }
+.skd_ring_fg { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 0.6s ease; }
+.skd_ring_green  { stroke: #28a745; }
+.skd_ring_amber  { stroke: #ffc107; }
+.skd_ring_red    { stroke: #dc3545; }
+.skd_ring_black  { stroke: #212529; }
+.skd_ring_grey   { stroke: #9e9e9e; }
+.skd_overall_pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+.skd_pct_green  { color: #28a745; }
+.skd_pct_amber  { color: #b08800; }
+.skd_pct_red    { color: #dc3545; }
+.skd_pct_black  { color: #212529; }
+.skd_pct_grey   { color: #6c757d; }
+
+/* ── Section ─────────────────────────────────────────────────── */
+.skd_section {
+    margin: 20px 20px 0;
+}
+.skd_section_header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 12px;
 }
-.sole_kpi_tiles {
-    display: flex;
-    flex-wrap: wrap;
+.skd_section_dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.skd_section_name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #495057;
+}
+.skd_section_count {
+    font-size: 0.72rem;
+    color: #adb5bd;
+    margin-left: 4px;
+}
+
+/* ── Tiles grid ──────────────────────────────────────────────── */
+.skd_tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 12px;
 }
-.sole_kpi_tile {
-    flex: 0 0 220px;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 14px 16px;
+
+/* ── Tile ────────────────────────────────────────────────────── */
+.skd_tile {
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.15s;
+}
+.skd_tile:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.skd_tile_status_bar {
+    height: 5px;
+    width: 100%;
+    flex-shrink: 0;
+}
+.skd_tile_green  .skd_tile_status_bar { background: #28a745; }
+.skd_tile_amber  .skd_tile_status_bar { background: #ffc107; }
+.skd_tile_red    .skd_tile_status_bar { background: #dc3545; }
+.skd_tile_black  .skd_tile_status_bar { background: #212529; }
+.skd_tile_grey   .skd_tile_status_bar { background: #9e9e9e; }
+.skd_tile_body {
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1;
 }
-.sole_kpi_tile .kpi_name {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #212529;
-    line-height: 1.3;
-}
-.sole_kpi_tile .kpi_numbers {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: #6c757d;
-}
-.sole_kpi_tile .kpi_actual {
-    font-size: 1.3rem;
+.skd_tile_name {
+    font-size: 0.84rem;
     font-weight: 700;
     color: #212529;
+    line-height: 1.3;
+    min-height: 2.2em;
 }
-.sole_kpi_tile .kpi_pct {
-    font-size: 0.85rem;
-    color: #495057;
+.skd_tile_actual {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a237e;
+    line-height: 1;
+    margin-top: 2px;
 }
-.sole_kpi_tile .kpi_badge {
-    align-self: flex-start;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 12px;
+.skd_tile_unit { font-size: 0.75rem; font-weight: 500; color: #6c757d; }
+.skd_tile_target { font-size: 0.78rem; color: #6c757d; }
+.skd_tile_progress_wrap {
+    height: 6px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.skd_tile_progress_bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    min-width: 4px;
+}
+.skd_prog_green  { background: #28a745; }
+.skd_prog_amber  { background: #ffc107; }
+.skd_prog_red    { background: #dc3545; }
+.skd_prog_black  { background: #212529; }
+.skd_prog_grey   { background: #9e9e9e; }
+.skd_tile_footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+.skd_badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 20px;
     padding: 2px 10px;
+    letter-spacing: 0.03em;
 }
-.kpi_badge.green  { background: #28a745; color: #fff; }
-.kpi_badge.amber  { background: #ffc107; color: #212529; }
-.kpi_badge.red    { background: #dc3545; color: #fff; }
-.kpi_badge.black  { background: #212529; color: #fff; }
-.kpi_badge.grey   { background: #6c757d; color: #fff; }
+.skd_badge_green  { background: #d4edda; color: #155724; }
+.skd_badge_amber  { background: #fff3cd; color: #856404; }
+.skd_badge_red    { background: #f8d7da; color: #721c24; }
+.skd_badge_black  { background: #d3d3d3; color: #212529; }
+.skd_badge_grey   { background: #e9ecef; color: #495057; }
+.skd_tile_pct {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #343a40;
+}
+
+/* ── Tender kanban status borders ────────────────────────────── */
+.o_kanban_record.sole_tender_won    { border-left: 4px solid #28a745; }
+.o_kanban_record.sole_tender_lost   { border-left: 4px solid #dc3545; }
+.o_kanban_record.sole_tender_urgent { border-left: 4px solid #ffc107; }
