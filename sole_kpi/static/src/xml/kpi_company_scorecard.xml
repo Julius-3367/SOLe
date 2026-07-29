@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sole_kpi.KpiCompanyScorecard">
+        <div class="skd_root">
+
+            <!-- ── Header ──────────────────────────────────────────── -->
+            <div class="skd_header">
+                <div class="skd_header_left">
+                    <div class="skd_logo"><span class="fa fa-users"/></div>
+                    <div>
+                        <div class="skd_title">Company Scorecard</div>
+                        <div class="skd_subtitle">All Staff · Balanced Scorecard · Softlink Options Limited</div>
+                    </div>
+                </div>
+                <div class="skd_header_right skd_cs_controls">
+                    <div class="skd_period_wrap">
+                        <span class="fa fa-calendar skd_period_icon"/>
+                        <select class="skd_period_select" t-on-change="onPeriodChange">
+                            <option value="">Select period…</option>
+                            <t t-foreach="state.periods" t-as="p" t-key="p.id">
+                                <option t-att-value="p.id" t-att-selected="p.id === state.currentPeriodId">
+                                    <t t-esc="p.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="skd_period_wrap">
+                        <span class="fa fa-filter skd_period_icon"/>
+                        <select class="skd_period_select" t-on-change="onRoleChange">
+                            <option value="">All Roles</option>
+                            <t t-foreach="state.roles" t-as="r" t-key="r.id">
+                                <option t-att-value="r.id" t-att-selected="r.id === state.selectedRoleId">
+                                    <t t-esc="r.name"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Loading ─────────────────────────────────────────── -->
+            <t t-if="state.loading">
+                <div class="skd_loading">
+                    <div class="skd_spinner"/>
+                    <span>Loading scorecard…</span>
+                </div>
+            </t>
+
+            <!-- ── No period ────────────────────────────────────────── -->
+            <t t-elif="!state.currentPeriodId">
+                <div class="skd_empty">
+                    <div class="skd_empty_icon">📊</div>
+                    <div class="skd_empty_title">Select a period to view the company scorecard</div>
+                    <div class="skd_empty_sub">Choose a reporting period to see all staff KPI results in one view.</div>
+                </div>
+            </t>
+
+            <!-- ── No data ──────────────────────────────────────────── -->
+            <t t-elif="!state.staffRows.length">
+                <div class="skd_empty">
+                    <div class="skd_empty_icon">📋</div>
+                    <div class="skd_empty_title">No KPI entries for this period</div>
+                    <div class="skd_empty_sub">Go to <strong>KPI Periods</strong>, open this period, and click <strong>Generate KPI Entries</strong> to create entry shells for all staff.</div>
+                </div>
+            </t>
+
+            <!-- ── Scorecard body ───────────────────────────────────── -->
+            <t t-else="">
+
+                <!-- Company summary bar -->
+                <t t-if="state.companySummary">
+                    <div class="skd_summary_bar">
+                        <div class="skd_summary_stat skd_stat_green">
+                            <div class="skd_stat_val" t-esc="state.companySummary.counts.green"/>
+                            <div class="skd_stat_lbl">Green ≥80%</div>
+                        </div>
+                        <div class="skd_summary_stat skd_stat_amber">
+                            <div class="skd_stat_val" t-esc="state.companySummary.counts.amber"/>
+                            <div class="skd_stat_lbl">Amber 70–79%</div>
+                        </div>
+                        <div class="skd_summary_stat skd_stat_red">
+                            <div class="skd_stat_val" t-esc="state.companySummary.counts.red"/>
+                            <div class="skd_stat_lbl">Red 60–69%</div>
+                        </div>
+                        <div class="skd_summary_stat skd_stat_black">
+                            <div class="skd_stat_val" t-esc="state.companySummary.counts.black"/>
+                            <div class="skd_stat_lbl">Black &lt;60%</div>
+                        </div>
+                        <div class="skd_summary_stat skd_stat_grey">
+                            <div class="skd_stat_val" t-esc="state.companySummary.counts.grey"/>
+                            <div class="skd_stat_lbl">No Data</div>
+                        </div>
+                        <div class="skd_summary_overall">
+                            <div class="skd_overall_label">Company Score</div>
+                            <div class="skd_overall_ring_wrap">
+                                <svg class="skd_overall_ring" viewBox="0 0 44 44">
+                                    <circle class="skd_ring_bg" cx="22" cy="22" r="18"/>
+                                    <circle t-att-class="'skd_ring_fg skd_ring_' + state.companySummary.overallStatus"
+                                            cx="22" cy="22" r="18"
+                                            t-att-stroke-dasharray="state.companySummary.overallDash"/>
+                                </svg>
+                                <div t-att-class="'skd_overall_pct skd_pct_' + state.companySummary.overallStatus">
+                                    <t t-esc="state.companySummary.overallPct + '%'"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Staff table -->
+                <div class="skd_cs_table_wrap">
+                    <table class="skd_cs_table">
+                        <thead>
+                            <tr>
+                                <th class="skd_cs_th_name">Staff Member</th>
+                                <th class="skd_cs_th_role">Role</th>
+                                <th class="skd_cs_th_score">Score</th>
+                                <th class="skd_cs_th_traffic">🟢</th>
+                                <th class="skd_cs_th_traffic">🟡</th>
+                                <th class="skd_cs_th_traffic">🔴</th>
+                                <th class="skd_cs_th_traffic">⚫</th>
+                                <th class="skd_cs_th_status">Status</th>
+                                <th class="skd_cs_th_action"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.staffRows" t-as="row" t-key="row.user.id">
+                                <!-- Summary row -->
+                                <tr t-att-class="'skd_cs_row skd_cs_row_' + row.summary.overallStatus"
+                                    t-on-click="() => this.toggleExpand(row.user.id)"
+                                    style="cursor:pointer">
+                                    <td class="skd_cs_td_name">
+                                        <div class="skd_cs_avatar">
+                                            <span t-esc="row.user.name[0].toUpperCase()"/>
+                                        </div>
+                                        <span t-esc="row.user.name"/>
+                                    </td>
+                                    <td class="skd_cs_td_role">
+                                        <span t-if="row.role" class="skd_role_badge" t-esc="row.role.name"/>
+                                        <span t-else="" class="skd_role_badge skd_role_none">—</span>
+                                    </td>
+                                    <td class="skd_cs_td_score">
+                                        <div class="skd_cs_score_bar_wrap">
+                                            <div t-att-class="'skd_cs_score_bar skd_prog_' + row.summary.overallStatus"
+                                                 t-att-style="'width:' + Math.min(row.summary.overallPct, 100) + '%'"/>
+                                        </div>
+                                        <strong t-att-class="'skd_cs_score_pct skd_pct_' + row.summary.overallStatus"
+                                                t-esc="row.summary.overallPct + '%'"/>
+                                    </td>
+                                    <td class="skd_cs_td_traffic skd_td_green" t-esc="row.summary.counts.green"/>
+                                    <td class="skd_cs_td_traffic skd_td_amber" t-esc="row.summary.counts.amber"/>
+                                    <td class="skd_cs_td_traffic skd_td_red" t-esc="row.summary.counts.red"/>
+                                    <td class="skd_cs_td_traffic skd_td_black" t-esc="row.summary.counts.black"/>
+                                    <td class="skd_cs_td_status">
+                                        <span t-att-class="'skd_badge skd_badge_' + row.summary.overallStatus"
+                                              t-esc="row.summary.overallStatus.charAt(0).toUpperCase() + row.summary.overallStatus.slice(1)"/>
+                                    </td>
+                                    <td class="skd_cs_td_action">
+                                        <span t-att-class="state.expandedUser === row.user.id ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"/>
+                                    </td>
+                                </tr>
+
+                                <!-- Expanded detail row -->
+                                <t t-if="state.expandedUser === row.user.id">
+                                    <tr class="skd_cs_detail_row">
+                                        <td colspan="9">
+                                            <div class="skd_cs_detail_body">
+                                                <t t-foreach="row.categories" t-as="cat" t-key="cat.id">
+                                                    <div class="skd_cs_detail_cat">
+                                                        <div class="skd_section_header">
+                                                            <span class="skd_section_dot"
+                                                                  t-att-style="'background:' + cat.color"/>
+                                                            <span class="skd_section_name" t-esc="cat.name"/>
+                                                        </div>
+                                                        <div class="skd_tiles">
+                                                            <t t-foreach="cat.entries" t-as="entry" t-key="entry.id">
+                                                                <div t-att-class="'skd_tile skd_tile_' + entry.status">
+                                                                    <div class="skd_tile_status_bar"/>
+                                                                    <div class="skd_tile_body">
+                                                                        <div class="skd_tile_name" t-esc="entry.indicator_name"/>
+                                                                        <div class="skd_tile_actual">
+                                                                            <t t-esc="entry.actual_display"/>
+                                                                            <span class="skd_tile_unit" t-esc="' ' + entry.unit_label"/>
+                                                                        </div>
+                                                                        <div class="skd_tile_target">
+                                                                            Target: <t t-esc="entry.target_display"/>
+                                                                            <span class="skd_tile_unit" t-esc="' ' + entry.unit_label"/>
+                                                                        </div>
+                                                                        <div class="skd_tile_progress_wrap">
+                                                                            <div t-att-class="'skd_tile_progress_bar skd_prog_' + entry.status"
+                                                                                 t-att-style="'width:' + Math.min(entry.achievement_pct, 100) + '%'"/>
+                                                                        </div>
+                                                                        <div class="skd_tile_footer">
+                                                                            <span t-att-class="'skd_badge skd_badge_' + entry.status"
+                                                                                  t-esc="entry.status_label"/>
+                                                                            <span class="skd_tile_pct"
+                                                                                  t-esc="Math.round(entry.achievement_pct) + '%'"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+            </t>
+        </div>
+    </t>
+
+</templates>

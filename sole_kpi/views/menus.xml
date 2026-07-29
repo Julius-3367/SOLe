@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ROOT MENU -->
+    <!-- ROOT -->
     <menuitem id="menu_sole_kpi_root"
               name="SOLe KPI"
               sequence="82"
-              web_icon="sole_kpi,static/description/icon.png"/>
+              web_icon="sole_kpi,static/description/icon.png"
+              groups="sole_kpi.group_kpi_user"/>
 
-    <!-- MY DASHBOARD -->
+    <!-- MY DASHBOARD (all users) -->
     <menuitem id="menu_sole_kpi_dashboard"
               name="My Dashboard"
               parent="menu_sole_kpi_root"
               action="action_sole_kpi_dashboard"
-              sequence="10"/>
+              sequence="10"
+              groups="sole_kpi.group_kpi_user"/>
+
+    <!-- COMPANY SCORECARD (managers only) -->
+    <menuitem id="menu_sole_kpi_company_scorecard"
+              name="Company Scorecard"
+              parent="menu_sole_kpi_root"
+              action="action_sole_kpi_company_scorecard"
+              sequence="15"
+              groups="sole_kpi.group_kpi_manager"/>
 
     <!-- KPI ENTRY -->
     <menuitem id="menu_sole_kpi_entry"
               name="KPI Entry"
               parent="menu_sole_kpi_root"
               action="action_sole_kpi_entry"
-              sequence="20"/>
+              sequence="20"
+              groups="sole_kpi.group_kpi_user"/>
 
     <!-- TENDER MANAGEMENT -->
     <menuitem id="menu_sole_tender"
               name="Tender Management"
               parent="menu_sole_kpi_root"
-              sequence="30"/>
+              sequence="30"
+              groups="sole_kpi.group_kpi_user"/>
 
     <menuitem id="menu_sole_tender_kanban"
               name="Tenders"
@@ -39,32 +51,31 @@
               action="action_sole_tender_list"
               sequence="20"/>
 
-    <!-- REPORTS -->
+    <!-- REPORTS (managers) -->
     <menuitem id="menu_sole_kpi_reports"
               name="Reports"
               parent="menu_sole_kpi_root"
-              sequence="40"/>
-
-    <menuitem id="menu_sole_kpi_indicators_report"
-              name="KPI Indicators"
-              parent="menu_sole_kpi_reports"
-              action="action_sole_kpi_indicator"
-              sequence="10"
-              groups="base.group_system"/>
+              sequence="40"
+              groups="sole_kpi.group_kpi_manager"/>
 
     <menuitem id="menu_sole_kpi_periods_report"
               name="Periods"
               parent="menu_sole_kpi_reports"
               action="action_sole_kpi_period"
-              sequence="20"
-              groups="account.group_account_manager"/>
+              sequence="10"/>
 
-    <!-- CONFIGURATION -->
+    <menuitem id="menu_sole_kpi_all_entries"
+              name="All KPI Entries"
+              parent="menu_sole_kpi_reports"
+              action="action_sole_kpi_entry"
+              sequence="20"/>
+
+    <!-- CONFIGURATION (managers) -->
     <menuitem id="menu_sole_kpi_config"
               name="Configuration"
               parent="menu_sole_kpi_root"
               sequence="90"
-              groups="base.group_system"/>
+              groups="sole_kpi.group_kpi_manager"/>
 
     <menuitem id="menu_sole_kpi_config_categories"
               name="Categories"

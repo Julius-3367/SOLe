@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_kpi_user" model="res.groups">
+        <field name="name">KPI User</field>
+    </record>
+
+    <record id="group_kpi_manager" model="res.groups">
+        <field name="name">KPI Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_kpi_user'))]"/>
+    </record>
+
+</odoo>

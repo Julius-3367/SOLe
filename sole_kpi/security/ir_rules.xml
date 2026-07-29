@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── KPI Entries ──────────────────────────────────────────────
+         Users see and edit only their own entries.
+         Managers see all entries across all staff.
+    ──────────────────────────────────────────────────────────────── -->
+
+    <record id="rule_kpi_entry_user_own" model="ir.rule">
+        <field name="name">KPI Entry: own records only (user)</field>
+        <field name="model_id" ref="model_sole_kpi_entry"/>
+        <field name="groups" eval="[(4, ref('group_kpi_user'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_kpi_entry_manager_all" model="ir.rule">
+        <field name="name">KPI Entry: all records (manager)</field>
+        <field name="model_id" ref="model_sole_kpi_entry"/>
+        <field name="groups" eval="[(4, ref('group_kpi_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ── Tenders ──────────────────────────────────────────────────
+         Users see and edit only tenders they are responsible for.
+         Managers see all tenders.
+    ──────────────────────────────────────────────────────────────── -->
+
+    <record id="rule_tender_user_own" model="ir.rule">
+        <field name="name">Tender: own records only (user)</field>
+        <field name="model_id" ref="model_sole_tender"/>
+        <field name="groups" eval="[(4, ref('group_kpi_user'))]"/>
+        <field name="domain_force">[('responsible_id', '=', user.id)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_tender_manager_all" model="ir.rule">
+        <field name="name">Tender: all records (manager)</field>
+        <field name="model_id" ref="model_sole_tender"/>
+        <field name="groups" eval="[(4, ref('group_kpi_manager'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

@@ -13,6 +13,7 @@
                 <field name="name"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
+                <field name="entry_count" string="Entries"/>
                 <field name="state"
                        decoration-success="state == 'draft'"
                        decoration-muted="state == 'locked'"/>
@@ -26,20 +27,33 @@
         <field name="arch" type="xml">
             <form string="KPI Period">
                 <header>
-                    <button name="action_open"
-                            string="Re-Open"
+                    <button name="action_generate_entries"
+                            string="Generate KPI Entries"
                             type="object"
-                            invisible="state == 'draft'"
-                            class="btn-secondary"/>
+                            invisible="state == 'locked'"
+                            class="btn-primary"
+                            confirm="This will create KPI entry shells for every role member × every indicator in that role. Already-existing entries are skipped. Continue?"/>
                     <button name="action_lock"
                             string="Lock Period"
                             type="object"
                             invisible="state == 'locked'"
                             class="btn-warning"/>
-                    <field name="state" widget="statusbar"
-                           statusbar_visible="draft,locked"/>
+                    <button name="action_open"
+                            string="Re-Open"
+                            type="object"
+                            invisible="state == 'draft'"
+                            class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,locked"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_entries"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-list">
+                            <field name="entry_count" widget="statinfo" string="Entries"/>
+                        </button>
+                    </div>
                     <group>
                         <group>
                             <field name="name"/>
@@ -80,9 +94,7 @@
         <field name="res_model">sole.kpi.period</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first KPI reporting period.
-            </p>
+            <p class="o_view_nocontent_smiling_face">Create your first KPI reporting period.</p>
         </field>
     </record>
 
@@ -102,6 +114,7 @@
                 <field name="period_id"/>
                 <field name="indicator_id"/>
                 <field name="user_id"/>
+                <field name="role_id" optional="show"/>
                 <field name="target" string="Target"/>
                 <field name="unit" optional="show"/>
                 <field name="actual"/>
@@ -128,7 +141,7 @@
                             <field name="user_id"/>
                             <field name="role_id"/>
                         </group>
-                        <group string="KPI">
+                        <group string="KPI Indicator">
                             <field name="indicator_id"/>
                             <field name="target" readonly="1"/>
                             <field name="unit" readonly="1"/>
@@ -149,6 +162,11 @@
                         <field name="notes" nolabel="1"/>
                     </group>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -161,29 +179,18 @@
                 <field name="indicator_id"/>
                 <field name="period_id"/>
                 <field name="user_id"/>
-                <separator/>
-                <filter string="My Entries" name="my_entries"
-                        domain="[('user_id', '=', uid)]"/>
-                <filter string="Green" name="green"
-                        domain="[('status', '=', 'green')]"/>
-                <filter string="Amber" name="amber"
-                        domain="[('status', '=', 'amber')]"/>
-                <filter string="Red" name="red"
-                        domain="[('status', '=', 'red')]"/>
-                <filter string="Black" name="black"
-                        domain="[('status', '=', 'black')]"/>
-                <filter string="No Data" name="no_data"
-                        domain="[('status', '=', 'grey')]"/>
-                <separator/>
+                <filter string="My Entries" name="my_entries" domain="[('user_id', '=', uid)]"/>
+                <filter string="Green"   name="green"   domain="[('status', '=', 'green')]"/>
+                <filter string="Amber"   name="amber"   domain="[('status', '=', 'amber')]"/>
+                <filter string="Red"     name="red"     domain="[('status', '=', 'red')]"/>
+                <filter string="Black"   name="black"   domain="[('status', '=', 'black')]"/>
+                <filter string="No Data" name="no_data" domain="[('status', '=', 'grey')]"/>
                 <group>
-                    <filter string="Category" name="group_category"
-                            domain="[]" context="{'group_by': 'category_id'}"/>
-                    <filter string="Period" name="group_period"
-                            domain="[]" context="{'group_by': 'period_id'}"/>
-                    <filter string="Status" name="group_status"
-                            domain="[]" context="{'group_by': 'status'}"/>
-                    <filter string="Staff Member" name="group_user"
-                            domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter string="Category"     name="group_category"     domain="[]" context="{'group_by': 'category_id'}"/>
+                    <filter string="Period"        name="group_period"       domain="[]" context="{'group_by': 'period_id'}"/>
+                    <filter string="Status"        name="group_status"       domain="[]" context="{'group_by': 'status'}"/>
+                    <filter string="Staff Member"  name="group_user"         domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter string="Role"          name="group_role"         domain="[]" context="{'group_by': 'role_id'}"/>
                 </group>
             </search>
         </field>
@@ -196,14 +203,12 @@
         <field name="context">{'search_default_my_entries': 1, 'search_default_group_category': 1}</field>
         <field name="search_view_id" ref="view_sole_kpi_entry_search"/>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Record your KPI results for the current period.
-            </p>
+            <p class="o_view_nocontent_smiling_face">Record your KPI results for the current period.</p>
         </field>
     </record>
 
     <!-- ============================================================
-         sole.kpi.indicator — VIEWS (Configuration)
+         sole.kpi.indicator — VIEWS
     ============================================================ -->
 
     <record id="view_sole_kpi_indicator_list" model="ir.ui.view">
@@ -217,6 +222,7 @@
                 <field name="target"/>
                 <field name="unit"/>
                 <field name="direction"/>
+                <field name="weight" optional="show"/>
                 <field name="active"/>
             </list>
         </field>
@@ -240,6 +246,7 @@
                             <field name="target_display"/>
                             <field name="unit"/>
                             <field name="direction"/>
+                            <field name="weight"/>
                         </group>
                     </group>
                     <group string="Applicable Roles">
@@ -258,14 +265,12 @@
         <field name="res_model">sole.kpi.indicator</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Define your KPI indicators here.
-            </p>
+            <p class="o_view_nocontent_smiling_face">Define your KPI indicators here.</p>
         </field>
     </record>
 
     <!-- ============================================================
-         sole.kpi.category — VIEWS (Configuration)
+         sole.kpi.category — VIEWS
     ============================================================ -->
 
     <record id="view_sole_kpi_category_list" model="ir.ui.view">
@@ -288,7 +293,7 @@
     </record>
 
     <!-- ============================================================
-         sole.kpi.role — VIEWS (Configuration)
+         sole.kpi.role — VIEWS
     ============================================================ -->
 
     <record id="view_sole_kpi_role_list" model="ir.ui.view">
@@ -332,12 +337,17 @@
     </record>
 
     <!-- ============================================================
-         MY KPI DASHBOARD — ir.actions.client
+         CLIENT ACTIONS
     ============================================================ -->
 
     <record id="action_sole_kpi_dashboard" model="ir.actions.client">
         <field name="name">My KPI Dashboard</field>
         <field name="tag">sole_kpi_dashboard</field>
+    </record>
+
+    <record id="action_sole_kpi_company_scorecard" model="ir.actions.client">
+        <field name="name">Company Scorecard</field>
+        <field name="tag">sole_kpi_company_scorecard</field>
     </record>
 
 </odoo>

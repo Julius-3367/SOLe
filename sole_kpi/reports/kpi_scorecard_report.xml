@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Report action ───────────────────────────────────────── -->
+    <record id="action_report_kpi_scorecard" model="ir.actions.report">
+        <field name="name">KPI Scorecard</field>
+        <field name="model">sole.kpi.period</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sole_kpi.report_kpi_scorecard</field>
+        <field name="report_file">sole_kpi.report_kpi_scorecard</field>
+        <field name="binding_model_id" ref="model_sole_kpi_period"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+    <!-- ── QWeb template ───────────────────────────────────────── -->
+    <template id="report_kpi_scorecard">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="period">
+                <t t-call="web.external_layout">
+                    <div class="page">
+
+                        <!-- Cover / period header -->
+                        <div style="text-align:center; margin-bottom:24px; border-bottom:3px solid #1a237e; padding-bottom:16px;">
+                            <h1 style="color:#1a237e; margin:0; font-size:22pt;">KPI Balanced Scorecard</h1>
+                            <h2 style="color:#555; margin:6px 0 0; font-size:14pt;" t-esc="period.name"/>
+                            <p style="color:#888; margin:4px 0 0; font-size:9pt;">
+                                Period: <t t-esc="period.date_start"/> – <t t-esc="period.date_end"/>
+                                &#160;·&#160; Status: <t t-esc="dict(period.fields_get(['state'])['state']['selection'])[period.state]"/>
+                            </p>
+                        </div>
+
+                        <!-- Iterate by user -->
+                        <t t-set="all_entries" t-value="period.entry_ids.sorted(key=lambda e: (e.user_id.name, e.category_id.sequence, e.indicator_id.sequence))"/>
+                        <t t-set="users" t-value="all_entries.mapped('user_id')"/>
+
+                        <t t-foreach="users" t-as="user">
+                            <t t-set="user_entries" t-value="all_entries.filtered(lambda e: e.user_id == user)"/>
+
+                            <!-- Staff member header -->
+                            <div style="background:#e8eaf6; border-radius:6px; padding:10px 14px; margin-top:18px; margin-bottom:12px; page-break-inside:avoid;">
+                                <strong style="color:#1a237e; font-size:12pt;" t-esc="user.name"/>
+                                <t t-set="role" t-value="user_entries[0].role_id if user_entries else False"/>
+                                <span t-if="role" style="color:#3949ab; font-size:9pt; margin-left:12px;" t-esc="' · ' + role.name"/>
+                            </div>
+
+                            <!-- Categories -->
+                            <t t-set="categories" t-value="user_entries.mapped('category_id').sorted('sequence')"/>
+                            <t t-foreach="categories" t-as="cat">
+                                <t t-set="cat_entries" t-value="user_entries.filtered(lambda e: e.category_id == cat)"/>
+                                <p style="font-size:8pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.05em; color:#666; margin:10px 0 4px; border-bottom:1px solid #ddd; padding-bottom:3px;"
+                                   t-esc="cat.name"/>
+                                <table style="width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:8px;">
+                                    <thead>
+                                        <tr style="background:#f5f5f5;">
+                                            <th style="padding:5px 8px; text-align:left; border:1px solid #e0e0e0; width:35%;">KPI Indicator</th>
+                                            <th style="padding:5px 8px; text-align:right; border:1px solid #e0e0e0; width:12%;">Target</th>
+                                            <th style="padding:5px 8px; text-align:right; border:1px solid #e0e0e0; width:12%;">Actual</th>
+                                            <th style="padding:5px 8px; text-align:right; border:1px solid #e0e0e0; width:12%;">Achievement</th>
+                                            <th style="padding:5px 8px; text-align:center; border:1px solid #e0e0e0; width:10%;">Status</th>
+                                            <th style="padding:5px 8px; text-align:left; border:1px solid #e0e0e0;">Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="cat_entries" t-as="entry">
+                                            <t t-set="status_color" t-value="{'green':'#28a745','amber':'#ffc107','red':'#dc3545','black':'#212529','grey':'#9e9e9e'}[entry.status]"/>
+                                            <t t-set="status_bg" t-value="{'green':'#d4edda','amber':'#fff3cd','red':'#f8d7da','black':'#e0e0e0','grey':'#f5f5f5'}[entry.status]"/>
+                                            <tr>
+                                                <td style="padding:5px 8px; border:1px solid #e0e0e0;" t-esc="entry.indicator_id.name"/>
+                                                <td style="padding:5px 8px; border:1px solid #e0e0e0; text-align:right;">
+                                                    <t t-esc="entry.indicator_id.target_display or '%g' % entry.target"/>
+                                                    <t t-esc="' ' + dict(entry.fields_get(['unit'])['unit']['selection'])[entry.unit]"/>
+                                                </td>
+                                                <td style="padding:5px 8px; border:1px solid #e0e0e0; text-align:right; font-weight:bold;">
+                                                    <t t-esc="'%g' % entry.actual"/>
+                                                    <t t-esc="' ' + dict(entry.fields_get(['unit'])['unit']['selection'])[entry.unit]"/>
+                                                </td>
+                                                <td style="padding:5px 8px; border:1px solid #e0e0e0; text-align:right; font-weight:bold;">
+                                                    <t t-esc="'%.1f%%' % entry.achievement_pct"/>
+                                                </td>
+                                                <td t-att-style="'padding:5px 8px; border:1px solid #e0e0e0; text-align:center; background:' + status_bg + '; color:' + status_color + '; font-weight:bold; font-size:7pt;'">
+                                                    <t t-esc="entry.status.upper()"/>
+                                                </td>
+                                                <td style="padding:5px 8px; border:1px solid #e0e0e0; color:#666; font-size:7.5pt;"
+                                                    t-esc="entry.notes or ''"/>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+
+                            <!-- User overall score -->
+                            <t t-set="scored" t-value="user_entries.filtered(lambda e: e.status != 'grey')"/>
+                            <t t-set="user_pct" t-value="sum(scored.mapped('achievement_pct')) / len(scored) if scored else 0"/>
+                            <t t-set="u_status" t-value="'Green' if user_pct >= 80 else ('Amber' if user_pct >= 70 else ('Red' if user_pct >= 60 else 'Black')) if scored else 'No Data'"/>
+                            <div style="text-align:right; margin-top:6px; margin-bottom:4px;">
+                                <strong style="font-size:9pt; color:#555;">Overall Score: </strong>
+                                <strong style="font-size:10pt;" t-esc="'%.1f%%' % user_pct if scored else 'N/A'"/>
+                                &#160;·&#160;
+                                <strong t-esc="u_status"/>
+                            </div>
+
+                        </t>
+                        <!-- end users loop -->
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

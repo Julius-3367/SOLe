@@ -24,7 +24,7 @@ class SoleKpiIndicator(models.Model):
     target = fields.Float(string='Target', required=True)
     target_display = fields.Char(
         string='Target Display',
-        help='Optional display override, e.g. "≤2" or "4–6"',
+        help='Optional override shown on the dashboard, e.g. "≤2" or "4–6".',
     )
     unit = fields.Selection(
         [
@@ -45,6 +45,11 @@ class SoleKpiIndicator(models.Model):
         string='Direction',
         default='higher',
         required=True,
+    )
+    weight = fields.Float(
+        string='Weight',
+        default=1.0,
+        help='Relative weight for weighted-average scoring. Default 1.0 (equal weight).',
     )
     description = fields.Text(string='Description')
     sequence = fields.Integer(string='Sequence', default=10)
