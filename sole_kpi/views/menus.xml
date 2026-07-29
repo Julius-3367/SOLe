@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ROOT MENU -->
+    <menuitem id="menu_sole_kpi_root"
+              name="SOLe KPI"
+              sequence="82"
+              web_icon="sole_kpi,static/description/icon.png"/>
+
+    <!-- MY DASHBOARD -->
+    <menuitem id="menu_sole_kpi_dashboard"
+              name="My Dashboard"
+              parent="menu_sole_kpi_root"
+              action="action_sole_kpi_dashboard"
+              sequence="10"/>
+
+    <!-- KPI ENTRY -->
+    <menuitem id="menu_sole_kpi_entry"
+              name="KPI Entry"
+              parent="menu_sole_kpi_root"
+              action="action_sole_kpi_entry"
+              sequence="20"/>
+
+    <!-- TENDER MANAGEMENT -->
+    <menuitem id="menu_sole_tender"
+              name="Tender Management"
+              parent="menu_sole_kpi_root"
+              sequence="30"/>
+
+    <menuitem id="menu_sole_tender_kanban"
+              name="Tenders"
+              parent="menu_sole_tender"
+              action="action_sole_tender_kanban"
+              sequence="10"/>
+
+    <menuitem id="menu_sole_tender_list"
+              name="Tender List"
+              parent="menu_sole_tender"
+              action="action_sole_tender_list"
+              sequence="20"/>
+
+    <!-- REPORTS -->
+    <menuitem id="menu_sole_kpi_reports"
+              name="Reports"
+              parent="menu_sole_kpi_root"
+              sequence="40"/>
+
+    <menuitem id="menu_sole_kpi_indicators_report"
+              name="KPI Indicators"
+              parent="menu_sole_kpi_reports"
+              action="action_sole_kpi_indicator"
+              sequence="10"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_sole_kpi_periods_report"
+              name="Periods"
+              parent="menu_sole_kpi_reports"
+              action="action_sole_kpi_period"
+              sequence="20"
+              groups="account.group_account_manager"/>
+
+    <!-- CONFIGURATION -->
+    <menuitem id="menu_sole_kpi_config"
+              name="Configuration"
+              parent="menu_sole_kpi_root"
+              sequence="90"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_sole_kpi_config_categories"
+              name="Categories"
+              parent="menu_sole_kpi_config"
+              action="action_sole_kpi_category"
+              sequence="10"/>
+
+    <menuitem id="menu_sole_kpi_config_roles"
+              name="Roles"
+              parent="menu_sole_kpi_config"
+              action="action_sole_kpi_role"
+              sequence="20"/>
+
+    <menuitem id="menu_sole_kpi_config_indicators"
+              name="KPI Indicators"
+              parent="menu_sole_kpi_config"
+              action="action_sole_kpi_indicator"
+              sequence="30"/>
+
+    <menuitem id="menu_sole_kpi_config_periods"
+              name="Periods"
+              parent="menu_sole_kpi_config"
+              action="action_sole_kpi_period"
+              sequence="40"/>
+
+</odoo>

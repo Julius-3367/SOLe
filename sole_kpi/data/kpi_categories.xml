@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="kpi_cat_financial" model="sole.kpi.category">
+            <field name="name">Financial Sustainability</field>
+            <field name="sequence">1</field>
+            <field name="color">10</field>
+        </record>
+
+        <record id="kpi_cat_customer_success" model="sole.kpi.category">
+            <field name="name">Customer Success &amp; Growth</field>
+            <field name="sequence">2</field>
+            <field name="color">4</field>
+        </record>
+
+        <record id="kpi_cat_sales" model="sole.kpi.category">
+            <field name="name">Sales &amp; Business Development</field>
+            <field name="sequence">3</field>
+            <field name="color">2</field>
+        </record>
+
+        <record id="kpi_cat_marketing" model="sole.kpi.category">
+            <field name="name">Marketing</field>
+            <field name="sequence">4</field>
+            <field name="color">6</field>
+        </record>
+
+        <record id="kpi_cat_project_delivery" model="sole.kpi.category">
+            <field name="name">Project Delivery</field>
+            <field name="sequence">5</field>
+            <field name="color">3</field>
+        </record>
+
+        <record id="kpi_cat_infrastructure" model="sole.kpi.category">
+            <field name="name">Infrastructure &amp; Support</field>
+            <field name="sequence">6</field>
+            <field name="color">1</field>
+        </record>
+
+        <record id="kpi_cat_tendering" model="sole.kpi.category">
+            <field name="name">Tendering &amp; Strategic Growth</field>
+            <field name="sequence">7</field>
+            <field name="color">7</field>
+        </record>
+
+        <record id="kpi_cat_people" model="sole.kpi.category">
+            <field name="name">People, Learning &amp; Culture</field>
+            <field name="sequence">8</field>
+            <field name="color">5</field>
+        </record>
+
+        <record id="kpi_cat_governance" model="sole.kpi.category">
+            <field name="name">Governance, Compliance &amp; Risk</field>
+            <field name="sequence">9</field>
+            <field name="color">9</field>
+        </record>
+
+        <record id="kpi_cat_innovation" model="sole.kpi.category">
+            <field name="name">Innovation &amp; Continuous Improvement</field>
+            <field name="sequence">10</field>
+            <field name="color">8</field>
+        </record>
+
+    </data>
+</odoo>

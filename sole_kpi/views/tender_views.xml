@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         sole.tender — KANBAN VIEW
+    ============================================================ -->
+
+    <record id="view_sole_tender_kanban" model="ir.ui.view">
+        <field name="name">sole.tender.kanban</field>
+        <field name="model">sole.tender</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column"
+                    records_draggable="1">
+                <field name="name"/>
+                <field name="issuing_org"/>
+                <field name="deadline_date"/>
+                <field name="days_to_deadline"/>
+                <field name="bid_value"/>
+                <field name="state"/>
+                <field name="color"/>
+                <field name="responsible_id"/>
+                <field name="category"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="color" widget="color_picker"/>
+                        <div class="oe_kanban_main">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle text-muted">
+                                        <field name="issuing_org"/>
+                                    </span>
+                                </div>
+                                <div class="o_kanban_record_top_right">
+                                    <field name="responsible_id" widget="many2one_avatar_user"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div t-if="record.deadline_date.value">
+                                    <span class="fa fa-calendar" title="Deadline"/>
+                                    <field name="deadline_date"/>
+                                    <t t-if="record.days_to_deadline.value != null">
+                                        <span t-att-class="record.days_to_deadline.value &lt;= 3 ? 'badge bg-danger ms-1' : record.days_to_deadline.value &lt;= 7 ? 'badge bg-warning ms-1' : 'badge bg-secondary ms-1'">
+                                            <t t-esc="record.days_to_deadline.value"/> days
+                                        </span>
+                                    </t>
+                                </div>
+                                <div t-if="record.bid_value.value">
+                                    <span class="fa fa-money" title="Bid Value"/>
+                                    KES <field name="bid_value" widget="monetary"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="category" widget="badge"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'won'"
+                                           decoration-danger="state in ('lost', 'cancelled')"
+                                           decoration-info="state in ('identified', 'qualifying', 'preparing')"
+                                           decoration-warning="state == 'submitted'"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.tender — LIST VIEW
+    ============================================================ -->
+
+    <record id="view_sole_tender_list" model="ir.ui.view">
+        <field name="name">sole.tender.list</field>
+        <field name="model">sole.tender</field>
+        <field name="arch" type="xml">
+            <list string="Tenders"
+                  decoration-danger="state in ('lost', 'cancelled') or days_to_deadline &lt;= 3"
+                  decoration-warning="days_to_deadline &lt;= 7 and state not in ('won', 'lost', 'cancelled', 'submitted')"
+                  decoration-success="state == 'won'">
+                <field name="reference" optional="show"/>
+                <field name="name"/>
+                <field name="issuing_org"/>
+                <field name="category"/>
+                <field name="deadline_date"/>
+                <field name="days_to_deadline" string="Days Left"/>
+                <field name="state"
+                       decoration-success="state == 'won'"
+                       decoration-danger="state in ('lost', 'cancelled')"
+                       decoration-warning="state == 'submitted'"
+                       decoration-info="state in ('identified', 'qualifying', 'preparing')"/>
+                <field name="bid_value" optional="show"/>
+                <field name="responsible_id"/>
+                <field name="go_no_go" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.tender — FORM VIEW
+    ============================================================ -->
+
+    <record id="view_sole_tender_form" model="ir.ui.view">
+        <field name="name">sole.tender.form</field>
+        <field name="model">sole.tender</field>
+        <field name="arch" type="xml">
+            <form string="Tender">
+                <header>
+                    <button name="action_qualifying"
+                            string="Start Qualifying"
+                            type="object"
+                            invisible="state != 'identified'"
+                            class="btn-primary"/>
+                    <button name="action_preparing"
+                            string="Start Preparing"
+                            type="object"
+                            invisible="state != 'qualifying'"
+                            class="btn-primary"/>
+                    <button name="action_submit"
+                            string="Mark as Submitted"
+                            type="object"
+                            invisible="state != 'preparing'"
+                            class="btn-primary"/>
+                    <button name="action_won"
+                            string="Won"
+                            type="object"
+                            invisible="state != 'submitted'"
+                            class="btn-success"/>
+                    <button name="action_lost"
+                            string="Lost"
+                            type="object"
+                            invisible="state not in ('submitted', 'preparing')"
+                            class="btn-danger"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            invisible="state in ('won', 'lost', 'cancelled')"
+                            class="btn-secondary"/>
+                    <button name="action_reset"
+                            string="Reset to Identified"
+                            type="object"
+                            invisible="state in ('identified', 'won')"
+                            class="btn-secondary"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="identified,qualifying,preparing,submitted,won"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Tender Name"/>
+                        </h1>
+                        <h4 class="text-muted">
+                            <field name="issuing_org" placeholder="Issuing Organization"/>
+                        </h4>
+                    </div>
+                    <group>
+                        <group string="Identification">
+                            <field name="reference"/>
+                            <field name="source"/>
+                            <field name="category"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Dates &amp; Responsibility">
+                            <field name="deadline_date"/>
+                            <field name="submission_date"
+                                   invisible="state not in ('submitted', 'won', 'lost')"/>
+                            <field name="days_to_deadline" readonly="1"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group string="Financials">
+                            <field name="bid_value"/>
+                            <field name="contract_value"
+                                   invisible="state != 'won'"/>
+                            <field name="go_no_go"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Scope / Notes">
+                            <field name="description" nolabel="1"
+                                   placeholder="Describe the tender scope, requirements, and strategy notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.tender — SEARCH VIEW
+    ============================================================ -->
+
+    <record id="view_sole_tender_search" model="ir.ui.view">
+        <field name="name">sole.tender.search</field>
+        <field name="model">sole.tender</field>
+        <field name="arch" type="xml">
+            <search string="Search Tenders">
+                <field name="name"/>
+                <field name="issuing_org"/>
+                <field name="reference"/>
+                <field name="responsible_id"/>
+                <separator/>
+                <filter string="My Tenders" name="my_tenders"
+                        domain="[('responsible_id', '=', uid)]"/>
+                <filter string="Active" name="active"
+                        domain="[('state', 'not in', ['won', 'lost', 'cancelled'])]"/>
+                <filter string="Won" name="won"
+                        domain="[('state', '=', 'won')]"/>
+                <filter string="Lost" name="lost"
+                        domain="[('state', '=', 'lost')]"/>
+                <filter string="Deadline This Week" name="deadline_week"
+                        domain="[('deadline_date', '&lt;=', (context_today() + relativedelta(weeks=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="ICT &amp; Software" name="cat_ict"
+                        domain="[('category', '=', 'ict')]"/>
+                <filter string="Consulting" name="cat_consulting"
+                        domain="[('category', '=', 'consulting')]"/>
+                <filter string="Managed Services" name="cat_services"
+                        domain="[('category', '=', 'services')]"/>
+                <separator/>
+                <filter string="eTenders Portal" name="src_etenders"
+                        domain="[('source', '=', 'etenders')]"/>
+                <filter string="Referral" name="src_referral"
+                        domain="[('source', '=', 'referral')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Responsible" name="group_responsible"
+                            context="{'group_by': 'responsible_id'}"/>
+                    <filter string="Status" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Category" name="group_category"
+                            context="{'group_by': 'category'}"/>
+                    <filter string="Source" name="group_source"
+                            context="{'group_by': 'source'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.tender — ACTIONS
+    ============================================================ -->
+
+    <record id="action_sole_tender_kanban" model="ir.actions.act_window">
+        <field name="name">Tenders</field>
+        <field name="res_model">sole.tender</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_sole_tender_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Track your first tender opportunity.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_sole_tender_list" model="ir.actions.act_window">
+        <field name="name">Tender List</field>
+        <field name="res_model">sole.tender</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sole_tender_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Track your first tender opportunity.
+            </p>
+        </field>
+    </record>
+
+</odoo>
