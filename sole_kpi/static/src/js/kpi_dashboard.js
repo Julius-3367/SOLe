@@ -24,7 +24,6 @@ export class KpiDashboard extends Component {
 
     setup() {
         this.orm = useService("orm");
-        this.user = useService("user");
         this.state = useState({
             periods: [],
             currentPeriodId: null,
@@ -63,7 +62,7 @@ export class KpiDashboard extends Component {
         }
         this.state.loading = true;
         try {
-            const userId = this.user.userId;
+            const userId = this.env.uid;
             const entries = await this.orm.searchRead(
                 "sole.kpi.entry",
                 [
