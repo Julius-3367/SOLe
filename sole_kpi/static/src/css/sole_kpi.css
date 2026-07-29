@@ -1,0 +1,118 @@
+.sole_kpi_status_green {
+    background-color: #28a745;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.sole_kpi_status_amber {
+    background-color: #ffc107;
+    color: #212529;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.sole_kpi_status_red {
+    background-color: #dc3545;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.sole_kpi_status_black {
+    background-color: #212529;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+.sole_kpi_status_grey {
+    background-color: #6c757d;
+    color: white;
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+.o_kanban_record.sole_tender_won {
+    border-left: 4px solid #28a745;
+}
+.o_kanban_record.sole_tender_lost {
+    border-left: 4px solid #dc3545;
+}
+.o_kanban_record.sole_tender_urgent {
+    border-left: 4px solid #ffc107;
+}
+
+/* ── KPI Dashboard ─────────────────────────────────────────── */
+.sole_kpi_dashboard {
+    padding: 16px;
+}
+.sole_kpi_dashboard .o_dashboard_header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.sole_kpi_dashboard .o_dashboard_header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+.sole_kpi_category_section {
+    margin-bottom: 24px;
+}
+.sole_kpi_category_section h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+.sole_kpi_tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.sole_kpi_tile {
+    flex: 0 0 220px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sole_kpi_tile .kpi_name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.3;
+}
+.sole_kpi_tile .kpi_numbers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+.sole_kpi_tile .kpi_actual {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #212529;
+}
+.sole_kpi_tile .kpi_pct {
+    font-size: 0.85rem;
+    color: #495057;
+}
+.sole_kpi_tile .kpi_badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 2px 10px;
+}
+.kpi_badge.green  { background: #28a745; color: #fff; }
+.kpi_badge.amber  { background: #ffc107; color: #212529; }
+.kpi_badge.red    { background: #dc3545; color: #fff; }
+.kpi_badge.black  { background: #212529; color: #fff; }
+.kpi_badge.grey   { background: #6c757d; color: #fff; }

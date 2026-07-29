@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sole_kpi.KpiDashboard">
+        <div class="sole_kpi_dashboard o_action o_main_navbar">
+            <div class="o_action_manager">
+                <div class="o_dashboard_header d-flex align-items-center gap-3 p-3 border-bottom">
+                    <h2 class="mb-0">My KPI Dashboard</h2>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <label class="fw-semibold mb-0" for="period_select">Period:</label>
+                        <select id="period_select"
+                                class="form-select form-select-sm"
+                                style="width:200px"
+                                t-on-change="onPeriodChange">
+                            <option value="">— Select Period —</option>
+                            <t t-foreach="state.periods" t-as="p" t-key="p.id">
+                                <option t-att-value="p.id"
+                                        t-att-selected="p.id === state.currentPeriodId">
+                                    <t t-esc="p.name"/>
+                                    <t t-if="p.state === 'locked'"> (Locked)</t>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <t t-if="state.loading">
+                        <div class="d-flex justify-content-center align-items-center" style="height:200px">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </t>
+
+                    <t t-elif="!state.currentPeriodId">
+                        <div class="alert alert-info">
+                            Select a period above to view your KPI results.
+                        </div>
+                    </t>
+
+                    <t t-elif="state.categories.length === 0">
+                        <div class="alert alert-warning">
+                            No KPI entries found for this period. Ask your manager to set up entries.
+                        </div>
+                    </t>
+
+                    <t t-else="">
+                        <t t-foreach="state.categories" t-as="cat" t-key="cat.id">
+                            <div class="sole_kpi_category_section">
+                                <h4 t-esc="cat.name"/>
+                                <div class="sole_kpi_tiles">
+                                    <t t-foreach="cat.entries" t-as="entry" t-key="entry.id">
+                                        <div class="sole_kpi_tile">
+                                            <div class="kpi_name" t-esc="entry.indicator_name"/>
+                                            <div class="kpi_numbers">
+                                                <span>Target: <t t-esc="entry.target_display or entry.target"/> <t t-esc="entry.unit_label"/></span>
+                                            </div>
+                                            <div class="kpi_actual">
+                                                <t t-esc="entry.actual"/>
+                                                <small class="text-muted ms-1" t-esc="entry.unit_label"/>
+                                            </div>
+                                            <div class="kpi_pct">
+                                                Achievement: <strong t-esc="Math.round(entry.achievement_pct) + '%'"/>
+                                            </div>
+                                            <span t-att-class="'kpi_badge ' + entry.status">
+                                                <t t-esc="entry.status_label"/>
+                                            </span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

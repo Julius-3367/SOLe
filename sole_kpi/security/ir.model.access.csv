@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_kpi_category_user,sole.kpi.category user,model_sole_kpi_category,base.group_user,1,0,0,0
+access_sole_kpi_category_manager,sole.kpi.category manager,model_sole_kpi_category,base.group_system,1,1,1,1
+access_sole_kpi_role_user,sole.kpi.role user,model_sole_kpi_role,base.group_user,1,0,0,0
+access_sole_kpi_role_manager,sole.kpi.role manager,model_sole_kpi_role,base.group_system,1,1,1,1
+access_sole_kpi_indicator_user,sole.kpi.indicator user,model_sole_kpi_indicator,base.group_user,1,0,0,0
+access_sole_kpi_indicator_manager,sole.kpi.indicator manager,model_sole_kpi_indicator,base.group_system,1,1,1,1
+access_sole_kpi_period_user,sole.kpi.period user,model_sole_kpi_period,base.group_user,1,0,0,0
+access_sole_kpi_period_manager,sole.kpi.period manager,model_sole_kpi_period,account.group_account_manager,1,1,1,1
+access_sole_kpi_entry_user,sole.kpi.entry user,model_sole_kpi_entry,base.group_user,1,1,1,1
+access_sole_tender_user,sole.tender user,model_sole_tender,base.group_user,1,0,0,0
+access_sole_tender_manager,sole.tender manager,model_sole_tender,account.group_account_manager,1,1,1,1

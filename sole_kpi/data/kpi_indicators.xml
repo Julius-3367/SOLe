@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ========================================================
+             FINANCIAL SUSTAINABILITY
+        ======================================================== -->
+
+        <record id="kpi_revenue" model="sole.kpi.indicator">
+            <field name="name">Revenue</field>
+            <field name="category_id" ref="kpi_cat_financial"/>
+            <field name="target">1000000</field>
+            <field name="unit">currency</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_cash_collection_rate" model="sole.kpi.indicator">
+            <field name="name">Cash Collection Rate</field>
+            <field name="category_id" ref="kpi_cat_financial"/>
+            <field name="target">95</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_gross_profit_margin" model="sole.kpi.indicator">
+            <field name="name">Gross Profit Margin</field>
+            <field name="category_id" ref="kpi_cat_financial"/>
+            <field name="target">40</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_managed_services_mrr_growth" model="sole.kpi.indicator">
+            <field name="name">Managed Services MRR Growth</field>
+            <field name="category_id" ref="kpi_cat_financial"/>
+            <field name="target">100000</field>
+            <field name="unit">currency</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_recurring_revenue_ratio" model="sole.kpi.indicator">
+            <field name="name">Recurring Revenue Ratio</field>
+            <field name="category_id" ref="kpi_cat_financial"/>
+            <field name="target">50</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <!-- ========================================================
+             CUSTOMER SUCCESS &amp; GROWTH
+        ======================================================== -->
+
+        <record id="kpi_customer_retention_rate" model="sole.kpi.indicator">
+            <field name="name">Customer Retention Rate</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">95</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_upsell_revenue" model="sole.kpi.indicator">
+            <field name="name">Upsell Revenue</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">300000</field>
+            <field name="unit">currency</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_cross_sell_opportunities" model="sole.kpi.indicator">
+            <field name="name">Cross-sell Opportunities Identified</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">10</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success'))]"/>
+        </record>
+
+        <record id="kpi_customer_engagement_visits" model="sole.kpi.indicator">
+            <field name="name">Customer Engagement Visits</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">84</field>
+            <field name="target_display">21/week</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success'))]"/>
+        </record>
+
+        <record id="kpi_csat" model="sole.kpi.indicator">
+            <field name="name">Customer Satisfaction (CSAT)</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">90</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success')), (4, ref('role_support'))]"/>
+        </record>
+
+        <record id="kpi_customer_referrals" model="sole.kpi.indicator">
+            <field name="name">Customer Referrals Generated</field>
+            <field name="category_id" ref="kpi_cat_customer_success"/>
+            <field name="target">2</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">60</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success'))]"/>
+        </record>
+
+        <!-- ========================================================
+             SALES &amp; BUSINESS DEVELOPMENT
+        ======================================================== -->
+
+        <record id="kpi_qualified_leads" model="sole.kpi.indicator">
+            <field name="name">Qualified Leads Generated</field>
+            <field name="category_id" ref="kpi_cat_sales"/>
+            <field name="target">40</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_discovery_meetings" model="sole.kpi.indicator">
+            <field name="name">Discovery Meetings Held</field>
+            <field name="category_id" ref="kpi_cat_sales"/>
+            <field name="target">20</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_proposals_submitted" model="sole.kpi.indicator">
+            <field name="name">Proposals Submitted</field>
+            <field name="category_id" ref="kpi_cat_sales"/>
+            <field name="target">12</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_new_contract_value" model="sole.kpi.indicator">
+            <field name="name">New Contract Value Signed</field>
+            <field name="category_id" ref="kpi_cat_sales"/>
+            <field name="target">1500000</field>
+            <field name="unit">currency</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_strategic_partnerships" model="sole.kpi.indicator">
+            <field name="name">Strategic Partnerships Established</field>
+            <field name="category_id" ref="kpi_cat_sales"/>
+            <field name="target">1</field>
+            <field name="target_display">1/quarter</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <!-- ========================================================
+             MARKETING
+        ======================================================== -->
+
+        <record id="kpi_website_enquiries" model="sole.kpi.indicator">
+            <field name="name">Website Enquiries</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">20</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_mqls" model="sole.kpi.indicator">
+            <field name="name">Marketing Qualified Leads (MQLs)</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">20</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_linkedin_posts" model="sole.kpi.indicator">
+            <field name="name">LinkedIn Posts Published</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">12</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_videos_produced" model="sole.kpi.indicator">
+            <field name="name">Videos Produced</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">8</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_website_articles" model="sole.kpi.indicator">
+            <field name="name">Website Articles Published</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">4</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_customer_success_story" model="sole.kpi.indicator">
+            <field name="name">Customer Success Story Published</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">60</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_newsletter" model="sole.kpi.indicator">
+            <field name="name">Company Newsletter Published</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">70</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_webinar" model="sole.kpi.indicator">
+            <field name="name">Webinar / Training Event Held</field>
+            <field name="category_id" ref="kpi_cat_marketing"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">80</field>
+            <field name="role_ids" eval="[(4, ref('role_marketing'))]"/>
+        </record>
+
+        <!-- ========================================================
+             PROJECT DELIVERY
+        ======================================================== -->
+
+        <record id="kpi_projects_on_time" model="sole.kpi.indicator">
+            <field name="name">Projects Delivered On Time</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">90</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_developer')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_project_gross_margin" model="sole.kpi.indicator">
+            <field name="name">Project Gross Margin</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">35</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_uat_signoffs" model="sole.kpi.indicator">
+            <field name="name">UAT Sign-offs Completed</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_qa'))]"/>
+        </record>
+
+        <record id="kpi_project_acceptance_certs" model="sole.kpi.indicator">
+            <field name="name">Project Acceptance Certificates Signed</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_pm'))]"/>
+        </record>
+
+        <record id="kpi_project_documentation" model="sole.kpi.indicator">
+            <field name="name">Project Documentation Completed</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_developer')), (4, ref('role_qa'))]"/>
+        </record>
+
+        <record id="kpi_change_requests" model="sole.kpi.indicator">
+            <field name="name">Change Requests Managed Through Process</field>
+            <field name="category_id" ref="kpi_cat_project_delivery"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">60</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_qa'))]"/>
+        </record>
+
+        <!-- ========================================================
+             INFRASTRUCTURE &amp; SUPPORT
+        ======================================================== -->
+
+        <record id="kpi_server_uptime" model="sole.kpi.indicator">
+            <field name="name">Server Uptime</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">99.9</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin'))]"/>
+        </record>
+
+        <record id="kpi_sla_compliance" model="sole.kpi.indicator">
+            <field name="name">SLA Compliance</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">95</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin')), (4, ref('role_support'))]"/>
+        </record>
+
+        <record id="kpi_backup_success_rate" model="sole.kpi.indicator">
+            <field name="name">Backup Success Rate</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin'))]"/>
+        </record>
+
+        <record id="kpi_critical_incidents" model="sole.kpi.indicator">
+            <field name="name">Critical Incidents</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">2</field>
+            <field name="target_display">&#8804;2</field>
+            <field name="unit">count</field>
+            <field name="direction">lower</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin')), (4, ref('role_support'))]"/>
+        </record>
+
+        <record id="kpi_preventive_maintenance" model="sole.kpi.indicator">
+            <field name="name">Preventive Maintenance Completed</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin'))]"/>
+        </record>
+
+        <record id="kpi_avg_ticket_resolution" model="sole.kpi.indicator">
+            <field name="name">Avg Ticket Resolution Within SLA</field>
+            <field name="category_id" ref="kpi_cat_infrastructure"/>
+            <field name="target">95</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">60</field>
+            <field name="role_ids" eval="[(4, ref('role_support'))]"/>
+        </record>
+
+        <!-- ========================================================
+             TENDERING &amp; STRATEGIC GROWTH
+        ======================================================== -->
+
+        <record id="kpi_tender_opportunities" model="sole.kpi.indicator">
+            <field name="name">Tender Opportunities Identified</field>
+            <field name="category_id" ref="kpi_cat_tendering"/>
+            <field name="target">20</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_tenders_submitted" model="sole.kpi.indicator">
+            <field name="name">Tenders Submitted</field>
+            <field name="category_id" ref="kpi_cat_tendering"/>
+            <field name="target">5</field>
+            <field name="target_display">4&#8211;6</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_tender_success_rate" model="sole.kpi.indicator">
+            <field name="name">Tender Success Rate</field>
+            <field name="category_id" ref="kpi_cat_tendering"/>
+            <field name="target">20</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_proposal_library" model="sole.kpi.indicator">
+            <field name="name">Proposal Library Updated</field>
+            <field name="category_id" ref="kpi_cat_tendering"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender'))]"/>
+        </record>
+
+        <record id="kpi_strategic_bid_meetings" model="sole.kpi.indicator">
+            <field name="name">Strategic Bid / Partner Meetings</field>
+            <field name="category_id" ref="kpi_cat_tendering"/>
+            <field name="target">4</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender'))]"/>
+        </record>
+
+        <!-- ========================================================
+             PEOPLE, LEARNING &amp; CULTURE
+        ======================================================== -->
+
+        <record id="kpi_internal_training_sessions" model="sole.kpi.indicator">
+            <field name="name">Internal Training Sessions Held</field>
+            <field name="category_id" ref="kpi_cat_people"/>
+            <field name="target">2</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_lunch_and_learn" model="sole.kpi.indicator">
+            <field name="name">Lunch &amp; Learn Knowledge Sharing Sessions</field>
+            <field name="category_id" ref="kpi_cat_people"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_avg_training_hours" model="sole.kpi.indicator">
+            <field name="name">Average Training Hours per Employee</field>
+            <field name="category_id" ref="kpi_cat_people"/>
+            <field name="target">4</field>
+            <field name="unit">hours</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_sysadmin')), (4, ref('role_support')), (4, ref('role_customer_success')), (4, ref('role_pm')), (4, ref('role_developer')), (4, ref('role_qa')), (4, ref('role_admin_tender')), (4, ref('role_marketing'))]"/>
+        </record>
+
+        <record id="kpi_performance_reviews" model="sole.kpi.indicator">
+            <field name="name">Performance Reviews Completed</field>
+            <field name="category_id" ref="kpi_cat_people"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_employee_retention" model="sole.kpi.indicator">
+            <field name="name">Employee Retention</field>
+            <field name="category_id" ref="kpi_cat_people"/>
+            <field name="target">95</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <!-- ========================================================
+             GOVERNANCE, COMPLIANCE &amp; RISK
+        ======================================================== -->
+
+        <record id="kpi_policies_reviewed" model="sole.kpi.indicator">
+            <field name="name">Policies Reviewed / Developed</field>
+            <field name="category_id" ref="kpi_cat_governance"/>
+            <field name="target">2</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_admin_tender')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_internal_audit" model="sole.kpi.indicator">
+            <field name="name">Internal Compliance Audit Completed</field>
+            <field name="category_id" ref="kpi_cat_governance"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_qa')), (4, ref('role_admin_tender'))]"/>
+        </record>
+
+        <record id="kpi_compliance_action_items" model="sole.kpi.indicator">
+            <field name="name">Compliance Action Items Closed</field>
+            <field name="category_id" ref="kpi_cat_governance"/>
+            <field name="target">90</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_qa'))]"/>
+        </record>
+
+        <record id="kpi_monthly_kpi_review" model="sole.kpi.indicator">
+            <field name="name">Monthly KPI Review Meeting Held</field>
+            <field name="category_id" ref="kpi_cat_governance"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_board_reports" model="sole.kpi.indicator">
+            <field name="name">Board Reports Submitted On Time</field>
+            <field name="category_id" ref="kpi_cat_governance"/>
+            <field name="target">100</field>
+            <field name="unit">percentage</field>
+            <field name="direction">higher</field>
+            <field name="sequence">50</field>
+            <field name="role_ids" eval="[(4, ref('role_ceo'))]"/>
+        </record>
+
+        <!-- ========================================================
+             INNOVATION &amp; CONTINUOUS IMPROVEMENT
+        ======================================================== -->
+
+        <record id="kpi_new_service_improvements" model="sole.kpi.indicator">
+            <field name="name">New Service Improvements Introduced</field>
+            <field name="category_id" ref="kpi_cat_innovation"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">10</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_developer')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_process_improvements" model="sole.kpi.indicator">
+            <field name="name">Internal Process Improvements Implemented</field>
+            <field name="category_id" ref="kpi_cat_innovation"/>
+            <field name="target">2</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">20</field>
+            <field name="role_ids" eval="[(4, ref('role_pm')), (4, ref('role_developer')), (4, ref('role_ceo'))]"/>
+        </record>
+
+        <record id="kpi_automation_initiatives" model="sole.kpi.indicator">
+            <field name="name">Automation Initiatives Completed</field>
+            <field name="category_id" ref="kpi_cat_innovation"/>
+            <field name="target">1</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">30</field>
+            <field name="role_ids" eval="[(4, ref('role_developer')), (4, ref('role_sysadmin'))]"/>
+        </record>
+
+        <record id="kpi_customer_improvement_suggestions" model="sole.kpi.indicator">
+            <field name="name">Customer Improvement Suggestions Implemented</field>
+            <field name="category_id" ref="kpi_cat_innovation"/>
+            <field name="target">2</field>
+            <field name="unit">count</field>
+            <field name="direction">higher</field>
+            <field name="sequence">40</field>
+            <field name="role_ids" eval="[(4, ref('role_customer_success')), (4, ref('role_pm'))]"/>
+        </record>
+
+    </data>
+</odoo>

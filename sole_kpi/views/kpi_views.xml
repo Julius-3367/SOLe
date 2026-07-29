@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         sole.kpi.period — VIEWS
+    ============================================================ -->
+
+    <record id="view_sole_kpi_period_list" model="ir.ui.view">
+        <field name="name">sole.kpi.period.list</field>
+        <field name="model">sole.kpi.period</field>
+        <field name="arch" type="xml">
+            <list string="KPI Periods">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="state"
+                       decoration-success="state == 'draft'"
+                       decoration-muted="state == 'locked'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_kpi_period_form" model="ir.ui.view">
+        <field name="name">sole.kpi.period.form</field>
+        <field name="model">sole.kpi.period</field>
+        <field name="arch" type="xml">
+            <form string="KPI Period">
+                <header>
+                    <button name="action_open"
+                            string="Re-Open"
+                            type="object"
+                            invisible="state == 'draft'"
+                            class="btn-secondary"/>
+                    <button name="action_lock"
+                            string="Lock Period"
+                            type="object"
+                            invisible="state == 'locked'"
+                            class="btn-warning"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,locked"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="KPI Entries">
+                            <field name="entry_ids" widget="one2many_list">
+                                <list editable="bottom">
+                                    <field name="user_id"/>
+                                    <field name="indicator_id"/>
+                                    <field name="role_id"/>
+                                    <field name="target" readonly="1"/>
+                                    <field name="unit" readonly="1"/>
+                                    <field name="actual"/>
+                                    <field name="achievement_pct" widget="percentage"/>
+                                    <field name="status"
+                                           decoration-success="status == 'green'"
+                                           decoration-warning="status == 'amber'"
+                                           decoration-danger="status == 'red'"
+                                           decoration-muted="status in ('black', 'grey')"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_kpi_period" model="ir.actions.act_window">
+        <field name="name">KPI Periods</field>
+        <field name="res_model">sole.kpi.period</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first KPI reporting period.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.kpi.entry — VIEWS
+    ============================================================ -->
+
+    <record id="view_sole_kpi_entry_list" model="ir.ui.view">
+        <field name="name">sole.kpi.entry.list</field>
+        <field name="model">sole.kpi.entry</field>
+        <field name="arch" type="xml">
+            <list string="KPI Entries"
+                  decoration-success="status == 'green'"
+                  decoration-warning="status == 'amber'"
+                  decoration-danger="status == 'red'"
+                  decoration-muted="status == 'black'">
+                <field name="period_id"/>
+                <field name="indicator_id"/>
+                <field name="user_id"/>
+                <field name="target" string="Target"/>
+                <field name="unit" optional="show"/>
+                <field name="actual"/>
+                <field name="achievement_pct" widget="percentage"/>
+                <field name="status"
+                       decoration-success="status == 'green'"
+                       decoration-warning="status == 'amber'"
+                       decoration-danger="status == 'red'"
+                       decoration-muted="status in ('black', 'grey')"/>
+                <field name="trend" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_kpi_entry_form" model="ir.ui.view">
+        <field name="name">sole.kpi.entry.form</field>
+        <field name="model">sole.kpi.entry</field>
+        <field name="arch" type="xml">
+            <form string="KPI Entry">
+                <sheet>
+                    <group>
+                        <group string="Context">
+                            <field name="period_id"/>
+                            <field name="user_id"/>
+                            <field name="role_id"/>
+                        </group>
+                        <group string="KPI">
+                            <field name="indicator_id"/>
+                            <field name="target" readonly="1"/>
+                            <field name="unit" readonly="1"/>
+                            <field name="direction" readonly="1"/>
+                        </group>
+                        <group string="Results">
+                            <field name="actual"/>
+                            <field name="achievement_pct" widget="percentage"/>
+                            <field name="status"
+                                   decoration-success="status == 'green'"
+                                   decoration-warning="status == 'amber'"
+                                   decoration-danger="status == 'red'"
+                                   decoration-muted="status in ('black', 'grey')"/>
+                            <field name="trend"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sole_kpi_entry_search" model="ir.ui.view">
+        <field name="name">sole.kpi.entry.search</field>
+        <field name="model">sole.kpi.entry</field>
+        <field name="arch" type="xml">
+            <search string="Search KPI Entries">
+                <field name="indicator_id"/>
+                <field name="period_id"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter string="My Entries" name="my_entries"
+                        domain="[('user_id', '=', uid)]"/>
+                <filter string="Green" name="green"
+                        domain="[('status', '=', 'green')]"/>
+                <filter string="Amber" name="amber"
+                        domain="[('status', '=', 'amber')]"/>
+                <filter string="Red" name="red"
+                        domain="[('status', '=', 'red')]"/>
+                <filter string="Black" name="black"
+                        domain="[('status', '=', 'black')]"/>
+                <filter string="No Data" name="no_data"
+                        domain="[('status', '=', 'grey')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Category" name="group_category"
+                            context="{'group_by': 'indicator_id.category_id'}"/>
+                    <filter string="Period" name="group_period"
+                            context="{'group_by': 'period_id'}"/>
+                    <filter string="Status" name="group_status"
+                            context="{'group_by': 'status'}"/>
+                    <filter string="Staff Member" name="group_user"
+                            context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sole_kpi_entry" model="ir.actions.act_window">
+        <field name="name">KPI Entries</field>
+        <field name="res_model">sole.kpi.entry</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_my_entries': 1, 'search_default_group_category': 1}</field>
+        <field name="search_view_id" ref="view_sole_kpi_entry_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Record your KPI results for the current period.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.kpi.indicator — VIEWS (Configuration)
+    ============================================================ -->
+
+    <record id="view_sole_kpi_indicator_list" model="ir.ui.view">
+        <field name="name">sole.kpi.indicator.list</field>
+        <field name="model">sole.kpi.indicator</field>
+        <field name="arch" type="xml">
+            <list string="KPI Indicators">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="target"/>
+                <field name="unit"/>
+                <field name="direction"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_kpi_indicator_form" model="ir.ui.view">
+        <field name="name">sole.kpi.indicator.form</field>
+        <field name="model">sole.kpi.indicator</field>
+        <field name="arch" type="xml">
+            <form string="KPI Indicator">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="category_id"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="target"/>
+                            <field name="target_display"/>
+                            <field name="unit"/>
+                            <field name="direction"/>
+                        </group>
+                    </group>
+                    <group string="Applicable Roles">
+                        <field name="role_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_kpi_indicator" model="ir.actions.act_window">
+        <field name="name">KPI Indicators</field>
+        <field name="res_model">sole.kpi.indicator</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define your KPI indicators here.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         sole.kpi.category — VIEWS (Configuration)
+    ============================================================ -->
+
+    <record id="view_sole_kpi_category_list" model="ir.ui.view">
+        <field name="name">sole.kpi.category.list</field>
+        <field name="model">sole.kpi.category</field>
+        <field name="arch" type="xml">
+            <list string="KPI Categories" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sole_kpi_category" model="ir.actions.act_window">
+        <field name="name">KPI Categories</field>
+        <field name="res_model">sole.kpi.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============================================================
+         sole.kpi.role — VIEWS (Configuration)
+    ============================================================ -->
+
+    <record id="view_sole_kpi_role_list" model="ir.ui.view">
+        <field name="name">sole.kpi.role.list</field>
+        <field name="model">sole.kpi.role</field>
+        <field name="arch" type="xml">
+            <list string="KPI Roles" editable="bottom">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_kpi_role_form" model="ir.ui.view">
+        <field name="name">sole.kpi.role.form</field>
+        <field name="model">sole.kpi.role</field>
+        <field name="arch" type="xml">
+            <form string="KPI Role">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Assigned Users">
+                        <field name="user_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_kpi_role" model="ir.actions.act_window">
+        <field name="name">KPI Roles</field>
+        <field name="res_model">sole.kpi.role</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ============================================================
+         MY KPI DASHBOARD — ir.actions.client
+    ============================================================ -->
+
+    <record id="action_sole_kpi_dashboard" model="ir.actions.client">
+        <field name="name">My KPI Dashboard</field>
+        <field name="tag">sole_kpi_dashboard</field>
+    </record>
+
+</odoo>

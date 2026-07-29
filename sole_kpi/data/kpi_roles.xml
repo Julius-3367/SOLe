@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="role_ceo" model="sole.kpi.role">
+            <field name="name">CEO</field>
+            <field name="code">ceo</field>
+        </record>
+
+        <record id="role_sysadmin" model="sole.kpi.role">
+            <field name="name">System Admin</field>
+            <field name="code">sysadmin</field>
+        </record>
+
+        <record id="role_support" model="sole.kpi.role">
+            <field name="name">Support Engineer</field>
+            <field name="code">support</field>
+        </record>
+
+        <record id="role_customer_success" model="sole.kpi.role">
+            <field name="name">Customer Success</field>
+            <field name="code">customer_success</field>
+        </record>
+
+        <record id="role_pm" model="sole.kpi.role">
+            <field name="name">Apps &amp; Projects Lead</field>
+            <field name="code">pm</field>
+        </record>
+
+        <record id="role_developer" model="sole.kpi.role">
+            <field name="name">Software Engineer</field>
+            <field name="code">developer</field>
+        </record>
+
+        <record id="role_qa" model="sole.kpi.role">
+            <field name="name">Quality Assurance</field>
+            <field name="code">qa</field>
+        </record>
+
+        <record id="role_admin_tender" model="sole.kpi.role">
+            <field name="name">Admin / Tender Officer</field>
+            <field name="code">admin_tender</field>
+        </record>
+
+        <record id="role_marketing" model="sole.kpi.role">
+            <field name="name">Social Media &amp; Marketing</field>
+            <field name="code">marketing</field>
+        </record>
+
+    </data>
+</odoo>
