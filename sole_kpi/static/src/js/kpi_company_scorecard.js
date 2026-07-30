@@ -63,7 +63,7 @@ export class KpiCompanyScorecard extends Component {
         this.state.loading = true;
         try {
             const [periods, roles] = await Promise.all([
-                this.orm.searchRead("sole.kpi.period", [], ["id", "name", "state"], { order: "date_start desc", limit: 24 }),
+                this.orm.searchRead("sole.kpi.period", [], ["id", "name", "state"], { order: "date_start desc, id desc", limit: 24 }),
                 this.orm.searchRead("sole.kpi.role", [["active", "=", true]], ["id", "name", "code"]),
             ]);
             this.state.periods = periods;

@@ -53,7 +53,7 @@ export class KpiDashboard extends Component {
             const periods = await this.orm.searchRead(
                 "sole.kpi.period", [],
                 ["id", "name", "state"],
-                { order: "date_start desc", limit: 24 }
+                { order: "date_start desc, id desc", limit: 24 }
             );
             this.state.periods = periods;
             if (periods.length) {
