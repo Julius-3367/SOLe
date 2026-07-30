@@ -9,8 +9,8 @@ const STATUS_LABELS = { green: "Green", amber: "Amber", red: "Red", black: "Blac
 const UNIT_LABELS = { currency: "KES", percentage: "%", count: "", hours: "hrs" };
 
 function pctToStatus(pct) {
-    if (pct >= 80) return "green";
-    if (pct >= 70) return "amber";
+    if (pct >= 90) return "green";
+    if (pct >= 75) return "amber";
     if (pct >= 60) return "red";
     return "black";
 }

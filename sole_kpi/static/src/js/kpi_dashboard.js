@@ -3,6 +3,7 @@
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
+import { session } from "@web/session";
 
 const UNIT_LABELS = { currency: "KES", percentage: "%", count: "", hours: "hrs" };
 const STATUS_LABELS = { green: "Green", amber: "Amber", red: "Red", black: "Black", grey: "No Data" };
@@ -11,8 +12,8 @@ const STATUS_LABELS = { green: "Green", amber: "Amber", red: "Red", black: "Blac
 const CIRC = 2 * Math.PI * 18;
 
 function pctToStatus(pct) {
-    if (pct >= 80) return "green";
-    if (pct >= 70) return "amber";
+    if (pct >= 90) return "green";
+    if (pct >= 75) return "amber";
     if (pct >= 60) return "red";
     return "black";
 }
@@ -72,7 +73,7 @@ export class KpiDashboard extends Component {
         }
         this.state.loading = true;
         try {
-            const userId = this.env.uid;
+            const userId = session.uid;
             const entries = await this.orm.searchRead(
                 "sole.kpi.entry",
                 [["period_id", "=", this.state.currentPeriodId], ["user_id", "=", userId]],
