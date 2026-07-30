@@ -94,18 +94,22 @@ class SoleKpiEntry(models.Model):
         'An entry for this KPI, period, and staff member already exists.',
     )
 
-    @api.constrains('period_id', 'indicator_id', 'user_id')
-    def _check_unique_period_indicator_user(self):
-        for rec in self:
-            if self.search_count([
-                ('period_id', '=', rec.period_id.id),
-                ('indicator_id', '=', rec.indicator_id.id),
-                ('user_id', '=', rec.user_id.id),
-                ('id', '!=', rec.id),
-            ]):
-                raise ValidationError(
-                    "An entry for this KPI, period, and staff member already exists."
-                )
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            pid = vals.get('period_id')
+            iid = vals.get('indicator_id')
+            uid_ = vals.get('user_id')
+            if pid and iid and uid_:
+                if self.search_count([
+                    ('period_id', '=', pid),
+                    ('indicator_id', '=', iid),
+                    ('user_id', '=', uid_),
+                ]):
+                    raise ValidationError(
+                        "An entry for this KPI, period, and staff member already exists."
+                    )
+        return super().create(vals_list)
 
     @api.depends('actual', 'target', 'indicator_id.direction')
     def _compute_achievement(self):
@@ -122,9 +126,9 @@ class SoleKpiEntry(models.Model):
             else:
                 pct = (rec.actual / rec.target) * 100.0
             rec.achievement_pct = pct
-            if pct >= 80:
+            if pct >= 90:
                 rec.status = 'green'
-            elif pct >= 70:
+            elif pct >= 75:
                 rec.status = 'amber'
             elif pct >= 60:
                 rec.status = 'red'

@@ -47,8 +47,8 @@ class TestKpiAchievement(TransactionCase):
         self.assertEqual(entry.status, 'green')
 
     def test_higher_amber(self):
-        entry = self._entry(self.indicator_higher, 750_000)
-        self.assertAlmostEqual(entry.achievement_pct, 75.0)
+        entry = self._entry(self.indicator_higher, 820_000)
+        self.assertAlmostEqual(entry.achievement_pct, 82.0)
         self.assertEqual(entry.status, 'amber')
 
     def test_higher_red(self):
@@ -62,10 +62,16 @@ class TestKpiAchievement(TransactionCase):
         self.assertEqual(entry.status, 'black')
 
     def test_higher_green_boundary(self):
-        """Exactly 80% must be green."""
-        entry = self._entry(self.indicator_higher, 800_000)
-        self.assertAlmostEqual(entry.achievement_pct, 80.0)
+        """Exactly 90% must be green (Softlink threshold)."""
+        entry = self._entry(self.indicator_higher, 900_000)
+        self.assertAlmostEqual(entry.achievement_pct, 90.0)
         self.assertEqual(entry.status, 'green')
+
+    def test_higher_amber_boundary(self):
+        """Exactly 75% must be amber (lower bound of Needs Attention)."""
+        entry = self._entry(self.indicator_higher, 750_000)
+        self.assertAlmostEqual(entry.achievement_pct, 75.0)
+        self.assertEqual(entry.status, 'amber')
 
     def test_higher_zero_actual(self):
         entry = self._entry(self.indicator_higher, 0)
