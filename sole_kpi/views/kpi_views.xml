@@ -147,19 +147,17 @@
                             <field name="unit" readonly="1"/>
                             <field name="direction" readonly="1"/>
                         </group>
+                    </group>
+                    <group>
                         <group string="Results">
                             <field name="actual"/>
-                            <field name="achievement_pct" widget="percentage"/>
-                            <field name="status"
-                                   decoration-success="status == 'green'"
-                                   decoration-warning="status == 'amber'"
-                                   decoration-danger="status == 'red'"
-                                   decoration-muted="status in ('black', 'grey')"/>
+                            <field name="achievement_pct" readonly="1"/>
+                            <field name="status" readonly="1"/>
                             <field name="trend"/>
                         </group>
-                    </group>
-                    <group string="Notes">
-                        <field name="notes" nolabel="1"/>
+                        <group string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </group>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
