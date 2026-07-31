@@ -65,11 +65,11 @@
                 <div class="skd_summary_bar">
                     <div class="skd_summary_stat skd_stat_green">
                         <div class="skd_stat_val" t-esc="state.counts.green"/>
-                        <div class="skd_stat_lbl">Green ≥90%</div>
+                        <div class="skd_stat_lbl">Green ≥100%</div>
                     </div>
                     <div class="skd_summary_stat skd_stat_amber">
                         <div class="skd_stat_val" t-esc="state.counts.amber"/>
-                        <div class="skd_stat_lbl">Amber 75–89%</div>
+                        <div class="skd_stat_lbl">Amber 75–99%</div>
                     </div>
                     <div class="skd_summary_stat skd_stat_red">
                         <div class="skd_stat_val" t-esc="state.counts.red"/>
