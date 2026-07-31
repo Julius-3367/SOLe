@@ -3,7 +3,7 @@
 import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { session } from "@web/session";
+import { user } from "@web/core/user";
 
 const UNIT_LABELS = { currency: "KES", percentage: "%", count: "", hours: "hrs" };
 const STATUS_LABELS = { green: "Green", amber: "Amber", red: "Red", black: "Black", grey: "No Data" };
@@ -73,7 +73,7 @@ export class KpiDashboard extends Component {
         }
         this.state.loading = true;
         try {
-            const userId = session.uid;
+            const userId = user.userId;
             const entries = await this.orm.searchRead(
                 "sole.kpi.entry",
                 [["period_id", "=", this.state.currentPeriodId], ["user_id", "=", userId]],
