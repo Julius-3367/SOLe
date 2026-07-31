@@ -126,7 +126,7 @@ class SoleKpiEntry(models.Model):
             else:
                 pct = (rec.actual / rec.target) * 100.0
             rec.achievement_pct = pct
-            if pct >= 100:
+            if pct >= 90:
                 rec.status = 'green'
             elif pct >= 75:
                 rec.status = 'amber'

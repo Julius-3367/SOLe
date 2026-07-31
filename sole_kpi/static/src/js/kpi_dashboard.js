@@ -12,7 +12,7 @@ const STATUS_LABELS = { green: "Green", amber: "Amber", red: "Red", black: "Blac
 const CIRC = 2 * Math.PI * 18;
 
 function pctToStatus(pct) {
-    if (pct >= 100) return "green";
+    if (pct >= 90) return "green";
     if (pct >= 75) return "amber";
     if (pct >= 60) return "red";
     return "black";

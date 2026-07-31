@@ -42,7 +42,7 @@ class TestKpiAchievement(TransactionCase):
     # ── Higher-is-better ──────────────────────────────────────────
 
     def test_higher_green(self):
-        """At or above target → green."""
+        """At or above target (100%) → green."""
         entry = self._entry(self.indicator_higher, 1_000_000)
         self.assertEqual(entry.achievement_pct, 100.0)
         self.assertEqual(entry.status, 'green')
@@ -53,10 +53,22 @@ class TestKpiAchievement(TransactionCase):
         self.assertAlmostEqual(entry.achievement_pct, 110.0)
         self.assertEqual(entry.status, 'green')
 
-    def test_higher_amber(self):
-        """90% of target → amber (just below target)."""
+    def test_higher_green_90pct(self):
+        """90% of target is green ('On Track' per Softlink RAG guide)."""
         entry = self._entry(self.indicator_higher, 900_000)
         self.assertAlmostEqual(entry.achievement_pct, 90.0)
+        self.assertEqual(entry.status, 'green')
+
+    def test_higher_green_boundary(self):
+        """Exactly 90% must be green (lower bound of Green band)."""
+        entry = self._entry(self.indicator_higher, 900_000)
+        self.assertAlmostEqual(entry.achievement_pct, 90.0)
+        self.assertEqual(entry.status, 'green')
+
+    def test_higher_amber(self):
+        """89% of target → amber (just below Green band)."""
+        entry = self._entry(self.indicator_higher, 890_000)
+        self.assertAlmostEqual(entry.achievement_pct, 89.0)
         self.assertEqual(entry.status, 'amber')
 
     def test_higher_amber_mid(self):
@@ -74,12 +86,6 @@ class TestKpiAchievement(TransactionCase):
         entry = self._entry(self.indicator_higher, 500_000)
         self.assertAlmostEqual(entry.achievement_pct, 50.0)
         self.assertEqual(entry.status, 'black')
-
-    def test_higher_green_boundary(self):
-        """Exactly 100% must be green (strict: hit the target)."""
-        entry = self._entry(self.indicator_higher, 1_000_000)
-        self.assertAlmostEqual(entry.achievement_pct, 100.0)
-        self.assertEqual(entry.status, 'green')
 
     def test_higher_amber_boundary(self):
         """Exactly 75% must be amber (lower bound of Needs Attention)."""

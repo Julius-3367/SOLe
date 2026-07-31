@@ -51,6 +51,7 @@ class SoleKpiIndicator(models.Model):
         default=1.0,
         help='Relative weight for weighted-average scoring. Default 1.0 (equal weight).',
     )
+    owner = fields.Char(string='KPI Owner', help='Person or role responsible for this KPI.')
     description = fields.Text(string='Description')
     sequence = fields.Integer(string='Sequence', default=10)
     active = fields.Boolean(string='Active', default=True)

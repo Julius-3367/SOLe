@@ -219,6 +219,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="category_id"/>
+                <field name="owner" optional="show"/>
                 <field name="target"/>
                 <field name="unit"/>
                 <field name="direction"/>
@@ -238,6 +239,7 @@
                         <group>
                             <field name="name"/>
                             <field name="category_id"/>
+                            <field name="owner"/>
                             <field name="sequence"/>
                             <field name="active"/>
                         </group>
