@@ -28,6 +28,8 @@
             'sole_kpi/static/src/js/kpi_dashboard.js',
             'sole_kpi/static/src/xml/kpi_company_scorecard.xml',
             'sole_kpi/static/src/js/kpi_company_scorecard.js',
+            'sole_kpi/static/src/xml/kpi_entry_widget.xml',
+            'sole_kpi/static/src/js/kpi_entry_widget.js',
         ],
     },
     'installable': True,

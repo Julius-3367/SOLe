@@ -135,6 +135,14 @@
         <field name="arch" type="xml">
             <form string="KPI Entry">
                 <sheet>
+                    <!-- Visual achievement banner -->
+                    <field name="achievement_pct"
+                           widget="kpi_achievement"
+                           nolabel="1"
+                           readonly="1"/>
+                    <!-- Load status for the widget (not displayed) -->
+                    <field name="status" invisible="1"/>
+
                     <group>
                         <group string="Context">
                             <field name="period_id"/>
@@ -151,8 +159,6 @@
                     <group>
                         <group string="Results">
                             <field name="actual"/>
-                            <field name="achievement_pct" readonly="1"/>
-                            <field name="status" readonly="1"/>
                             <field name="trend"/>
                         </group>
                         <group string="Notes">

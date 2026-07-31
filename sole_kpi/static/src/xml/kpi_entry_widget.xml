@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sole_kpi.KpiAchievementWidget">
+        <div class="kaw_root">
+
+            <!-- Ring gauge -->
+            <div class="kaw_ring_wrap">
+                <svg class="kaw_ring" viewBox="0 0 80 80">
+                    <circle class="kaw_ring_bg" cx="40" cy="40" r="34"/>
+                    <circle class="kaw_ring_fg"
+                            cx="40" cy="40" r="34"
+                            t-att-stroke="cfg.color"
+                            t-att-stroke-dasharray="dashArray"/>
+                </svg>
+                <div class="kaw_pct" t-att-style="'color:' + cfg.color">
+                    <t t-esc="displayPct"/>
+                </div>
+            </div>
+
+            <!-- Info panel -->
+            <div class="kaw_info">
+                <div class="kaw_kpi_label" t-esc="indicatorName || 'Select an indicator'"/>
+
+                <div class="kaw_meta_row">
+                    <i class="fa fa-calendar-o kaw_meta_icon"/>
+                    <span t-esc="periodName"/>
+                </div>
+
+                <!-- Actual vs Target numbers -->
+                <div class="kaw_numbers">
+                    <div class="kaw_number">
+                        <span class="kaw_num_label">Actual</span>
+                        <span class="kaw_num_val" t-att-style="'color:' + cfg.color">
+                            <t t-esc="actualDisplay"/>
+                            <t t-if="unitLabel">
+                                <span class="kaw_unit"> <t t-esc="unitLabel"/></span>
+                            </t>
+                        </span>
+                    </div>
+                    <div class="kaw_number_sep"/>
+                    <div class="kaw_number">
+                        <span class="kaw_num_label">Target</span>
+                        <span class="kaw_num_val kaw_target_val">
+                            <t t-esc="targetDisplay"/>
+                            <t t-if="unitLabel">
+                                <span class="kaw_unit"> <t t-esc="unitLabel"/></span>
+                            </t>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <div class="kaw_bar_wrap">
+                    <div class="kaw_bar"
+                         t-att-style="'width:' + Math.min(pct, 100) + '%;background:' + cfg.color"/>
+                </div>
+
+                <!-- Status badge -->
+                <span class="kaw_badge"
+                      t-att-style="'background:' + cfg.bg + ';color:' + cfg.text">
+                    <t t-esc="cfg.label"/>
+                </span>
+            </div>
+
+        </div>
+    </t>
+
+</templates>
