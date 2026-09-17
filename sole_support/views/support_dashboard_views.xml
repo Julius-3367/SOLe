@@ -28,7 +28,6 @@
                 <field name="category_id" type="row"/>
                 <field name="response_time_hours" type="measure" string="Avg Response (hrs)"/>
                 <field name="resolution_time_hours" type="measure" string="Avg Resolution (hrs)"/>
-                <field name="is_sla_breached" type="measure" string="SLA Breaches"/>
             </pivot>
         </field>
     </record>
@@ -56,31 +55,19 @@
                 <filter name="sla_breached" string="SLA Breached"
                         domain="[('is_sla_breached', '=', True)]"/>
 
-                <!-- ── Period quick-select ────────────────────────────── -->
+                <!--
+                    Odoo's native date filter. Provides This Month / This Quarter /
+                    This Year plus period-over-period comparison, evaluated by the
+                    framework.
+
+                    Replaces four hand-written domains that called date.replace()
+                    and used floor division. py.js, the client-side Python
+                    evaluator, implements neither, so rendering the search view
+                    raised "Function.prototype.apply was called on undefined" and
+                    the Reports page failed to load.
+                -->
                 <separator/>
-                <!--
-                    This Week: Monday of the current ISO week.
-                    relativedelta(weeks=-1, days=1, weekday=0) steps back 6 days
-                    then forward to the next/same Monday, giving this week's start.
-                -->
-                <filter name="this_week" string="This Week"
-                        domain="[('create_date', '&gt;=', (context_today() + relativedelta(weeks=-1, days=1, weekday=0)).strftime('%Y-%m-%d'))]"/>
-                <!--
-                    This Month: first day of the current calendar month.
-                -->
-                <filter name="this_month" string="This Month"
-                        domain="[('create_date', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
-                <!--
-                    This Quarter: first day of the current quarter (Jan/Apr/Jul/Oct).
-                    Formula: month = ((current_month - 1) // 3) * 3 + 1
-                -->
-                <filter name="this_quarter" string="This Quarter"
-                        domain="[('create_date', '&gt;=', context_today().replace(day=1, month=((context_today().month - 1) // 3) * 3 + 1).strftime('%Y-%m-%d'))]"/>
-                <!--
-                    This Year: January 1 of the current year.
-                -->
-                <filter name="this_year" string="This Year"
-                        domain="[('create_date', '&gt;=', context_today().replace(day=1, month=1).strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_create_date" string="Creation Date" date="create_date"/>
 
                 <!-- ── Period group-by ────────────────────────────────── -->
                 <separator/>
@@ -109,7 +96,7 @@
         <field name="res_model">sole.support.ticket</field>
         <field name="view_mode">graph,pivot,list</field>
         <field name="search_view_id" ref="view_sole_support_ticket_search"/>
-        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="context">{'search_default_filter_create_date': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No tickets yet — start by creating one.
