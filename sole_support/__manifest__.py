@@ -21,7 +21,12 @@ Features
     'author': 'SOLe',
     'website': 'https://sole.co.ke',
     'license': 'LGPL-3',
-    'depends': ['base', 'mail', 'portal'],
+    # website: the portal routes are declared website=True and the public
+    # request page renders website.layout.
+    # google_recaptcha: protects the anonymous submission form at
+    # /support/request. Without site keys configured it is inert, so the
+    # form still works, just unprotected.
+    'depends': ['base', 'mail', 'portal', 'website', 'google_recaptcha'],
     'data': [
         'security/ir.model.access.csv',
         'data/support_stage_data.xml',

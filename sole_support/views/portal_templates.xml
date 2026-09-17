@@ -135,4 +135,132 @@
             </div>
         </t>
     </template>
+
+    <!--
+        Public request form.
+
+        Rendered with website.layout rather than portal.portal_layout so that
+        visitors with no account get the normal site header and footer. When a
+        logged-in user opens it, the name/email/phone block is hidden and their
+        own contact record is used.
+    -->
+    <template id="portal_public_ticket" name="Request Support">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container my-5">
+                    <h1>Request Support</h1>
+                    <p class="text-muted">
+                        Tell us what you need help with and our team will get back to you.
+                    </p>
+
+                    <div t-if="error" class="alert alert-danger" role="alert">
+                        <t t-esc="error"/>
+                    </div>
+
+                    <form id="sole_support_request_form" action="/support/request"
+                          method="post" class="mt-4"
+                          t-att-data-recaptcha-key="recaptcha_site_key">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="recaptcha_token_response" value=""/>
+
+                        <t t-if="is_public">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Your name</label>
+                                    <input type="text" name="contact_name" class="form-control"
+                                           t-att-value="post.get('contact_name')"/>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" name="email" class="form-control"
+                                           required="required" t-att-value="post.get('email')"/>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="phone" class="form-control"
+                                       t-att-value="post.get('phone')"/>
+                            </div>
+                        </t>
+
+                        <div class="mb-3">
+                            <label class="form-label">Subject <span class="text-danger">*</span></label>
+                            <input type="text" name="subject" class="form-control" required="required"
+                                   placeholder="Brief description of the issue"
+                                   t-att-value="post.get('subject')"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category_id" class="form-select">
+                                <option value="">-- Select a category --</option>
+                                <t t-foreach="categories" t-as="cat">
+                                    <option t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="6"
+                                      placeholder="Please give us as much detail as you can..."><t t-esc="post.get('description')"/></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Send request</button>
+                        <a href="/" class="btn btn-secondary ms-2">Cancel</a>
+
+                        <div t-if="is_public and recaptcha_site_key" class="mt-3 small text-muted">
+                            This site is protected by reCAPTCHA and the Google
+                            <a href="https://policies.google.com/privacy" target="_blank"
+                               rel="noopener">Privacy Policy</a> and
+                            <a href="https://policies.google.com/terms" target="_blank"
+                               rel="noopener">Terms of Service</a> apply.
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <t t-if="is_public and recaptcha_site_key">
+                <script t-attf-src="https://www.google.com/recaptcha/api.js?render=#{recaptcha_site_key}"/>
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var form = document.getElementById('sole_support_request_form');
+                        if (!form || !form.dataset.recaptchaKey) { return; }
+                        form.addEventListener('submit', function (ev) {
+                            if (form.dataset.tokenReady === '1') { return; }
+                            ev.preventDefault();
+                            grecaptcha.ready(function () {
+                                grecaptcha.execute(form.dataset.recaptchaKey, {action: 'support_request'})
+                                    .then(function (token) {
+                                        form.querySelector('[name=recaptcha_token_response]').value = token;
+                                        form.dataset.tokenReady = '1';
+                                        form.submit();
+                                    });
+                            });
+                        });
+                    });
+                </script>
+            </t>
+        </t>
+    </template>
+
+    <!-- Confirmation shown to anonymous submitters, who cannot see /support -->
+    <template id="portal_public_ticket_thanks" name="Support Request Received">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container my-5">
+                    <h1>Thank you</h1>
+                    <p class="lead">
+                        We have received your request. Your reference is
+                        <strong><t t-esc="ticket.name"/></strong>.
+                    </p>
+                    <p>
+                        Please quote that reference if you contact us about it.
+                        Our support team will be in touch.
+                    </p>
+                    <a href="/" class="btn btn-primary">Back to the website</a>
+                </div>
+            </div>
+        </t>
+    </template>
 </odoo>
