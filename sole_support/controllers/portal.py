@@ -113,7 +113,9 @@ class SoleSupportPortal(CustomerPortal):
         """
         try:
             result = request.env["ir.http"]._verify_recaptcha_token(
-                post.get("recaptcha_token_response"), action="support_request"
+                request.httprequest.remote_addr,
+                post.get("recaptcha_token_response"),
+                action="support_request",
             )
         except Exception:
             # Never let a captcha outage swallow a genuine support request.
