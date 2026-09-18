@@ -11,7 +11,8 @@ class SoleSmsTemplate(models.Model):
     body = fields.Text(
         string="Message Body",
         required=True,
-        help="Use {placeholder} syntax. Available: {customer_name}, {amount}, {ref}, {company_name}, {date}",
+        help="Use {placeholder} syntax. Available: {customer_name}, {amount}, "
+             "{ref}, {company_name}, {company_email}, {date}",
     )
     category = fields.Char(string="Category")
     is_active = fields.Boolean(string="Active", default=True)

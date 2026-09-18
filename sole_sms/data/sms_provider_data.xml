@@ -16,7 +16,7 @@
 
     <record id="sole_sms_template_welcome" model="sole.sms.template">
         <field name="name">Welcome</field>
-        <field name="body">Dear {customer_name}, welcome to SOLe. Contact us at support@sole.co.ke. — {company_name}</field>
+        <field name="body">Dear {customer_name}, welcome to SOLe. Contact us at {company_email}. — {company_name}</field>
         <field name="category">General</field>
     </record>
     <record id="sole_sms_template_payment_confirm" model="sole.sms.template">

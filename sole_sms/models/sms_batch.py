@@ -120,6 +120,7 @@ class SoleSmsBatch(models.Model):
         self.env.cr.commit()
 
         company_name = self.env.company.name or ""
+        company_email = self.env.company.email or ""
         today = fields.Date.today().strftime("%Y-%m-%d")
         pending_lines = self.line_ids.filtered(lambda l: l.state == "draft")
 
@@ -130,6 +131,7 @@ class SoleSmsBatch(models.Model):
             ctx = {
                 "customer_name": line.name or "",
                 "company_name": company_name,
+                "company_email": company_email,
                 "date": today,
                 "amount": "",
                 "ref": "",

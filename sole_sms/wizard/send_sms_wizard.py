@@ -52,6 +52,7 @@ class SoleSendSmsWizard(models.TransientModel):
         return {
             "customer_name": self.partner_id.name or "",
             "company_name": self.env.company.name or "",
+            "company_email": self.env.company.email or "",
             "date": fields.Date.today().strftime("%Y-%m-%d"),
             "amount": "",
             "ref": "",
