@@ -57,4 +57,60 @@
         </field>
         <field name="auto_delete" eval="True"/>
     </record>
+
+    <!--
+        Acknowledgement sent to the customer when they raise a ticket
+        themselves, through the portal or the public form at /support/request.
+
+        email_from is deliberately not set. Odoo then composes the sender from
+        the mail.default.from and mail.catchall.domain system parameters, which
+        match the outgoing server's FROM filter. Hard-coding the company email
+        would break if it sits on a different domain from the mail server.
+    -->
+    <record id="mail_template_ticket_acknowledgement" model="mail.template">
+        <field name="name">Support Ticket: Customer Acknowledgement</field>
+        <field name="model_id" ref="sole_support.model_sole_support_ticket"/>
+        <field name="subject">We have received your request [{{ object.name }}]</field>
+        <field name="email_to">{{ object.email or object.partner_id.email }}</field>
+        <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+    <p>Hi <t t-out="object.partner_id.name or ''">there</t>,</p>
+    <p>
+        Thank you for getting in touch. We have logged your request and our
+        support team will be in contact.
+    </p>
+    <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; width: 160px;">Your reference</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.name or ''">TKT-00001</t></td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Subject</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.subject or ''">Ticket Subject</t></td>
+        </tr>
+        <t t-if="object.category_id">
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Category</td>
+            <td style="padding: 8px; border: 1px solid #ddd;"><t t-out="object.category_id.name or ''">Category</t></td>
+        </tr>
+        </t>
+    </table>
+    <t t-if="object.description">
+    <p><strong>What you told us:</strong></p>
+    <div style="background: #f9f9f9; padding: 12px; border-left: 4px solid #ccc;">
+        <t t-out="object.description or ''">Description text</t>
+    </div>
+    </t>
+    <p>
+        Please quote <strong><t t-out="object.name or ''">TKT-00001</t></strong>
+        if you contact us about this request.
+    </p>
+    <p style="color: #999; font-size: 12px; margin-top: 32px;">
+        This is an automated message from <t t-out="object.company_id.name or ''">Company</t>.
+        Please do not reply to this address.
+    </p>
+</div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
 </odoo>

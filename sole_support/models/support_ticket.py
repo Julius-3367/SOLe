@@ -210,6 +210,7 @@ class SoleSupportTicket(models.Model):
         for record in records:
             if record.assigned_to:
                 record._notify_assigned(record.assigned_to)
+            record._notify_customer_created()
         return records
 
     # ── Stage change hooks ────────────────────────────────────────────────────
@@ -255,6 +256,33 @@ class SoleSupportTicket(models.Model):
             "sole_support.mail_template_ticket_assigned", raise_if_not_found=False
         )
         if template and user.email:
+            template.send_mail(self.id, force_send=False)
+
+    def _notify_customer_created(self):
+        """Subscribe the customer and acknowledge tickets they raised themselves.
+
+        The customer is always subscribed, so later chatter messages and stage
+        changes reach them. The acknowledgement email is only sent for tickets
+        raised through the portal or the public form — a ticket logged
+        internally on someone's behalf (a phone call, say) should not email
+        them out of the blue.
+        """
+        self.ensure_one()
+        partner = self.partner_id
+        if not partner:
+            return
+        self.message_subscribe(partner_ids=[partner.id])
+        if not self.is_portal:
+            return
+        if not (self.email or partner.email):
+            return
+        template = self.env.ref(
+            "sole_support.mail_template_ticket_acknowledgement",
+            raise_if_not_found=False,
+        )
+        if template:
+            # Queued rather than sent inline, so a slow or unreachable mail
+            # server can never stall the visitor's form submission.
             template.send_mail(self.id, force_send=False)
 
     # ── Computed: SLA breach ─────────────────────────────────────────────────
