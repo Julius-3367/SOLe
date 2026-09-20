@@ -42,6 +42,17 @@ SOURCE_DB = "odoo17_temp"
 TAG = "[migrated from old ERP]"
 
 
+class WouldCreate:
+    """Stand-in during a dry run for a product a real run would create.
+
+    Without this, only the first record of a missing product counts as ready
+    and the rest are reported as skipped, because the decision cache stores a
+    failure. The dry run would then under-report what a real run does.
+    """
+
+    id = None
+
+
 def source_dsn():
     """Connection string for the old database.
 
@@ -175,38 +186,28 @@ for r in rows:
         continue
 
     key = (r["product_name"], r["account_code"])
-    if key in decisions:
-        prod, why = decisions[key]
-    else:
+    if key not in decisions:
         prod, why = resolve_product(r["product_name"], r["account_code"])
         if prod is None and CREATE_MISSING_PRODUCTS and r["product_name"]:
             account = Account.search([("code", "=", r["account_code"])], limit=1)
             if account:
-                vals = {"name": r["product_name"], "can_be_expensed": True,
-                        "type": "service"}
-                vals["property_account_expense_id"] = account.id
-                prod = Product.create(vals) if not DRY_RUN else None
-                why = "would create, expense account %s" % r["account_code"]
                 created_products[r["product_name"]] = r["account_code"]
                 if DRY_RUN:
-                    # Nothing to attach to yet; count it as ready so the
-                    # reported totals reflect what a real run would do.
-                    decisions[key] = (None, why)
-                    to_create.append({
-                        "name": "%s %s" % (r["name"] or r["product_name"], TAG),
-                        "employee_id": emp.id,
-                        "product_id": None,
-                        "date": r["date"],
-                        "quantity": float(r["quantity"] or 1.0) or 1.0,
-                        "total_amount_currency": float(r["total_amount"] or 0.0),
-                        "payment_mode": r["payment_mode"] or "own_account",
-                        "company_id": company.id,
-                        "currency_id": company.currency_id.id,
+                    prod = WouldCreate()
+                    why = "would create product, expense account %s" % r["account_code"]
+                else:
+                    prod = Product.create({
+                        "name": r["product_name"],
+                        "can_be_expensed": True,
+                        "type": "service",
+                        "property_account_expense_id": account.id,
                     })
-                    continue
+                    why = "created product %d, expense account %s" % (
+                        prod.id, r["account_code"])
             else:
                 why += "; account %s not found either" % r["account_code"]
         decisions[key] = (prod, why)
+    prod, why = decisions[key]
 
     if prod is None:
         skipped.append((r["old_id"], r["name"], r["total_amount"], why))
@@ -229,7 +230,7 @@ print("\nProduct decisions:")
 for (name, code), (prod, why) in sorted(decisions.items(), key=lambda x: str(x[0])):
     print("   %-30s acct %-8s -> %-8s  %s"
           % (name or "(none)", code or "(none)",
-             prod.id if prod else "SKIP", why))
+             ("SKIP" if prod is None else (prod.id or "NEW")), why))
 
 if created_products:
     print("\nProducts that would be created:")
