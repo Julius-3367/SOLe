@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sole_payroll_parameter_list" model="ir.ui.view">
+        <field name="name">sole.payroll.parameter.list</field>
+        <field name="model">sole.payroll.parameter</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Rates">
+                <field name="code"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sole_payroll_parameter_form" model="ir.ui.view">
+        <field name="name">sole.payroll.parameter.form</field>
+        <field name="model">sole.payroll.parameter</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Rate">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group string="Notes">
+                        <field name="note" nolabel="1"
+                               placeholder="Where does this rate come from? The Act, circular or KRA guidance. Whoever updates it next will not have the context you have now."/>
+                    </group>
+                    <notebook>
+                        <page string="Values">
+                            <p class="text-muted">
+                                To change a rate, add a new line with the date it
+                                takes effect. Do not edit an existing line —
+                                payslips already issued were calculated with it,
+                                and changing it would silently alter them.
+                            </p>
+                            <field name="value_ids">
+                                <list editable="bottom">
+                                    <field name="date_from"/>
+                                    <field name="value"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sole_payroll_parameter" model="ir.actions.act_window">
+        <field name="name">Payroll Rates</field>
+        <field name="res_model">sole.payroll.parameter</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No payroll rates yet</p>
+            <p>
+                Statutory rates — NSSF limits, the SHIF rate, PAYE bands,
+                reliefs — each with the date it takes effect.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sole_payroll_parameter"
+              name="Payroll Rates"
+              parent="hr_payroll_community.menu_hr_payroll_community_configuration"
+              action="action_sole_payroll_parameter"
+              sequence="90"/>
+</odoo>

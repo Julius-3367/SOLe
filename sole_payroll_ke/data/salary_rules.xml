@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            ═══════════════════════════════════════════════════════════════
+            Kenyan salary rules
+            ═══════════════════════════════════════════════════════════════
+
+            Variables available inside a rule, as provided by
+            hr_payroll_community:
+
+              contract      the hr.contract record — a real recordset, so
+                            methods can be called on it. This is why rate
+                            lookups go through contract.rule_param().
+              employee      the hr.employee record.
+              payslip       a thin wrapper; field access works,
+                            method calls do not.
+              categories    running totals per category. Attribute access
+                            only: categories.BASIC, never categories['BASIC'].
+              inputs        payslip inputs. inputs.CODE returns 0.0 when
+                            absent, so bool(inputs.CODE) is the test.
+              <RULE_CODE>   the computed total of any rule that has already
+                            run, as a plain variable.
+
+            Two consequences worth knowing before editing these:
+
+            1. A rule referenced by a later rule MUST always execute, or the
+               later rule raises NameError. Every rule read by another is
+               therefore "Always True", and returns zero when it does not
+               apply, rather than being skipped. Skipping is what would
+               break the payslip.
+
+            2. hr_payroll_community wraps every rule error in a bare except
+               and reports only "Wrong python code defined for salary rule
+               X". There is no traceback. Change one rule at a time.
+
+            Deviations from the reference configuration, all deliberate:
+
+            - Employer costs (NITA, employer NSSF, employer AHL) are in the
+              COMP category rather than NET. They are a cost to the company,
+              not part of anyone's net pay, and putting them in NET invites
+              a later mistake.
+            - Mortgage interest is capped at the statutory maximum. The
+              reference subtracts it uncapped.
+            - The 2024 transitions are driven by parameters rather than
+              dates written into the formulas.
+        -->
+
+        <!-- ══ 1. Basic ══════════════════════════════════════════════════ -->
+        <record id="rule_basic" model="hr.salary.rule">
+            <field name="name">Basic Salary</field>
+            <field name="code">BASIC</field>
+            <field name="sequence">1</field>
+            <field name="category_id" ref="categ_basic"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage</field>
+        </record>
+
+        <!-- ══ 2-5. Untaxed allowances ═══════════════════════════════════ -->
+        <record id="rule_untaxed_food" model="hr.salary.rule">
+            <field name="name">Food Allowance (untaxed)</field>
+            <field name="code">UNTAXED_FOOD_ALLOWANCE</field>
+            <field name="sequence">11</field>
+            <field name="category_id" ref="categ_ke_ut_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = 0 < contract.ke_food_allowance <= contract.rule_param('ke_food_alw_max', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_food_allowance</field>
+            <field name="note">All-or-nothing: within the ceiling the whole allowance is untaxed, above it the whole allowance is taxed. It is not split.</field>
+        </record>
+
+        <record id="rule_untaxed_airtime" model="hr.salary.rule">
+            <field name="name">Airtime Allowance (untaxed)</field>
+            <field name="code">UNTAXED_AIRTIME_ALLOWANCE</field>
+            <field name="sequence">13</field>
+            <field name="category_id" ref="categ_ke_ut_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = 0 < contract.ke_airtime_allowance <= contract.rule_param('ke_airtime_alw_max', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_airtime_allowance</field>
+        </record>
+
+        <record id="rule_untaxed_pension" model="hr.salary.rule">
+            <field name="name">Pension Allowance (untaxed portion)</field>
+            <field name="code">UNTAXED_PENSION_ALLOWANCE</field>
+            <field name="sequence">14</field>
+            <field name="category_id" ref="categ_ke_ut_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(contract.ke_pension_allowance)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+maximum = contract.rule_param('ke_pension_alw_max', payslip.date_to)
+result = min(maximum, contract.ke_pension_allowance)
+]]></field>
+            <field name="note">Unlike food and airtime, the pension allowance is split: the portion up to the ceiling is untaxed and only the excess is taxed.</field>
+        </record>
+
+        <record id="rule_untaxed_allowance" model="hr.salary.rule">
+            <field name="name">Untaxed Allowances</field>
+            <field name="code">UNTAXED_ALLOWANCE</field>
+            <field name="sequence">20</field>
+            <field name="category_id" ref="categ_alw"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.KE_UT_ALW</field>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="note">Carries the untaxed allowances into the ALW category so they reach net pay. They are deliberately excluded from taxable pay later, in GROSS_TAXABLE.</field>
+        </record>
+
+        <!-- ══ 6-11. Taxed allowances ════════════════════════════════════ -->
+        <record id="rule_taxed_food" model="hr.salary.rule">
+            <field name="name">Food Allowance (taxed)</field>
+            <field name="code">TAXED_FOOD_ALLOWANCE</field>
+            <field name="sequence">21</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.ke_food_allowance > contract.rule_param('ke_food_alw_max', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_food_allowance</field>
+        </record>
+
+        <record id="rule_taxed_airtime" model="hr.salary.rule">
+            <field name="name">Airtime Allowance (taxed)</field>
+            <field name="code">TAXED_AIRTIME_ALLOWANCE</field>
+            <field name="sequence">23</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.ke_airtime_allowance > contract.rule_param('ke_airtime_alw_max', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_airtime_allowance</field>
+        </record>
+
+        <record id="rule_taxed_pension" model="hr.salary.rule">
+            <field name="name">Pension Allowance (taxed excess)</field>
+            <field name="code">TAXED_PENSION_ALLOWANCE</field>
+            <field name="sequence">24</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.ke_pension_allowance >= contract.rule_param('ke_pension_alw_max', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_pension_allowance - contract.rule_param('ke_pension_alw_max', payslip.date_to)
+]]></field>
+        </record>
+
+        <record id="rule_taxed_commuter" model="hr.salary.rule">
+            <field name="name">Commuter Allowance</field>
+            <field name="code">TAXED_COMMUTER_ALLOWANCE</field>
+            <field name="sequence">25</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_commuter_allowance</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_commuter_allowance</field>
+        </record>
+
+        <record id="rule_taxed_housing" model="hr.salary.rule">
+            <field name="name">Housing Allowance</field>
+            <field name="code">TAXED_HOUSING_ALLOWANCE</field>
+            <field name="sequence">26</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+if contract.ke_housing_allowance_unit == 'fixed':
+    result = contract.ke_housing_allowance_fixed
+else:
+    result = contract.ke_housing_allowance_percentage
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if contract.ke_housing_allowance_unit == 'fixed':
+    result = contract.ke_housing_allowance_fixed
+    result_rate = 100
+else:
+    result = categories.BASIC
+    result_rate = contract.ke_housing_allowance_percentage
+]]></field>
+        </record>
+
+        <record id="rule_taxed_allowance" model="hr.salary.rule">
+            <field name="name">Taxed Allowances</field>
+            <field name="code">TAXED_ALLOWANCE</field>
+            <field name="sequence">30</field>
+            <field name="category_id" ref="categ_alw"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.KE_T_ALW</field>
+            <field name="appears_on_payslip" eval="False"/>
+        </record>
+
+        <!-- ══ 12-14. Variable pay ═══════════════════════════════════════ -->
+        <record id="rule_bonus" model="hr.salary.rule">
+            <field name="name">Bonus</field>
+            <field name="code">BONUS</field>
+            <field name="sequence">31</field>
+            <field name="category_id" ref="categ_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.BONUS)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.BONUS.amount</field>
+        </record>
+
+        <record id="rule_commission" model="hr.salary.rule">
+            <field name="name">Commission</field>
+            <field name="code">COMMISSION</field>
+            <field name="sequence">32</field>
+            <field name="category_id" ref="categ_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.COMMISSION)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.COMMISSION.amount</field>
+        </record>
+
+        <record id="rule_reimbursement" model="hr.salary.rule">
+            <field name="name">Reimbursement</field>
+            <field name="code">REIMBURSEMENT</field>
+            <field name="sequence">33</field>
+            <field name="category_id" ref="categ_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.REIMBURSEMENT)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.REIMBURSEMENT.amount</field>
+        </record>
+
+        <!-- ══ 15-18. Court-ordered and ad hoc deductions ════════════════ -->
+        <record id="rule_attach_salary" model="hr.salary.rule">
+            <field name="name">Attachment of Salary</field>
+            <field name="code">ATTACH_SALARY</field>
+            <field name="sequence">75</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.ATTACH_SALARY)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.ATTACH_SALARY.amount</field>
+        </record>
+
+        <record id="rule_assig_salary" model="hr.salary.rule">
+            <field name="name">Assignment of Salary</field>
+            <field name="code">ASSIG_SALARY</field>
+            <field name="sequence">76</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.ASSIG_SALARY)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.ASSIG_SALARY.amount</field>
+        </record>
+
+        <record id="rule_child_support" model="hr.salary.rule">
+            <field name="name">Child Support</field>
+            <field name="code">CHILD_SUPPORT</field>
+            <field name="sequence">77</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.CHILD_SUPPORT)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.CHILD_SUPPORT.amount</field>
+        </record>
+
+        <record id="rule_deduction" model="hr.salary.rule">
+            <field name="name">Other Deduction</field>
+            <field name="code">DEDUCTION</field>
+            <field name="sequence">78</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.DEDUCTION)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.DEDUCTION.amount</field>
+        </record>
+
+        <!-- ══ 19. Gross ═════════════════════════════════════════════════ -->
+        <record id="rule_gross" model="hr.salary.rule">
+            <field name="name">Gross Salary</field>
+            <field name="code">GROSS</field>
+            <field name="sequence">100</field>
+            <field name="category_id" ref="categ_gross"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.BASIC + categories.ALW</field>
+        </record>
+
+        <!-- ══ 20. Mortgage interest ═════════════════════════════════════ -->
+        <record id="rule_mortgage" model="hr.salary.rule">
+            <field name="name">Mortgage Interest</field>
+            <field name="code">MORTGAGE</field>
+            <field name="sequence">102</field>
+            <field name="category_id" ref="categ_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if employee.ke_mortgage and not contract.ke_is_secondary:
+    cap = contract.rule_param('ke_max_mortgage_interest', payslip.date_to)
+    result = min(employee.ke_mortgage, cap)
+else:
+    result = 0
+]]></field>
+            <field name="note">Reduces taxable pay, not cash pay — it is read by GROSS_TAXABLE and is not part of TOTAL_DED. Always runs, returning zero when it does not apply, because GROSS_TAXABLE reads it.</field>
+        </record>
+
+        <!-- ══ 21-23. NSSF ═══════════════════════════════════════════════ -->
+        <record id="rule_nssf_tier_1" model="hr.salary.rule">
+            <field name="name">NSSF Tier I (employee)</field>
+            <field name="code">NSSF_EMPLOYEE_TIER_1</field>
+            <field name="sequence">110</field>
+            <field name="category_id" ref="categ_hidden"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if contract.ke_is_secondary:
+    result = 0
+    result_rate = 0
+else:
+    lower_limit = contract.rule_param('ke_nssf_lower_limit', payslip.date_to)
+    pensionable = categories.BASIC
+    result = min(lower_limit, pensionable)
+    result_rate = contract.rule_param('ke_nssf_rate', payslip.date_to)
+]]></field>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="note">Pensionable pay is taken as basic salary. Confirm with the accountant whether commission and allowances should be pensionable here — if so, this is the line to change.</field>
+        </record>
+
+        <record id="rule_nssf_tier_2" model="hr.salary.rule">
+            <field name="name">NSSF Tier II (employee)</field>
+            <field name="code">NSSF_EMPLOYEE_TIER_2</field>
+            <field name="sequence">111</field>
+            <field name="category_id" ref="categ_hidden"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if contract.ke_is_secondary:
+    result = 0
+    result_rate = 0
+else:
+    lower_limit = contract.rule_param('ke_nssf_lower_limit', payslip.date_to)
+    upper_limit = contract.rule_param('ke_nssf_upper_limit', payslip.date_to)
+    pensionable = categories.BASIC
+    if upper_limit < pensionable:
+        result = upper_limit - lower_limit
+    elif lower_limit < pensionable:
+        result = pensionable - lower_limit
+    else:
+        result = 0
+    result_rate = contract.rule_param('ke_nssf_rate', payslip.date_to)
+]]></field>
+            <field name="appears_on_payslip" eval="False"/>
+        </record>
+
+        <record id="rule_nssf_amount" model="hr.salary.rule">
+            <field name="name">NSSF</field>
+            <field name="code">NSSF_AMOUNT</field>
+            <field name="sequence">121</field>
+            <field name="category_id" ref="categ_statutory_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = NSSF_EMPLOYEE_TIER_1 + NSSF_EMPLOYEE_TIER_2</field>
+        </record>
+
+        <!-- ══ 24. Affordable Housing Levy ═══════════════════════════════ -->
+        <record id="rule_ahl_amount" model="hr.salary.rule">
+            <field name="name">Affordable Housing Levy</field>
+            <field name="code">AHL_AMOUNT</field>
+            <field name="sequence">120</field>
+            <field name="category_id" ref="categ_statutory_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+exempt = 0
+if employee.ke_disabled:
+    exempt = contract.rule_param('ke_disability_threshold', payslip.date_to)
+result = max(0, categories.BASIC - exempt)
+result_rate = contract.rule_param('ke_ahl_employee', payslip.date_to) * 100
+]]></field>
+            <field name="note">Charged on basic salary, following the reference configuration. If Softlink pays significant allowances, confirm with the accountant whether the levy should instead be charged on gross pay.</field>
+        </record>
+
+        <!-- ══ 25-26. NHIF (historic) ════════════════════════════════════ -->
+        <record id="rule_nhif_hidden" model="hr.salary.rule">
+            <field name="name">NHIF (calculation)</field>
+            <field name="code">NHIF_AMOUNT_HIDDEN</field>
+            <field name="sequence">122</field>
+            <field name="category_id" ref="categ_hidden"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+bands = contract.rule_param('ke_nhif', payslip.date_to)
+result = 0
+if bands and not contract.ke_is_secondary:
+    basic = categories.BASIC
+    for high, rate in bands:
+        if basic < float(high):
+            result = rate
+            break
+]]></field>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="note">NHIF was replaced by SHIF in October 2024, and its parameter is zero from that date, so this returns zero for any current payslip. Retained so that a payslip dated earlier still computes correctly.</field>
+        </record>
+
+        <record id="rule_nhif_amount" model="hr.salary.rule">
+            <field name="name">NHIF</field>
+            <field name="code">NHIF_AMOUNT</field>
+            <field name="sequence">123</field>
+            <field name="category_id" ref="categ_statutory_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = NHIF_AMOUNT_HIDDEN</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = NHIF_AMOUNT_HIDDEN</field>
+        </record>
+
+        <!-- ══ 27. SHIF ══════════════════════════════════════════════════ -->
+        <record id="rule_shif_amount" model="hr.salary.rule">
+            <field name="name">SHIF</field>
+            <field name="code">SHIF_AMOUNT</field>
+            <field name="sequence">125</field>
+            <field name="category_id" ref="categ_statutory_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+rate = contract.rule_param('ke_shif_rate', payslip.date_to)
+result = 0
+if rate and not contract.ke_is_secondary:
+    gross = GROSS
+    min_gross = float(contract.rule_param('ke_shif_min_gross', payslip.date_to))
+    if gross < min_gross:
+        result = contract.rule_param('ke_shif_min_amount', payslip.date_to)
+    else:
+        result = rate * gross
+]]></field>
+        </record>
+
+        <!-- ══ 28. Taxable pay ═══════════════════════════════════════════ -->
+        <record id="rule_gross_taxable" model="hr.salary.rule">
+            <field name="name">Taxable Pay</field>
+            <field name="code">GROSS_TAXABLE</field>
+            <field name="sequence">130</field>
+            <field name="category_id" ref="categ_gross"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+total_pension = NSSF_AMOUNT + contract.ke_pension_contribution
+max_pension = contract.rule_param('ke_max_pension_contribution', payslip.date_to)
+alw_max = contract.rule_param('ke_pension_alw_max', payslip.date_to)
+
+# The untaxed portion of a pension allowance has already been excluded from
+# taxable pay as an untaxed allowance. Subtracting it again through the
+# pension deduction would relieve the same money twice.
+already_relieved = max(0, contract.ke_pension_allowance - alw_max)
+non_taxable_pension = min(total_pension, max_pension) - already_relieved
+
+result = GROSS - categories.KE_UT_ALW - MORTGAGE - non_taxable_pension
+
+if contract.rule_param('ke_shif_ahl_deductible', payslip.date_to):
+    result -= SHIF_AMOUNT + AHL_AMOUNT
+
+result = max(0, result)
+]]></field>
+        </record>
+
+        <!-- ══ 29. Tax before relief ═════════════════════════════════════ -->
+        <record id="rule_income_tax" model="hr.salary.rule">
+            <field name="name">Income Tax (before relief)</field>
+            <field name="code">INCOME_TAX</field>
+            <field name="sequence">131</field>
+            <field name="category_id" ref="categ_hidden"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if contract.ke_is_secondary:
+    result = GROSS_TAXABLE
+    result_rate = contract.rule_param('ke_income_tax_secondary', payslip.date_to)
+else:
+    remaining = max(0, GROSS_TAXABLE)
+    income_tax = 0
+    for amount, coefficient in contract.rule_param('ke_income_tax_breakdown', payslip.date_to):
+        band = min(float(amount), remaining)
+        income_tax += band * coefficient
+        remaining -= band
+        if remaining <= 0:
+            break
+    result = income_tax
+]]></field>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="note">The band figures are widths, not thresholds: each is consumed in turn.</field>
+        </record>
+
+        <!-- ══ 30-34. Reliefs ════════════════════════════════════════════ -->
+        <record id="rule_nhif_relief" model="hr.salary.rule">
+            <field name="name">NHIF Relief</field>
+            <field name="code">NHIF_RELIEF</field>
+            <field name="sequence">142</field>
+            <field name="category_id" ref="categ_ins_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = NHIF_AMOUNT_HIDDEN and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = NHIF_AMOUNT_HIDDEN
+result_rate = -contract.rule_param('ke_insurance_relief_rate', payslip.date_to)
+]]></field>
+        </record>
+
+        <record id="rule_med_insurance_relief" model="hr.salary.rule">
+            <field name="name">Medical Insurance Relief</field>
+            <field name="code">MED_INSURANCE_RELIEF</field>
+            <field name="sequence">143</field>
+            <field name="category_id" ref="categ_ins_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_voluntary_medical_insurance and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_voluntary_medical_insurance
+result_rate = -contract.rule_param('ke_insurance_relief_rate', payslip.date_to)
+]]></field>
+        </record>
+
+        <record id="rule_life_insurance_relief" model="hr.salary.rule">
+            <field name="name">Life Insurance Relief</field>
+            <field name="code">LIFE_INSURANCE_RELIEF</field>
+            <field name="sequence">144</field>
+            <field name="category_id" ref="categ_ins_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_life_insurance and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_life_insurance
+result_rate = -contract.rule_param('ke_insurance_relief_rate', payslip.date_to)
+]]></field>
+        </record>
+
+        <record id="rule_education_relief" model="hr.salary.rule">
+            <field name="name">Education Relief</field>
+            <field name="code">EDUCATION_RELIEF</field>
+            <field name="sequence">145</field>
+            <field name="category_id" ref="categ_ins_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_education and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_education
+result_rate = -contract.rule_param('ke_insurance_relief_rate', payslip.date_to)
+]]></field>
+        </record>
+
+        <record id="rule_insurance_relief" model="hr.salary.rule">
+            <field name="name">Insurance Relief</field>
+            <field name="code">INSURANCE_RELIEF</field>
+            <field name="sequence">146</field>
+            <field name="category_id" ref="categ_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = categories.INS_RELIEF and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+cap = contract.rule_param('ke_insurance_relief_max', payslip.date_to)
+result = -min(cap, -categories.INS_RELIEF)
+]]></field>
+            <field name="note">The individual reliefs are held as negatives in INS_RELIEF; this applies the overall monthly cap to their total.</field>
+        </record>
+
+        <!-- ══ 35-36. AHL and personal relief ════════════════════════════ -->
+        <record id="rule_ahl_relief" model="hr.salary.rule">
+            <field name="name">AHL Relief</field>
+            <field name="code">AHL_RELIEF</field>
+            <field name="sequence">147</field>
+            <field name="category_id" ref="categ_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.rule_param('ke_ahl_relief_active', payslip.date_to) and not contract.ke_is_secondary
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+cap = contract.rule_param('ke_ahl_relief_cap', payslip.date_to)
+rate = contract.rule_param('ke_ahl_relief_rate', payslip.date_to)
+if cap < AHL_AMOUNT * rate:
+    result = -cap
+else:
+    result = AHL_AMOUNT
+    result_rate = -rate * 100
+]]></field>
+            <field name="note">Applied only between 19 March and 26 December 2024. From 27 December 2024 the levy is deducted from taxable pay instead, so this returns nothing for current payslips.</field>
+        </record>
+
+        <record id="rule_pers_relief" model="hr.salary.rule">
+            <field name="name">Personal Relief</field>
+            <field name="code">PERS_RELIEF</field>
+            <field name="sequence">148</field>
+            <field name="category_id" ref="categ_relief"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -contract.rule_param('ke_personal_relief', payslip.date_to)</field>
+        </record>
+
+        <!-- ══ 37. PAYE ══════════════════════════════════════════════════ -->
+        <record id="rule_paye" model="hr.salary.rule">
+            <field name="name">P.A.Y.E.</field>
+            <field name="code">PAYE</field>
+            <field name="sequence">150</field>
+            <field name="category_id" ref="categ_statutory_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = GROSS_TAXABLE >= contract.rule_param('ke_paye_lower_bound', payslip.date_to)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = max(INCOME_TAX + categories.RELIEF, 0)</field>
+            <field name="note">Reliefs are held as negatives, so adding them reduces the tax. Floored at zero: relief cannot produce a refund.</field>
+        </record>
+
+        <record id="rule_statutory_ded" model="hr.salary.rule">
+            <field name="name">Statutory Deductions</field>
+            <field name="code">STATUTORY_DED</field>
+            <field name="sequence">151</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.STATUTORY_DED</field>
+            <field name="appears_on_payslip" eval="False"/>
+        </record>
+
+        <!-- ══ 39-44. Other deductions ═══════════════════════════════════ -->
+        <record id="rule_helb" model="hr.salary.rule">
+            <field name="name">HELB</field>
+            <field name="code">HELB</field>
+            <field name="sequence">152</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.HELB) and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.HELB.amount</field>
+        </record>
+
+        <record id="rule_med_insurance" model="hr.salary.rule">
+            <field name="name">Voluntary Medical Insurance</field>
+            <field name="code">MED_INSURANCE</field>
+            <field name="sequence">153</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_voluntary_medical_insurance and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_voluntary_medical_insurance</field>
+        </record>
+
+        <record id="rule_life_insurance" model="hr.salary.rule">
+            <field name="name">Life Insurance</field>
+            <field name="code">LIFE_INSURANCE</field>
+            <field name="sequence">154</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = (contract.ke_life_insurance
+          and not contract.ke_is_li_managed_by_employee
+          and not contract.ke_is_secondary)
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_life_insurance</field>
+            <field name="note">Not deducted when the employee pays the premium directly — the relief still applies, but the money never passes through payroll.</field>
+        </record>
+
+        <record id="rule_education" model="hr.salary.rule">
+            <field name="name">Education Policy</field>
+            <field name="code">EDUCATION</field>
+            <field name="sequence">155</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_education and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_education</field>
+        </record>
+
+        <record id="rule_pension_contribution" model="hr.salary.rule">
+            <field name="name">Pension Contribution</field>
+            <field name="code">NSSF_EMPLOYEE_TIER_3</field>
+            <field name="sequence">156</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = contract.ke_pension_contribution and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.ke_pension_contribution</field>
+            <field name="note">Voluntary contribution to a registered scheme, over and above NSSF. Named Tier III by convention.</field>
+        </record>
+
+        <record id="rule_fringe_benefit" model="hr.salary.rule">
+            <field name="name">Fringe Benefit Tax</field>
+            <field name="code">FRINGE_BENEFIT</field>
+            <field name="sequence">157</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = bool(inputs.FRINGE_BENEFIT) and not contract.ke_is_secondary</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.FRINGE_BENEFIT.amount</field>
+        </record>
+
+        <record id="rule_other_ded" model="hr.salary.rule">
+            <field name="name">Other Deductions</field>
+            <field name="code">OTHER_DED</field>
+            <field name="sequence">158</field>
+            <field name="category_id" ref="categ_total_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.OTHER_DED</field>
+            <field name="appears_on_payslip" eval="False"/>
+        </record>
+
+        <record id="rule_total_ded" model="hr.salary.rule">
+            <field name="name">Total Deductions</field>
+            <field name="code">TOTAL_DED</field>
+            <field name="sequence">159</field>
+            <field name="category_id" ref="categ_ded"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.TOTAL_DED</field>
+        </record>
+
+        <!-- ══ 47-49. Employer costs ═════════════════════════════════════ -->
+        <record id="rule_nita" model="hr.salary.rule">
+            <field name="name">NITA Levy (employer)</field>
+            <field name="code">NITA</field>
+            <field name="sequence">160</field>
+            <field name="category_id" ref="categ_comp"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.rule_param('ke_nita', payslip.date_to)</field>
+        </record>
+
+        <record id="rule_nssf_employer" model="hr.salary.rule">
+            <field name="name">NSSF (employer)</field>
+            <field name="code">NSSF_EMP</field>
+            <field name="sequence">161</field>
+            <field name="category_id" ref="categ_comp"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = NSSF_AMOUNT</field>
+            <field name="note">The employer matches the employee contribution.</field>
+        </record>
+
+        <record id="rule_ahl_employer" model="hr.salary.rule">
+            <field name="name">Affordable Housing Levy (employer)</field>
+            <field name="code">AHL_AMOUNT_EMP</field>
+            <field name="sequence">162</field>
+            <field name="category_id" ref="categ_comp"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+exempt = 0
+if employee.ke_disabled:
+    exempt = contract.rule_param('ke_disability_threshold', payslip.date_to)
+result = max(0, categories.BASIC - exempt)
+result_rate = contract.rule_param('ke_ahl_employer', payslip.date_to) * 100
+]]></field>
+        </record>
+
+        <!-- ══ 50-51. Non-cash and net ═══════════════════════════════════ -->
+        <record id="rule_non_cash_benefit" model="hr.salary.rule">
+            <field name="name">Non-Cash Benefit</field>
+            <field name="code">NON_CASH_BENEFIT</field>
+            <field name="sequence">163</field>
+            <field name="category_id" ref="categ_exemption"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+if inputs.NON_CASH_BENEFIT:
+    result = inputs.NON_CASH_BENEFIT.amount
+else:
+    result = 0
+]]></field>
+        </record>
+
+        <record id="rule_net" model="hr.salary.rule">
+            <field name="name">Net Salary</field>
+            <field name="code">NET</field>
+            <field name="sequence">200</field>
+            <field name="category_id" ref="categ_net"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = GROSS - TOTAL_DED + NON_CASH_BENEFIT</field>
+        </record>
+    </data>
+</odoo>

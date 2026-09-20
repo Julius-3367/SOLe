@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sole_payroll_parameter_user,sole.payroll.parameter.user,model_sole_payroll_parameter,hr.group_hr_user,1,0,0,0
+access_sole_payroll_parameter_manager,sole.payroll.parameter.manager,model_sole_payroll_parameter,hr.group_hr_manager,1,1,1,1
+access_sole_payroll_parameter_value_user,sole.payroll.parameter.value.user,model_sole_payroll_parameter_value,hr.group_hr_user,1,0,0,0
+access_sole_payroll_parameter_value_manager,sole.payroll.parameter.value.manager,model_sole_payroll_parameter_value,hr.group_hr_manager,1,1,1,1

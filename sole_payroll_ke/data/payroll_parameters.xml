@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Statutory rates, each with the date it took effect.
+
+            The full history is kept, not just the current figure, so that
+            re-running a payslip for an earlier month reproduces the amount
+            that was actually paid rather than recalculating it at today's
+            rates.
+
+            noupdate="1" is deliberate: once these exist, a module upgrade
+            must never overwrite a rate an accountant has corrected. New
+            rates are added as new value records with a later start date —
+            never by editing an existing one.
+        -->
+
+        <!-- ══ NSSF ══════════════════════════════════════════════════════ -->
+        <record id="param_nssf_lower_limit" model="sole.payroll.parameter">
+            <field name="name">NSSF Tier I upper bound</field>
+            <field name="code">ke_nssf_lower_limit</field>
+            <field name="note">Pensionable pay up to this amount is Tier I. Both employee and employer contribute 6%.</field>
+        </record>
+        <record id="param_nssf_lower_limit_2024" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_lower_limit"/>
+            <field name="date_from">2024-02-01</field>
+            <field name="value">7000</field>
+        </record>
+        <record id="param_nssf_lower_limit_2025" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_lower_limit"/>
+            <field name="date_from">2025-02-01</field>
+            <field name="value">8000</field>
+        </record>
+        <record id="param_nssf_lower_limit_2026" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_lower_limit"/>
+            <field name="date_from">2026-02-01</field>
+            <field name="value">9000</field>
+        </record>
+
+        <record id="param_nssf_upper_limit" model="sole.payroll.parameter">
+            <field name="name">NSSF Tier II upper bound</field>
+            <field name="code">ke_nssf_upper_limit</field>
+            <field name="note">Pensionable pay between the Tier I and Tier II bounds is Tier II. Nothing above this bound is pensionable.</field>
+        </record>
+        <record id="param_nssf_upper_limit_2024" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_upper_limit"/>
+            <field name="date_from">2024-02-01</field>
+            <field name="value">36000</field>
+        </record>
+        <record id="param_nssf_upper_limit_2025" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_upper_limit"/>
+            <field name="date_from">2025-02-01</field>
+            <field name="value">72000</field>
+        </record>
+        <record id="param_nssf_upper_limit_2026" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_upper_limit"/>
+            <field name="date_from">2026-02-01</field>
+            <field name="value">108000</field>
+        </record>
+
+        <record id="param_nssf_rate" model="sole.payroll.parameter">
+            <field name="name">NSSF contribution rate</field>
+            <field name="code">ke_nssf_rate</field>
+            <field name="note">Percentage, applied to both tiers, by both employee and employer.</field>
+        </record>
+        <record id="param_nssf_rate_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nssf_rate"/>
+            <field name="date_from">2023-02-01</field>
+            <field name="value">6</field>
+        </record>
+
+        <!-- ══ SHIF (replaced NHIF from October 2024) ════════════════════ -->
+        <record id="param_shif_rate" model="sole.payroll.parameter">
+            <field name="name">SHIF rate</field>
+            <field name="code">ke_shif_rate</field>
+            <field name="note">Fraction of gross pay. Zero before SHIF came into force.</field>
+        </record>
+        <record id="param_shif_rate_v0" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_rate"/>
+            <field name="date_from">2021-01-01</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_shif_rate_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_rate"/>
+            <field name="date_from">2024-10-10</field>
+            <field name="value">0.0275</field>
+        </record>
+
+        <record id="param_shif_min_gross" model="sole.payroll.parameter">
+            <field name="name">SHIF minimum gross</field>
+            <field name="code">ke_shif_min_gross</field>
+            <field name="note">Below this gross, the flat minimum contribution applies instead of the percentage.</field>
+        </record>
+        <record id="param_shif_min_gross_v0" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_min_gross"/>
+            <field name="date_from">2021-01-01</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_shif_min_gross_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_min_gross"/>
+            <field name="date_from">2024-10-10</field>
+            <field name="value">10909</field>
+        </record>
+
+        <record id="param_shif_min_amount" model="sole.payroll.parameter">
+            <field name="name">SHIF minimum contribution</field>
+            <field name="code">ke_shif_min_amount</field>
+        </record>
+        <record id="param_shif_min_amount_v0" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_min_amount"/>
+            <field name="date_from">2021-01-01</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_shif_min_amount_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_min_amount"/>
+            <field name="date_from">2024-10-10</field>
+            <field name="value">300</field>
+        </record>
+
+        <!-- ══ NHIF (superseded by SHIF; kept so historic months compute) ═ -->
+        <record id="param_nhif" model="sole.payroll.parameter">
+            <field name="name">NHIF band table</field>
+            <field name="code">ke_nhif</field>
+            <field name="note">Pairs of (upper bound of basic pay, flat contribution). Set to 0 from 10 October 2024, when SHIF replaced NHIF. Kept so that any payslip dated before that still computes correctly.</field>
+        </record>
+        <record id="param_nhif_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nhif"/>
+            <field name="date_from">2021-01-01</field>
+            <field name="value">[(6000.0, 150), (8000.0, 300), (12000.0, 400), (15000.0, 500), (20000.0, 600), (25000.0, 750), (30000.0, 850), (35000.0, 900), (40000.0, 950), (45000.0, 1000), (50000.0, 1100), (60000.0, 1200), (70000.0, 1300), (80000.0, 1400), (90000.0, 1500), (100000.0, 1600), ('inf', 1700)]</field>
+        </record>
+        <record id="param_nhif_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nhif"/>
+            <field name="date_from">2024-10-10</field>
+            <field name="value">0</field>
+        </record>
+
+        <!-- ══ Affordable Housing Levy ═══════════════════════════════════ -->
+        <record id="param_ahl_employee" model="sole.payroll.parameter">
+            <field name="name">AHL employee rate</field>
+            <field name="code">ke_ahl_employee</field>
+            <field name="note">Fraction, not percentage. 0.015 means 1.5%.</field>
+        </record>
+        <record id="param_ahl_employee_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_employee"/>
+            <field name="date_from">2023-01-01</field>
+            <field name="value">0.015</field>
+        </record>
+
+        <record id="param_ahl_employer" model="sole.payroll.parameter">
+            <field name="name">AHL employer rate</field>
+            <field name="code">ke_ahl_employer</field>
+            <field name="note">Fraction. Matched by the employer, and an employer cost rather than a deduction.</field>
+        </record>
+        <record id="param_ahl_employer_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_employer"/>
+            <field name="date_from">2023-01-01</field>
+            <field name="value">0.015</field>
+        </record>
+
+        <record id="param_ahl_relief_cap" model="sole.payroll.parameter">
+            <field name="name">AHL relief cap</field>
+            <field name="code">ke_ahl_relief_cap</field>
+            <field name="note">Applied only between 19 March and 26 December 2024, when AHL attracted relief rather than being deductible from taxable pay.</field>
+        </record>
+        <record id="param_ahl_relief_cap_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_relief_cap"/>
+            <field name="date_from">2024-03-19</field>
+            <field name="value">9000</field>
+        </record>
+
+        <record id="param_ahl_relief_rate" model="sole.payroll.parameter">
+            <field name="name">AHL relief rate</field>
+            <field name="code">ke_ahl_relief_rate</field>
+        </record>
+        <record id="param_ahl_relief_rate_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_relief_rate"/>
+            <field name="date_from">2024-03-19</field>
+            <field name="value">0.15</field>
+        </record>
+
+        <record id="param_ahl_relief_active" model="sole.payroll.parameter">
+            <field name="name">AHL relief in force</field>
+            <field name="code">ke_ahl_relief_active</field>
+            <field name="note">1 while the housing levy attracted tax relief, 0 otherwise. From 27 December 2024 the levy became deductible from taxable pay instead, so the relief stopped. Held as a parameter rather than a date test inside the rule, so the change is visible and adjustable without touching code.</field>
+        </record>
+        <record id="param_ahl_relief_active_v0" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_relief_active"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_ahl_relief_active_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_relief_active"/>
+            <field name="date_from">2024-03-19</field>
+            <field name="value">1</field>
+        </record>
+        <record id="param_ahl_relief_active_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_ahl_relief_active"/>
+            <field name="date_from">2024-12-27</field>
+            <field name="value">0</field>
+        </record>
+
+        <record id="param_shif_ahl_deductible" model="sole.payroll.parameter">
+            <field name="name">SHIF and AHL deductible from taxable pay</field>
+            <field name="code">ke_shif_ahl_deductible</field>
+            <field name="note">1 from 27 December 2024, when SHIF and the housing levy became allowable deductions against taxable pay. 0 before that.</field>
+        </record>
+        <record id="param_shif_ahl_deductible_v0" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_ahl_deductible"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_shif_ahl_deductible_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_shif_ahl_deductible"/>
+            <field name="date_from">2024-12-27</field>
+            <field name="value">1</field>
+        </record>
+
+        <record id="param_disability_threshold" model="sole.payroll.parameter">
+            <field name="name">Disability exemption threshold</field>
+            <field name="code">ke_disability_threshold</field>
+            <field name="note">Amount of pay excluded from AHL for an employee holding a valid exemption certificate.</field>
+        </record>
+        <record id="param_disability_threshold_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_disability_threshold"/>
+            <field name="date_from">2023-01-01</field>
+            <field name="value">150000</field>
+        </record>
+
+        <!-- ══ PAYE ══════════════════════════════════════════════════════ -->
+        <record id="param_income_tax_breakdown" model="sole.payroll.parameter">
+            <field name="name">PAYE bands</field>
+            <field name="code">ke_income_tax_breakdown</field>
+            <field name="note">Pairs of (width of the band, rate). Each band is consumed in turn, so the figures are band widths, not cumulative thresholds. 'inf' is the final open-ended band.</field>
+        </record>
+        <record id="param_income_tax_breakdown_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_income_tax_breakdown"/>
+            <field name="date_from">2021-01-01</field>
+            <field name="value">[(24000, 0.1), (8333, 0.25), ('inf', 0.3)]</field>
+        </record>
+        <record id="param_income_tax_breakdown_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_income_tax_breakdown"/>
+            <field name="date_from">2023-07-01</field>
+            <field name="value">[(24000, 0.1), (8333, 0.25), (467667, 0.3), (300000, 0.325), ('inf', 0.35)]</field>
+        </record>
+
+        <record id="param_income_tax_secondary" model="sole.payroll.parameter">
+            <field name="name">PAYE rate, secondary employment</field>
+            <field name="code">ke_income_tax_secondary</field>
+            <field name="note">Percentage. Secondary employment is taxed at a flat rate with no personal relief.</field>
+        </record>
+        <record id="param_income_tax_secondary_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_income_tax_secondary"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">35</field>
+        </record>
+
+        <record id="param_paye_lower_bound" model="sole.payroll.parameter">
+            <field name="name">PAYE lower bound</field>
+            <field name="code">ke_paye_lower_bound</field>
+            <field name="note">Taxable pay below this produces no PAYE line on the payslip.</field>
+        </record>
+        <record id="param_paye_lower_bound_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_paye_lower_bound"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">24000</field>
+        </record>
+
+        <!-- ══ Reliefs ═══════════════════════════════════════════════════ -->
+        <record id="param_personal_relief" model="sole.payroll.parameter">
+            <field name="name">Personal relief</field>
+            <field name="code">ke_personal_relief</field>
+            <field name="note">Monthly. Deducted from tax payable, not from taxable pay.</field>
+        </record>
+        <record id="param_personal_relief_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_personal_relief"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">2400</field>
+        </record>
+
+        <record id="param_insurance_relief_max" model="sole.payroll.parameter">
+            <field name="name">Insurance relief cap</field>
+            <field name="code">ke_insurance_relief_max</field>
+            <field name="note">Monthly ceiling on the total of all insurance reliefs combined.</field>
+        </record>
+        <record id="param_insurance_relief_max_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_insurance_relief_max"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">5000</field>
+        </record>
+
+        <record id="param_insurance_relief_rate" model="sole.payroll.parameter">
+            <field name="name">Insurance relief rate</field>
+            <field name="code">ke_insurance_relief_rate</field>
+            <field name="note">Percentage of the premium allowed as relief.</field>
+        </record>
+        <record id="param_insurance_relief_rate_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_insurance_relief_rate"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">15</field>
+        </record>
+
+        <!-- ══ Deductible from taxable pay ═══════════════════════════════ -->
+        <record id="param_max_pension_contribution" model="sole.payroll.parameter">
+            <field name="name">Maximum deductible pension contribution</field>
+            <field name="code">ke_max_pension_contribution</field>
+            <field name="note">NSSF and registered scheme contributions combined, deductible from taxable pay up to this monthly amount.</field>
+        </record>
+        <record id="param_max_pension_contribution_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_max_pension_contribution"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">20000</field>
+        </record>
+        <record id="param_max_pension_contribution_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_max_pension_contribution"/>
+            <field name="date_from">2024-12-27</field>
+            <field name="value">30000</field>
+        </record>
+
+        <record id="param_max_mortgage_interest" model="sole.payroll.parameter">
+            <field name="name">Maximum deductible mortgage interest</field>
+            <field name="code">ke_max_mortgage_interest</field>
+        </record>
+        <record id="param_max_mortgage_interest_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_max_mortgage_interest"/>
+            <field name="date_from">2017-01-01</field>
+            <field name="value">25000</field>
+        </record>
+        <record id="param_max_mortgage_interest_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_max_mortgage_interest"/>
+            <field name="date_from">2024-12-27</field>
+            <field name="value">30000</field>
+        </record>
+
+        <!-- ══ Allowance ceilings ════════════════════════════════════════ -->
+        <record id="param_food_alw_max" model="sole.payroll.parameter">
+            <field name="name">Food allowance ceiling</field>
+            <field name="code">ke_food_alw_max</field>
+            <field name="note">Untaxed up to this amount. Above it the whole allowance becomes taxable, not just the excess.</field>
+        </record>
+        <record id="param_food_alw_max_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_food_alw_max"/>
+            <field name="date_from">2022-01-01</field>
+            <field name="value">4000</field>
+        </record>
+        <record id="param_food_alw_max_v2" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_food_alw_max"/>
+            <field name="date_from">2024-12-01</field>
+            <field name="value">5000</field>
+        </record>
+
+        <record id="param_airtime_alw_max" model="sole.payroll.parameter">
+            <field name="name">Airtime allowance ceiling</field>
+            <field name="code">ke_airtime_alw_max</field>
+            <field name="note">Untaxed up to this amount. Above it the whole allowance becomes taxable.</field>
+        </record>
+        <record id="param_airtime_alw_max_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_airtime_alw_max"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">3000</field>
+        </record>
+
+        <record id="param_pension_alw_max" model="sole.payroll.parameter">
+            <field name="name">Pension allowance ceiling</field>
+            <field name="code">ke_pension_alw_max</field>
+            <field name="note">Unlike food and airtime, only the excess over this amount is taxed.</field>
+        </record>
+        <record id="param_pension_alw_max_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_pension_alw_max"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">20000</field>
+        </record>
+
+        <!-- ══ Employer levies ═══════════════════════════════════════════ -->
+        <record id="param_nita" model="sole.payroll.parameter">
+            <field name="name">NITA levy</field>
+            <field name="code">ke_nita</field>
+            <field name="note">Flat monthly amount per employee, paid by the employer.</field>
+        </record>
+        <record id="param_nita_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_nita"/>
+            <field name="date_from">2022-01-01</field>
+            <field name="value">50</field>
+        </record>
+
+        <record id="param_helb_min" model="sole.payroll.parameter">
+            <field name="name">HELB minimum deduction</field>
+            <field name="code">ke_helb_min</field>
+        </record>
+        <record id="param_helb_min_v1" model="sole.payroll.parameter.value">
+            <field name="parameter_id" ref="param_helb_min"/>
+            <field name="date_from">2020-01-01</field>
+            <field name="value">1500</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            The Kenyan salary structure.
+
+            parent_id is explicitly false. It matters: hr.payroll.structure
+            defaults its parent to hr_payroll_community.structure_base, and
+            _get_parent_structure() pulls in the parent's rules as well as
+            its own. That base structure ships its own BASIC, GROSS and NET
+            rules, and because a rule's result is stored under its code,
+            duplicates silently overwrite one another — the payslip would
+            still compute, and the numbers would be wrong. Leaving the
+            default in place is the single easiest way to break this module.
+        -->
+        <record id="structure_ke" model="hr.payroll.structure">
+            <field name="name">Kenyan Payroll</field>
+            <field name="code">KE_PAYROLL</field>
+            <field name="parent_id" eval="False"/>
+            <field name="note">Kenyan statutory payroll: NSSF Tier I and II, SHIF, the Affordable Housing Levy, banded PAYE, and personal and insurance reliefs. Rates come from dated parameters under Payroll > Configuration, not from the rules themselves.</field>
+            <field name="rule_ids" eval="[(6, 0, [
+                ref('rule_basic'),
+                ref('rule_untaxed_food'),
+                ref('rule_untaxed_airtime'),
+                ref('rule_untaxed_pension'),
+                ref('rule_untaxed_allowance'),
+                ref('rule_taxed_food'),
+                ref('rule_taxed_airtime'),
+                ref('rule_taxed_pension'),
+                ref('rule_taxed_commuter'),
+                ref('rule_taxed_housing'),
+                ref('rule_taxed_allowance'),
+                ref('rule_bonus'),
+                ref('rule_commission'),
+                ref('rule_reimbursement'),
+                ref('rule_attach_salary'),
+                ref('rule_assig_salary'),
+                ref('rule_child_support'),
+                ref('rule_deduction'),
+                ref('rule_gross'),
+                ref('rule_mortgage'),
+                ref('rule_nssf_tier_1'),
+                ref('rule_nssf_tier_2'),
+                ref('rule_ahl_amount'),
+                ref('rule_nssf_amount'),
+                ref('rule_nhif_hidden'),
+                ref('rule_nhif_amount'),
+                ref('rule_shif_amount'),
+                ref('rule_gross_taxable'),
+                ref('rule_income_tax'),
+                ref('rule_nhif_relief'),
+                ref('rule_med_insurance_relief'),
+                ref('rule_life_insurance_relief'),
+                ref('rule_education_relief'),
+                ref('rule_insurance_relief'),
+                ref('rule_ahl_relief'),
+                ref('rule_pers_relief'),
+                ref('rule_paye'),
+                ref('rule_statutory_ded'),
+                ref('rule_helb'),
+                ref('rule_med_insurance'),
+                ref('rule_life_insurance'),
+                ref('rule_education'),
+                ref('rule_pension_contribution'),
+                ref('rule_fringe_benefit'),
+                ref('rule_other_ded'),
+                ref('rule_total_ded'),
+                ref('rule_nita'),
+                ref('rule_nssf_employer'),
+                ref('rule_ahl_employer'),
+                ref('rule_non_cash_benefit'),
+                ref('rule_net'),
+            ])]"/>
+        </record>
+    </data>
+</odoo>
