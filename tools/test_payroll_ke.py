@@ -70,7 +70,9 @@ payslip = env["hr.payslip"].create({
 })
 
 try:
-    payslip.compute_sheet()
+    # Named action_compute_sheet in hr_payroll_community, not compute_sheet
+    # as in Odoo's own payroll.
+    payslip.action_compute_sheet()
 except Exception as exc:
     # hr_payroll_community wraps every rule failure in a bare except and
     # reports only the rule name, with no traceback. Printing the raw message
