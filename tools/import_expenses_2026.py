@@ -16,10 +16,35 @@
 import psycopg2
 import psycopg2.extras
 
+from odoo.tools import config as odoo_config
+
 DRY_RUN = True
 CREATE_MISSING_PRODUCTS = False
 CUTOFF = "2026-06-30"
-SRC_DSN = "dbname=odoo17_temp user=odoo19 host=sole_db"
+SOURCE_DB = "odoo17_temp"
+
+
+def source_dsn():
+    """Connection string for the old database.
+
+    Built from Odoo's own configuration rather than hard-coded, so the
+    credentials stay in odoo.conf and never reach this repository — which is
+    public.
+    """
+    parts = ["dbname=%s" % SOURCE_DB]
+    for key, param in (
+        ("db_user", "user"),
+        ("db_password", "password"),
+        ("db_host", "host"),
+        ("db_port", "port"),
+    ):
+        value = odoo_config.get(key)
+        if value:
+            parts.append("%s=%s" % (param, value))
+    return " ".join(parts)
+
+
+SRC_DSN = source_dsn()
 
 # Marker written into every imported record so the whole batch can be found
 # again — or reversed — without guessing.
