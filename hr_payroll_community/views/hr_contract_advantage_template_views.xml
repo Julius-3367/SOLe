@@ -28,9 +28,9 @@
             </form>
         </field>
     </record>
-    <!-- Hr Contract Advantage Template tree view -->
+    <!-- Hr Contract Advantage Template list view -->
     <record id="hr_contract_advantage_template_view_tree" model="ir.ui.view">
-        <field name="name">hr.contract.advantage.template.view.tree</field>
+        <field name="name">hr.contract.advantage.template.view.list</field>
         <field name="model">hr.contract.advantage.template</field>
         <field name="arch" type="xml">
             <list>

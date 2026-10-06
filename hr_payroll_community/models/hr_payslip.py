@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -21,11 +21,11 @@
 #
 #############################################################################
 from datetime import date, datetime, time
-import babel
 from dateutil.relativedelta import relativedelta
-from pytz import timezone
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError, ValidationError
+from pytz import timezone
+import babel
 
 # This will generate 16th of days
 ROUNDING_FACTOR = 16
@@ -79,9 +79,13 @@ class HrPayslip(models.Model):
                                'slip_id',
                                string='Payslip Lines',
                                help="Choose Payslip for line")
-    company_id = fields.Many2one('res.company', string='Company',
-                                 copy=False, help="Choose Company for line",
-                                 default=lambda self: self.env.company)
+
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company.id
+    )
     worked_days_line_ids = fields.One2many('hr.payslip.worked.days',
                                            'payslip_id',
                                            string='Payslip Worked Days',
@@ -94,7 +98,7 @@ class HrPayslip(models.Model):
     paid = fields.Boolean(string='Made Payment Order ? ',
                           copy=False, help="Is Payment Order")
     note = fields.Text(string='Internal Note', help="Description for Payslip")
-    contract_id = fields.Many2one('hr.contract', string='Contract',
+    contract_id = fields.Many2one('hr.version', string='Contract',
                                   help="Choose Contract for Payslip")
     details_by_salary_rule_category_ids = fields.One2many(
         comodel_name='hr.payslip.line',
@@ -198,10 +202,10 @@ class HrPayslip(models.Model):
         # date_end (or never finish)
         clause_3 = ['&', ('date_start', '<=', date_from), '|',
                     ('date_end', '=', False), ('date_end', '>=', date_to)]
-        clause_final = [('employee_id', '=', employee.id),
-                        ('state', '=', 'open'), '|',
+
+        clause_final = [('employee_id', '=', employee.id), '|',
                         '|'] + clause_1 + clause_2 + clause_3
-        return self.env['hr.contract'].search(clause_final).ids
+        return self.env['hr.version'].search(clause_final).ids
 
     def action_compute_sheet(self):
         """Function for compute Payslip sheet"""
@@ -345,7 +349,7 @@ class HrPayslip(models.Model):
             localdict['categories'].dict[category.code] \
                 = category.code in localdict[
                 'categories'].dict and localdict['categories'].dict[
-                category.code] + amount or amount
+                      category.code] + amount or amount
             return localdict
 
         class BrowsableObject(object):
@@ -376,8 +380,7 @@ class HrPayslip(models.Model):
                     WHERE hp.employee_id = %s AND hp.state = 'done'
                     AND hp.date_from >= %s AND hp.date_to <= %s AND hp.id = 
                     pi.payslip_id AND pi.code = %s""",
-                                    (
-                                        self.employee_id, from_date, to_date,
+                                    (self.employee_id, from_date, to_date,
                                         code))
                 return self.env.cr.fetchone()[0] or 0.0
 
@@ -397,8 +400,7 @@ class HrPayslip(models.Model):
                     WHERE hp.employee_id = %s AND hp.state = 'done'
                     AND hp.date_from >= %s AND hp.date_to <= %s AND hp.id = 
                     pi.payslip_id AND pi.code = %s""",
-                                    (
-                                        self.employee_id, from_date, to_date,
+                                    (self.employee_id, from_date, to_date,
                                         code))
                 return self.env.cr.fetchone()
 
@@ -458,10 +460,13 @@ class HrPayslip(models.Model):
                          'inputs': inputs}
         # get the ids of the structures on the contracts and their
         # parent id as well
-        contracts = self.env['hr.contract'].browse(contract_ids)
-        if len(contracts) == 1 and payslip.struct_id:
+        contracts = self.env['hr.version'].browse(contract_ids)
+        if payslip.struct_id:
             structure_ids = list(
                 set(payslip.struct_id._get_parent_structure().ids))
+        elif len(contracts) == 1 and contracts.struct_id:
+            structure_ids = list(
+                set(contracts.struct_id._get_parent_structure().ids))
         else:
             structure_ids = contracts.get_all_structures()
         # get the rules of the structure and thier children
@@ -527,10 +532,7 @@ class HrPayslip(models.Model):
                                   rule._recursive_search_of_rules()]
         return list(result_dict.values())
 
-    # YTI
-    # TODO To rename. This method is not really an onchange,
-    #  as it is not in any view
-    # employee_id and contract_id could be browse records
+
     def onchange_employee_id(self, date_from, date_to, employee_id=False,
                              contract_id=False):
         """Function for return worked days when changing onchange_employee_id"""
@@ -538,12 +540,9 @@ class HrPayslip(models.Model):
         res = {
             'value': {
                 'line_ids': [],
-                # delete old input lines
                 'input_line_ids': [(2, x,) for x in self.input_line_ids.ids],
-                # delete old worked days lines
                 'worked_days_line_ids': [(2, x,) for x in
                                          self.worked_days_line_ids.ids],
-                # 'details_by_salary_head':[], TODO put me back
                 'name': '',
                 'contract_id': False,
                 'struct_id': False,
@@ -574,7 +573,7 @@ class HrPayslip(models.Model):
                 contract_ids = self.get_contract(employee, date_from, date_to)
         if not contract_ids:
             return res
-        contract = self.env['hr.contract'].browse(contract_ids[0])
+        contract = self.env['hr.version'].browse(contract_ids[0])
         res['value'].update({
             'contract_id': contract.id
         })
@@ -585,7 +584,7 @@ class HrPayslip(models.Model):
             'struct_id': struct.id,
         })
         # computation of the salary input
-        contracts = self.env['hr.contract'].browse(contract_ids)
+        contracts = self.env['hr.version'].browse(contract_ids)
         worked_days_line_ids = self.get_worked_day_lines(contracts, date_from,
                                                          date_to)
         input_line_ids = self.get_inputs(contracts, date_from, date_to)
@@ -615,14 +614,14 @@ class HrPayslip(models.Model):
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
                 return
-            self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
-        if not self.contract_id.struct_id:
-            return
-        self.struct_id = self.contract_id.struct_id
+            self.contract_id = self.env['hr.version'].browse(contract_ids[0])
+            if not self.contract_id.struct_id:
+                return
+            self.struct_id = self.contract_id.struct_id
         if self.contract_id:
             contract_ids = self.contract_id.ids
         # computation of the salary input
-        contracts = self.env['hr.contract'].browse(contract_ids)
+        contracts = self.env['hr.version'].browse(contract_ids)
         worked_days_line_ids = self.get_worked_day_lines(contracts, date_from,
                                                          date_to)
         worked_days_lines = self.worked_days_line_ids.browse([])
@@ -662,7 +661,7 @@ class HrPayslip(models.Model):
         if self.contract_id:
             contract_ids = self.contract_id.ids
         # # computation of the salary input
-        contracts = self.env['hr.contract'].browse(contract_ids)
+        contracts = self.env['hr.version'].browse(contract_ids)
         worked_days_line_ids = self.get_worked_day_lines(contracts, date_from,
                                                          date_to)
         worked_days_lines = self.worked_days_line_ids.browse([])
@@ -691,7 +690,7 @@ class HrPayslip(models.Model):
         if self.contract_id:
             contract_ids = self.contract_id.ids
         # computation of the salary input
-        contracts = self.env['hr.contract'].browse(contract_ids)
+        contracts = self.env['hr.version'].browse(contract_ids)
         worked_days_line_ids = self.get_worked_day_lines(contracts, date_from,
                                                          date_to)
         worked_days_lines = self.worked_days_line_ids.browse([])

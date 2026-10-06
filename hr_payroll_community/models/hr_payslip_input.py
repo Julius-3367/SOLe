@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -31,13 +31,13 @@ class HrPayslipInput(models.Model):
     _description = 'Payslip Input'
     _order = 'payslip_id, sequence'
 
-    name = fields.Char(string='Description', required=True)
+    name = fields.Char(string='Description', required=True, help='Name of the input')
     payslip_id = fields.Many2one('hr.payslip', string='Pay Slip',
-                                 required=True,
-                                 ondelete='cascade', help="Payslip", index=True)
+                                 required=True, help='Payslip related to the input',
+                                 ondelete='cascade',  index=True)
     sequence = fields.Integer(required=True, index=True, default=10,
-                              help="Sequence")
-    code = fields.Char(required=True,
+                              string="Sequence", help='Sequence to identify the record')
+    code = fields.Char(required=True, string='Code',
                        help="The code that can be used in the salary rules")
     date_from = fields.Date(string='Date From',
                             help="Starting Date for Payslip Lines",
@@ -55,7 +55,7 @@ class HrPayslipInput(models.Model):
                                "per product can defined in "
                                "expression like result = "
                                "inputs.SALEURO.amount * contract.wage*0.01.")
-    contract_id = fields.Many2one('hr.contract', string='Contract',
+    contract_id = fields.Many2one('hr.version', string='Contract',
                                   required=True,
                                   help="The contract for which applied"
                                        " this input")

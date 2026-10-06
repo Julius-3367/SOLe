@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -21,9 +21,9 @@
 #
 #############################################################################
 from odoo import api, fields, models, _
+# from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
-
 
 
 class HrSalaryRule(models.Model):
@@ -41,7 +41,7 @@ class HrSalaryRule(models.Model):
     sequence = fields.Integer(required=True, index=True, default=5,
                               help='Use to arrange calculation sequence',
                               string="Sequence")
-    quantity = fields.Char(default='1.0',
+    quantity = fields.Char(default='1.0', string='Quantity',
                            help="It is used in computation for percentage"
                                 "and fixed amount. For e.g. A rule for Meal"
                                 "Voucher having fixed amount of "
@@ -52,7 +52,7 @@ class HrSalaryRule(models.Model):
                                   string='Category',
                                   help="Choose Salary Rule Category",
                                   required=True)
-    active = fields.Boolean(default=True,
+    active = fields.Boolean(default=True, string='Active',
                             help="If the active field is set to false, "
                                  "it will allow you to hide the salary"
                                  "rule without removing it.")
@@ -63,10 +63,12 @@ class HrSalaryRule(models.Model):
     parent_rule_id = fields.Many2one('hr.salary.rule',
                                      string='Parent Salary Rule', index=True,
                                      help="Choose Hr Salary Rule")
-    company_id = fields.Many2one('res.company', string='Company',
-                                 help="Choose Company",
-                                 default=lambda self:
-                                 self.env.company)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company.id
+    )
     condition_select = fields.Selection([
         ('none', 'Always True'),
         ('range', 'Range'),
@@ -87,7 +89,7 @@ class HrSalaryRule(models.Model):
     #----------------------
     # payslip: object containing the payslips
     # employee: hr.employee object
-    # contract: hr.contract object
+    # contract: hr.version object
     # rules: object containing the rules code (previously computed)
     # categories: object containing the computed salary rule categories 
     # (sum of amount of all rules belonging to that category).
@@ -97,9 +99,9 @@ class HrSalaryRule(models.Model):
     # Note: returned value have to be set in the variable 'result'
 
     result = rules.NET > categories.NET * 0.10''',
-                   help='Applied this rule for calculation'
-                        ' if condition is true. You can specify'
-                        ' condition like basic > 1000.')
+                                   help='Applied this rule for calculation'
+                                        ' if condition is true. You can specify'
+                                        ' condition like basic > 1000.')
     condition_range_min = fields.Float(string='Minimum Range',
                                        help="The minimum amount, applied for"
                                             " this rule.")
@@ -112,9 +114,11 @@ class HrSalaryRule(models.Model):
         ('code', 'Python Code'),
     ], string='Amount Type', index=True, required=True, default='fix',
         help="The computation method for the rule amount.")
+
     amount_fix = fields.Float(string='Fixed Amount',
                               digits='Payroll',
                               help="Set a Fixed Amount")
+
     amount_percentage = fields.Float(string='Percentage (%)',
                                      digits='Payroll Rate',
                                      help='For example, enter 50.0 to apply '
@@ -125,7 +129,7 @@ class HrSalaryRule(models.Model):
             #----------------------
             # payslip: object containing the payslips
             # employee: hr.employee object
-            # contract: hr.contract object
+            # contract: hr.version object
             # rules: object containing the rules code (previously computed)
             # categories: object containing the computed salary rule categories 
             # (sum of amount of all rules belonging to that category).
@@ -140,6 +144,7 @@ class HrSalaryRule(models.Model):
                                               'variable')
     child_ids = fields.One2many('hr.salary.rule',
                                 'parent_rule_id',
+                                help='Child rules of the Salary rule',
                                 string='Child Salary Rule', copy=True)
     register_id = fields.Many2one('hr.contribution.register',
                                   string='Contribution Register',
@@ -153,7 +158,7 @@ class HrSalaryRule(models.Model):
     @api.constrains('parent_rule_id')
     def _check_parent_rule_id(self):
         """Function to adding constrains for parent_rule_id field"""
-        if not self._check_recursion(parent='parent_rule_id'):
+        if self._has_cycle('parent_rule_id'):
             raise ValidationError(
                 _('Error! You cannot create recursive hierarchy '
                   'of Salary Rules.'))
@@ -171,12 +176,22 @@ class HrSalaryRule(models.Model):
     # TODO should add some checks on the type of result (should be float)
     def _compute_rule(self, localdict):
         """
-        :param localdict: dictionary containing the environement in which to compute the rule
-        :return: returns a tuple build as the base/amount computed, the quantity and the rate
+        :param localdict: dictionary containing the environement in which to
+            compute the rule
+        :return: returns a tuple build as the base/amount computed,
+            the quantity and the rate
         :rtype: (float, float, float)
         """
         for rec in self:
             rec.ensure_one()
+
+            if 'worked_days' in localdict and hasattr(localdict['worked_days'], 'dict'):
+                worked_days_obj = localdict['worked_days']
+                for code in worked_days_obj.dict:
+                    worked_day_line = worked_days_obj.dict[code]
+                    # Add direct access variables for number_of_days
+                    localdict[f'{code}'] = worked_day_line.number_of_days
+
             if rec.amount_select == 'fix':
                 try:
                     return rec.amount_fix, float(
@@ -198,6 +213,7 @@ class HrSalaryRule(models.Model):
                             rec.name, rec.code))
             else:
                 try:
+
                     safe_eval(rec.amount_python_compute, localdict, mode='exec')
                     return (float(localdict['result']),
                             'result_qty' in localdict and
@@ -211,7 +227,7 @@ class HrSalaryRule(models.Model):
 
     def _satisfy_condition(self, localdict):
         """
-        @param contract_id: id of hr_contract to be tested
+        @param localdict: id of hr_contract to be tested
         @return: returns True if the given rule match the condition for the
         given contract. Return False otherwise.
         """
@@ -221,8 +237,8 @@ class HrSalaryRule(models.Model):
         elif self.condition_select == 'range':
             try:
                 result = safe_eval(self.condition_range, localdict)
-                return (self.condition_range_min <= result and result <=
-                        self.condition_range_max or False)
+                return (
+                            self.condition_range_min <= result <= self.condition_range_max or False)
             except:
                 raise UserError(
                     _('Wrong range condition defined for '
@@ -230,7 +246,8 @@ class HrSalaryRule(models.Model):
                         self.name, self.code))
         else:  # python code
             try:
-                safe_eval(self.condition_python, localdict, mode='exec')
+                safe_eval(self.condition_python, localdict, mode='exec',
+                          nocopy=True)
                 return 'result' in localdict and localdict['result'] or False
             except:
                 raise UserError(

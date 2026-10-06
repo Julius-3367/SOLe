@@ -2,8 +2,8 @@
     :target: https://www.gnu.org/licenses/lgpl-3.0-standalone.html
     :alt: License: LGPL-3
 
-Odoo17 Payroll
-==============
+Odoo 19 HR Payroll
+==================
 Manage your employee payroll records.
 
 Configuration
@@ -21,8 +21,10 @@ General Public License, v3.0 (LGPL v3).
 
 Credits
 -------
-* Developers: (V16) Sumith Sivan,
-              (V17) Farhana Jahan PT,
+* Developers:   (V19) Anjana PV,
+                (V18) Raneesha MK,
+                (V17) Farhana Jahan PT,
+                (V16) Sumith Sivan,
 
 Contacts
 --------

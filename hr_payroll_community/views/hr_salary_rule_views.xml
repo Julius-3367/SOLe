@@ -34,9 +34,9 @@
             </kanban>
         </field>
     </record>
-<!--    Tree View of Salary Rule-->
+<!--    List View of Salary Rule-->
     <record id="hr_salary_rule_view_tree" model="ir.ui.view">
-        <field name="name">hr.salary.rule.view.tree</field>
+        <field name="name">hr.salary.rule.view.list</field>
         <field name="model">hr.salary.rule</field>
         <field eval="20" name="priority"/>
         <field name="arch" type="xml">
@@ -46,6 +46,8 @@
                 <field name="category_id" invisible="1"/>
                 <field name="sequence" invisible="1"/>
                 <field name="register_id"/>
+                                <field name="company_id"
+                       options="{'no_create': True}"/>
                 <field name="company_id" groups="base.group_multi_company"
                        options="{'no_create': True}"/>
             </list>
@@ -57,15 +59,14 @@
         <field name="model">hr.salary.rule</field>
         <field name="arch" type="xml">
             <form string="Salary Rules">
-                <label for="name"/>
+                <label for="name" class="oe_edit_only"/>
                 <h1>
                     <field name="name"/>
                 </h1>
-                <label for="category_id"/>
+                <label for="category_id" class="oe_edit_only"/>
                 <h2>
                     <field name="category_id"/>
                 </h2>
-
                 <group col="4">
                     <field name="code"/>
                     <field name="sequence"/>
@@ -145,17 +146,16 @@
     </record>
 <!--    Search option for Salary Rule-->
     <record id="hr_salary_rule_search" model="ir.ui.view">
-        <field name="name">hr.salary.rule.select</field>
+        <field name="name">hr.salary.rule.search</field>
         <field name="model">hr.salary.rule</field>
         <field name="arch" type="xml">
             <search string="Search Salary Rule">
-                <field name="name" string="Salary Rules"
-                       filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
+                <field name="name" string="Salary Rules" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
                 <field name="category_id"/>
                 <field name="condition_range_min"/>
-                <separator/>
-                <filter string="Category" name="head"
-                        context="{'group_by':'category_id'}"/>
+                <group>
+                    <filter string="Category" name="head" context="{'group_by':'category_id'}"/>
+                </group>
             </search>
         </field>
     </record>

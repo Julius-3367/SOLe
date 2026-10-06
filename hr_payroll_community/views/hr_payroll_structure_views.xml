@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<!--  Salary Structure tree view -->
+<!--  Salary Structure list view -->
         <record id="hr_payroll_structure_view_tree" model="ir.ui.view">
-            <field name="name">hr.payroll.structure.view.tree</field>
+            <field name="name">hr.payroll.structure.view.list</field>
             <field name="model">hr.payroll.structure</field>
             <field name="arch" type="xml">
                 <list string="Employee Function">
@@ -11,6 +11,7 @@
                     <field name="rule_ids"/>
                     <field name="company_id" groups="base.group_multi_company"
                            options="{'no_create': True}"/>
+
                 </list>
             </field>
         </record>
@@ -21,7 +22,7 @@
             <field name="arch" type="xml">
                 <kanban class="o_kanban_mobile">
                     <templates>
-                        <t t-name="card">
+                        <t t-name="kanban-box">
                             <div t-attf-class="oe_kanban_content oe_kanban_global_click">
                                 <div class="row">
                                     <div class="col-12">
@@ -45,7 +46,7 @@
         </record>
     <!--  Salary Structure search option -->
         <record id="hr_payroll_structure_view_tree" model="ir.ui.view">
-            <field name="name">hr.payroll.structure.view.tree</field>
+            <field name="name">hr.payroll.structure.view.list</field>
             <field name="model">hr.payroll.structure</field>
             <field name="arch" type="xml">
                 <list string="Salary Structure">
@@ -53,6 +54,7 @@
                     <field name="code"/>
                     <field name="company_id" groups="base.group_multi_company"
                            options="{'no_create': True}"/>
+
                 </list>
             </field>
         </record>

@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -50,7 +50,7 @@ class ResourceMixin(models.AbstractModel):
         """
         resource = self.resource_id
         calendar = calendar or self.resource_calendar_id
-        # naive datetimes are made explicit in UTC
+        # naive datetime are made explicit in UTC
         if not from_datetime.tzinfo:
             from_datetime = from_datetime.replace(tzinfo=utc)
         if not to_datetime.tzinfo:

@@ -18,9 +18,9 @@
             </search>
         </field>
     </record>
-<!--    Tree view of hr_payslip_run-->
+<!--    List view of hr_payslip_run-->
     <record id="hr_payslip_run_view_tree" model="ir.ui.view">
-        <field name="name">hr.payslip.run.view.tree</field>
+        <field name="name">hr.payslip.run.view.list</field>
         <field name="model">hr.payslip.run</field>
         <field name="arch" type="xml">
             <list string="Payslips Batches">
@@ -89,7 +89,7 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <label for="name"/>
+                    <label for="name" class="oe_edit_only"/>
                     <h1>
                         <field name="name" readonly="state != 'draft'"/>
                     </h1>

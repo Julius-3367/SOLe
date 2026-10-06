@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -27,8 +27,8 @@ from odoo.exceptions import UserError
 class HrPayslipLine(models.Model):
     """Create new model for adding Payslip Line"""
     _name = 'hr.payslip.line'
-    _inherit = 'hr.salary.rule'
     _description = 'Payslip Line'
+    _inherit = 'hr.salary.rule'
     _order = 'contract_id, sequence'
 
     slip_id = fields.Many2one('hr.payslip', string='Pay Slip',
@@ -41,7 +41,7 @@ class HrPayslipLine(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee',
                                   required=True,
                                   help="Choose Employee for line")
-    contract_id = fields.Many2one('hr.contract', string='Contract',
+    contract_id = fields.Many2one('hr.version', string='Contract',
                                   required=True, index=True,
                                   help="Choose Contract for line")
     rate = fields.Float(string='Rate (%)', help="Set Rate for payslip",

@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -20,5 +20,5 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from . import report_hr_payroll_community_report_payslip_details
 from . import report_hr_payroll_community_report_contribution_register
+from . import report_hr_payroll_community_report_payslip_details

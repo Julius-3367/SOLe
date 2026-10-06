@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -27,7 +27,7 @@ from odoo.exceptions import UserError
 class HrPayslipEmployees(models.TransientModel):
     """Create new model for Generate payslips for all selected employees"""
     _name = 'hr.payslip.employees'
-    _description = 'Generate payslips for all selected employees'
+    _description = 'Generate Payslips for All Selected Employees'
 
     employee_ids = fields.Many2many('hr.employee',
                                     'hr_employee_group_rel',

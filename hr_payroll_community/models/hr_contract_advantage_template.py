@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -28,14 +28,14 @@ class HrContractAdvantageTemplate(models.Model):
     _name = 'hr.contract.advantage.template'
     _description = "Employee's Advantage on Contract"
 
-    name = fields.Char('Name', required=True,
+    name = fields.Char(string='Name', required=True,
                        help="Name for Employee's Advantage on Contract")
-    code = fields.Char('Code', required=True,
+    code = fields.Char(string='Code', required=True,
                        help="Code for Employee's Advantage on Contract")
-    lower_bound = fields.Float('Lower Bound',
+    lower_bound = fields.Float(string='Lower Bound',
                                help="Lower bound authorized by the employer"
                                     "for this advantage")
-    upper_bound = fields.Float('Upper Bound',
+    upper_bound = fields.Float(string='Upper Bound',
                                help="Upper bound authorized by the employer"
                                     "for this advantage")
     default_value = fields.Float(string="Default Value",

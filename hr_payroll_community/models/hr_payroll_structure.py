@@ -4,7 +4,7 @@
 #
 #    Cybrosys Technologies Pvt. Ltd.
 #
-#    Copyright (C) 2023-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
+#    Copyright (C) 2025-TODAY Cybrosys Technologies(<https://www.cybrosys.com>)
 #    Author: Cybrosys Techno Solutions(<https://www.cybrosys.com>)
 #
 #    You can modify it under the terms of the GNU LESSER
@@ -44,9 +44,11 @@ class HrPayrollStructure(models.Model):
     code = fields.Char(string='Reference', required=True,
                        help="Code for Payroll Structure")
     company_id = fields.Many2one(
-        comodel_name='res.company', string='Company', required=True,
-        help="Choose Company for Payroll Structure", copy=False,
-        default=lambda self: self.env.company)
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company.id
+    )
     note = fields.Text(string='Description',
                        help="Description for Payroll Structure")
     parent_id = fields.Many2one('hr.payroll.structure',
@@ -65,8 +67,8 @@ class HrPayrollStructure(models.Model):
 
     @api.constrains('parent_id')
     def _check_parent_id(self):
-        """Function for check parent in Payroll Structure"""
-        if not self._check_recursion():
+        """Function _has_cycle for check parent in Payroll Structure"""
+        if self._has_cycle():
             raise ValidationError(
                 _('You cannot create a recursive salary structure.'))
 
