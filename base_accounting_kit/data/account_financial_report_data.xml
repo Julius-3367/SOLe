@@ -73,6 +73,19 @@
             <field name="type">account_type</field>
             <field name="account_type_ids">expense</field>
         </record>
+        <!-- A line of its own rather than a change to Expense above: this
+             block is noupdate, so existing databases only pick up new records. -->
+        <record id="account_financial_report_depreciation0"
+                model="account.financial.report">
+            <field name="name">Depreciation</field>
+            <field name="sign" eval="'-1'"/>
+            <field name="sequence">3</field>
+            <field name="parent_id"
+                   ref="account_financial_report_profitandloss0"/>
+            <field name="display_detail">detail_with_hierarchy</field>
+            <field name="type">account_type</field>
+            <field name="account_type_ids">expense_depreciation</field>
+        </record>
 
         <!-- ═══ BALANCE SHEET ══════════════════════════════════════════════ -->
         <record id="account_financial_report_balancesheet0"
