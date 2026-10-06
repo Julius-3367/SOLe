@@ -9,9 +9,12 @@ class AccountingKitCommon(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.company = cls.env.company
-        cls.currency_kes = cls.env['res.currency'].search(
-            [('name', '=', 'KES')], limit=1)
-        if not cls.currency_kes:
+        # Odoo ships KES inactive, so look past the active filter
+        cls.currency_kes = cls.env['res.currency'].with_context(
+            active_test=False).search([('name', '=', 'KES')], limit=1)
+        if cls.currency_kes:
+            cls.currency_kes.active = True
+        else:
             cls.currency_kes = cls.env['res.currency'].create({
                 'name': 'KES', 'symbol': 'KSh', 'rounding': 0.01,
             })
