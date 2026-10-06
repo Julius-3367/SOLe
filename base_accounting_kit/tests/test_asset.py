@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from odoo.tests import tagged
+from datetime import date
+
+from odoo.tests import Form, tagged
 from odoo.exceptions import UserError
 from .common import AccountingKitCommon
 
@@ -100,6 +102,32 @@ class TestAsset(AccountingKitCommon):
         asset.validate()
         with self.assertRaises(UserError):
             asset.unlink()
+
+    def test_date_editable_in_draft_and_rebuilds_board(self):
+        """A draft asset's date can be changed, and saving rebuilds the board from it."""
+        asset = self.env['account.asset.asset'].create({
+            'name': 'Itel Phone',
+            'category_id': self.asset_category.id,
+            'value': 11500.0,
+            'date': '2025-01-01',
+        })
+        with Form(asset) as form:
+            form.date = date(2024, 9, 18)
+        self.assertEqual(asset.date, date(2024, 9, 18))
+        first_line = asset.depreciation_line_ids.sorted('depreciation_date')[0]
+        self.assertEqual(first_line.depreciation_date.year, 2024)
+
+    def test_date_locked_once_running(self):
+        """A running asset's date stays read-only; its posted board depends on it."""
+        asset = self.env['account.asset.asset'].create({
+            'name': 'Running Asset',
+            'category_id': self.asset_category.id,
+            'value': 11500.0,
+            'date': '2025-01-01',
+        })
+        asset.validate()
+        with Form(asset) as form, self.assertRaises(AssertionError):
+            form.date = date(2024, 9, 18)
 
     def test_set_to_draft_reverts_state(self):
         """set_to_draft must revert a validated asset back to draft."""

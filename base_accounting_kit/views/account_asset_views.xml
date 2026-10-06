@@ -163,7 +163,7 @@
                                    context="{'default_type': 'purchase'}"
                                    help="Category of asset" readonly="state != 'draft'"/>
                             <field name="code" readonly="state != 'draft'"/>
-                            <field name="date" help="Date of asset"/>
+                            <field name="date" help="Date of asset" readonly="state != 'draft'"/>
                             <field name="type" invisible="1"/>
                         </group>
                         <group>
