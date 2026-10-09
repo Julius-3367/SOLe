@@ -27,6 +27,13 @@ class ResCompany(models.Model):
         string='Device Serial Number',
         help='Serial number assigned by KRA to this VSCU device.',
     )
+    sole_fiscal_device_manual = fields.Boolean(
+        string='Invoices Fiscalised on a Separate Device',
+        help='Tick when invoices are fiscalised by hand on a stand-alone fiscal device, '
+             'outside Odoo. Odoo then sends the real invoice instead of a proforma and '
+             'stops warning that fiscal device details are missing. Untick once eTIMS '
+             'signs invoices from Odoo.',
+    )
 
     def _compute_l10n_ke_oscu_is_active(self):
         """Mark OSCU active when eTIMS VSCU is configured — hides the Tremol button."""
@@ -61,4 +68,8 @@ class ResConfigSettings(models.TransientModel):
         related='company_id.sole_etims_device_serial',
         readonly=False,
         string='Device Serial No.',
+    )
+    sole_fiscal_device_manual = fields.Boolean(
+        related='company_id.sole_fiscal_device_manual',
+        readonly=False,
     )

@@ -34,6 +34,14 @@ class AccountMove(models.Model):
                 and move.company_id.sole_etims_enabled
             )
 
+    def _l10n_ke_fiscal_device_details_filled(self):
+        """Invoices fiscalised by hand on a stand-alone device carry no device
+        details in Odoo. Without this, l10n_ke_edi_tremol warns on every send
+        and emails a proforma in place of the invoice."""
+        if self.company_id.sole_fiscal_device_manual:
+            return True
+        return super()._l10n_ke_fiscal_device_details_filled()
+
     # -------------------------------------------------------------------------
     # Helpers
     # -------------------------------------------------------------------------

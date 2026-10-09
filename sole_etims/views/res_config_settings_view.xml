@@ -9,6 +9,12 @@
                 <div invisible="country_code != 'KE'">
                     <block title="KRA eTIMS VSCU (Software e-Invoice)" id="sole_etims_block">
                         <setting
+                            string="Invoices fiscalised on a separate device"
+                            help="Tick while invoices are fiscalised by hand on a stand-alone fiscal device. Odoo then emails the real invoice instead of a proforma, without the fiscal device warning. Untick once eTIMS signs invoices from Odoo."
+                            company_dependent="1">
+                            <field name="sole_fiscal_device_manual"/>
+                        </setting>
+                        <setting
                             string="eTIMS API Integration"
                             help="Connect directly to the KRA eTIMS API (VSCU). Enable this if you do not have a Tremol hardware device. The Tremol button will be hidden when eTIMS is enabled."
                             company_dependent="1">
