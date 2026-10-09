@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_asset_asset_form" model="ir.ui.view">
+        <field name="name">account.asset.asset.form.employee</field>
+        <field name="model">account.asset.asset</field>
+        <field name="inherit_id" ref="base_accounting_kit.view_account_asset_asset_form"/>
+        <field name="arch" type="xml">
+            <field name="code" position="after">
+                <field name="employee_id" invisible="type == 'sale'"/>
+                <field name="department_id" invisible="type == 'sale' or not employee_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_asset_asset_purchase_tree" model="ir.ui.view">
+        <field name="name">account.asset.asset.purchase.tree.employee</field>
+        <field name="model">account.asset.asset</field>
+        <field name="inherit_id" ref="base_accounting_kit.view_account_asset_asset_purchase_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="employee_id" optional="show"/>
+                <field name="department_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_asset_search" model="ir.ui.view">
+        <field name="name">account.asset.asset.search.employee</field>
+        <field name="model">account.asset.asset</field>
+        <field name="inherit_id" ref="base_accounting_kit.view_account_asset_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+            </field>
+            <filter name="state" position="before">
+                <filter name="unassigned" string="Not Assigned" domain="[('employee_id', '=', False)]"/>
+            </filter>
+            <filter name="category_id" position="after">
+                <filter name="group_employee" string="Assigned Employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                <filter name="group_department" string="Department" domain="[]" context="{'group_by': 'department_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>
