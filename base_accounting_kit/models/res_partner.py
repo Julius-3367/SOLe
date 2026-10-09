@@ -11,7 +11,9 @@ class ResPartner(models.Model):
     invoice_list = fields.One2many('account.move', 'partner_id',
                                    string="Invoice Details",
                                    readonly=True,
-                                   domain=[('payment_state', '=', 'not_paid'),
+                                   # drafts and cancelled invoices are also 'not_paid'
+                                   domain=[('state', '=', 'posted'),
+                                           ('payment_state', 'in', ('not_paid', 'partial')),
                                            ('move_type', '=', 'out_invoice')])
     total_due = fields.Monetary(compute='_compute_for_followup', store=False, readonly=True)
     next_reminder_date = fields.Date(compute='_compute_for_followup', store=False, readonly=True)

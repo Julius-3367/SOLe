@@ -7,9 +7,10 @@
             <field name="subject">Payment Reminder - Outstanding Balance</field>
             <field name="email_from">{{ (object.company_id.email or user.email) }}</field>
             <field name="email_to">{{ object.email }}</field>
-            <field name="body_html"><![CDATA[
+            <!-- body_html is rendered with QWeb, not inline_template: {{ }} only works in the fields above -->
+            <field name="body_html" type="html">
 <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-    <p>Dear {{ object.name }},</p>
+    <p>Dear <t t-out="object.name or ''"/>,</p>
 
     <p>This is a friendly reminder that you have outstanding invoices with us.
     We kindly request you to settle the following balance at your earliest convenience.</p>
@@ -21,20 +22,20 @@
             <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Due Date</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Amount Due</th>
         </tr>
-        {% for inv in object.invoice_list %}
-        <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">{{ inv.name or '' }}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">{{ inv.invoice_date or '' }}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">{{ inv.invoice_date_due or '' }}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; color: #c0392b; font-weight: bold;">
-                {{ '%.2f' % inv.amount_residual }} {{ inv.currency_id.symbol or '' }}
-            </td>
-        </tr>
-        {% endfor %}
+        <t t-foreach="object.invoice_list" t-as="inv">
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;"><t t-out="inv.name or ''"/></td>
+                <td style="border: 1px solid #ddd; padding: 8px;"><t t-out="inv.invoice_date or ''"/></td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><t t-out="inv.invoice_date_due or ''"/></td>
+                <td style="border: 1px solid #ddd; padding: 8px; text-align: right; color: #c0392b; font-weight: bold;">
+                    <t t-out="inv.amount_residual" t-options="{'widget': 'monetary', 'display_currency': inv.currency_id}"/>
+                </td>
+            </tr>
+        </t>
     </table>
 
     <p style="font-size: 16px; font-weight: bold; color: #c0392b;">
-        Total Outstanding: {{ '%.2f' % object.total_overdue }} {{ object.company_id.currency_id.symbol or 'KES' }}
+        Total Outstanding: <t t-out="object.total_overdue" t-options="{'widget': 'monetary', 'display_currency': object.company_id.currency_id}"/>
     </p>
 
     <p>Please contact us if you have any questions regarding your account or if payment has already been arranged.</p>
@@ -42,12 +43,12 @@
     <p>Thank you for your prompt attention to this matter.</p>
 
     <p>Kind regards,<br/>
-    {{ object.company_id.name }}<br/>
-    {{ object.company_id.phone or '' }}<br/>
-    {{ object.company_id.email or '' }}
+    <t t-out="object.company_id.name or ''"/><br/>
+    <t t-out="object.company_id.phone or ''"/><br/>
+    <t t-out="object.company_id.email or ''"/>
     </p>
 </div>
-            ]]></field>
+            </field>
         </record>
 
         <record id="ir_cron_send_followup_reminders" model="ir.cron">
