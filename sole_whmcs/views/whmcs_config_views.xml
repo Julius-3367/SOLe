@@ -10,7 +10,7 @@
                             string="Test Connection" class="btn-secondary"/>
                     <button name="action_sync_full" type="object"
                             string="Sync Now" class="btn-primary"
-                            confirm="This will sync all clients and invoices from WHMCS. Continue?"/>
+                            confirm="This syncs all WHMCS clients, then imports paid WHMCS invoices from the 'Import Paid Invoices From' date as posted and paid. Continue?"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -34,7 +34,9 @@
                             <field name="default_journal_id"/>
                             <field name="default_account_id"
                                    domain="[('account_type', 'in', ['income', 'income_other'])]"/>
-                            <field name="auto_post_paid"/>
+                            <field name="payment_journal_id"/>
+                            <field name="sale_tax_id"/>
+                            <field name="import_from_date"/>
                         </group>
                     </group>
                     <group string="Last Sync">

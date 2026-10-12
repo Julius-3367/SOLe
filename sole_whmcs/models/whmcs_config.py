@@ -18,8 +18,6 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-_PAID_STATUSES = {"Paid"}
-_CANCELLED_STATUSES = {"Cancelled", "Refunded"}
 
 
 class SoleWhmcsConfig(models.Model):
@@ -56,12 +54,21 @@ class SoleWhmcsConfig(models.Model):
         string="Invoice Journal",
         domain=[("type", "=", "sale")],
     )
-    auto_post_paid = fields.Boolean(
-        string="Auto-post Paid Invoices",
-        default=False,
-        help="If enabled, invoices with WHMCS status 'Paid' are automatically "
-             "confirmed (posted) in Odoo during sync. Leave off to import all "
-             "invoices as drafts for review.",
+    payment_journal_id = fields.Many2one(
+        "account.journal",
+        string="Payment Journal",
+        domain=[("type", "in", ("bank", "cash"))],
+        help="Journal the WHMCS payment is recorded against when a paid invoice is imported.",
+    )
+    sale_tax_id = fields.Many2one(
+        "account.tax",
+        string="VAT",
+        domain=[("type_tax_use", "=", "sale")],
+        help="Applied to the WHMCS subtotal when the WHMCS invoice carries tax.",
+    )
+    import_from_date = fields.Date(
+        string="Import Paid Invoices From",
+        help="Paid WHMCS invoices dated before this are not imported. Required before syncing invoices.",
     )
     last_client_sync = fields.Datetime(string="Last Client Sync", readonly=True)
     last_invoice_sync = fields.Datetime(string="Last Invoice Sync", readonly=True)
@@ -234,26 +241,36 @@ class SoleWhmcsConfig(models.Model):
 
     # ── Invoice Sync ─────────────────────────────────────────────────────────
     def sync_invoices(self, limit_per_page=100):
-        """Import WHMCS invoices as Odoo customer invoices.
+        """Import paid WHMCS invoices as posted, paid Odoo customer invoices.
 
-        - Already-imported invoices (matched by ref WHMCS-INV-{id}) are skipped.
-        - When auto_post_paid is True, Paid invoices are confirmed automatically.
-        - Cancelled/Refunded invoices are imported and immediately cancelled.
+        Unpaid, cancelled and refunded invoices stay in WHMCS. Invoices already
+        imported (ref WHMCS-INV-{id}) or dated before import_from_date are skipped.
+        Invoices settled partly or fully from WHMCS credit are skipped and listed
+        in the sync log for manual entry.
         """
         self.ensure_one()
-        if not self.default_journal_id:
-            raise UserError(_("Please set an Invoice Journal before syncing invoices."))
+        missing = [
+            label for label, value in (
+                (_("Invoice Journal"), self.default_journal_id),
+                (_("Payment Journal"), self.payment_journal_id),
+                (_("Import Paid Invoices From"), self.import_from_date),
+            ) if not value
+        ]
+        if missing:
+            raise UserError(_("Set these on the WHMCS configuration before syncing invoices: %s") % ", ".join(missing))
         offset = 0
         total_created = 0
         errors = []
         Move = self.env["account.move"].sudo()
         Partner = self.env["res.partner"].sudo()
+        Currency = self.env["res.currency"].sudo()
 
         while True:
             try:
                 data = self._api_call("GetInvoices", {
                     "limitstart": offset,
                     "limitnum": limit_per_page,
+                    "status": "Paid",
                 })
             except UserError as exc:
                 errors.append(str(exc))
@@ -270,9 +287,24 @@ class SoleWhmcsConfig(models.Model):
                 if not whmcs_inv_id:
                     continue
                 ref = f"WHMCS-INV-{whmcs_inv_id}"
-
+                invoice_date = self._parse_date(inv.get("date"))
+                if not invoice_date or invoice_date < self.import_from_date:
+                    continue
                 if Move.search([("ref", "=", ref)], limit=1):
                     continue  # already imported
+
+                subtotal = float(inv.get("subtotal") or 0)
+                tax = float(inv.get("tax") or 0) + float(inv.get("tax2") or 0)
+                total = float(inv.get("total") or 0)
+                if not subtotal:
+                    continue  # zero-value invoice, nothing to book
+                if abs(subtotal + tax - total) > 0.01:
+                    errors.append(f"Invoice {whmcs_inv_id}: paid from WHMCS credit "
+                                  f"(subtotal {subtotal:.2f} + tax {tax:.2f}, paid {total:.2f}), enter manually")
+                    continue
+                if tax and not self.sale_tax_id:
+                    errors.append(f"Invoice {whmcs_inv_id}: carries tax but no VAT is set on the WHMCS configuration")
+                    continue
 
                 client_id = str(inv.get("userid", "")).strip()
                 partner = (
@@ -283,31 +315,38 @@ class SoleWhmcsConfig(models.Model):
                     errors.append(f"Invoice {whmcs_inv_id}: WHMCS client {client_id or '?'} not in Odoo, run client sync first")
                     continue
 
-                whmcs_status = inv.get("status", "Unpaid")
-
                 try:
-                    invoice_lines = self._build_invoice_lines(inv)
-                    invoice_date = self._parse_date(inv.get("date")) or fields.Date.today()
-                    due_date = self._parse_date(inv.get("duedate")) or invoice_date
-
-                    move_vals = {
-                        "move_type": "out_invoice",
-                        "partner_id": partner.id if partner else False,
-                        "journal_id": self.default_journal_id.id,
-                        "ref": ref,
-                        "invoice_date": invoice_date,
-                        "invoice_date_due": due_date,
-                        "invoice_line_ids": invoice_lines,
-                        "narration": f"WHMCS Status: {whmcs_status}",
-                    }
-                    move = Move.create(move_vals)
-                    total_created += 1
-
-                    if whmcs_status in _CANCELLED_STATUSES:
-                        move.button_cancel()
-                    elif whmcs_status in _PAID_STATUSES and self.auto_post_paid:
+                    with self.env.cr.savepoint():
+                        move_vals = {
+                            "move_type": "out_invoice",
+                            "partner_id": partner.id,
+                            "journal_id": self.default_journal_id.id,
+                            "ref": ref,
+                            "invoice_date": invoice_date,
+                            "invoice_date_due": self._parse_date(inv.get("duedate")) or invoice_date,
+                            "invoice_line_ids": [(0, 0, {
+                                "name": f"WHMCS Invoice #{whmcs_inv_id}",
+                                "quantity": 1,
+                                "price_unit": subtotal,
+                                "account_id": self.default_account_id.id if self.default_account_id else False,
+                                "tax_ids": [(6, 0, self.sale_tax_id.ids if tax else [])],
+                            })],
+                            "narration": "WHMCS Status: Paid",
+                        }
+                        currency = Currency.search([("name", "=", inv.get("currencycode"))], limit=1)
+                        if currency:
+                            move_vals["currency_id"] = currency.id
+                        move = Move.create(move_vals)
+                        if abs(move.amount_total - total) > 0.01:
+                            raise UserError(f"Odoo total {move.amount_total:.2f} does not match WHMCS total {total:.2f}")
                         move.action_post()
-
+                        self.env["account.payment.register"].sudo().with_context(
+                            active_model="account.move", active_ids=move.ids,
+                        ).create({
+                            "journal_id": self.payment_journal_id.id,
+                            "payment_date": self._parse_date(inv.get("datepaid")) or invoice_date,
+                        })._create_payments()
+                    total_created += 1
                 except Exception as exc:
                     _logger.exception("WHMCS: failed to import invoice %s", whmcs_inv_id)
                     errors.append(f"Invoice {whmcs_inv_id}: {exc}")
@@ -319,34 +358,6 @@ class SoleWhmcsConfig(models.Model):
         self.last_invoice_sync = fields.Datetime.now()
         self._log_sync("invoices", total_created, 0, errors)
         return total_created, errors
-
-    def _build_invoice_lines(self, inv):
-        """Return invoice_line_ids commands for a WHMCS invoice dict."""
-        lines = []
-        items = (inv.get("items") or {}).get("item") or []
-        if isinstance(items, dict):
-            items = [items]
-
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            lines.append((0, 0, {
-                "name": item.get("description") or "WHMCS Service",
-                "quantity": float(item.get("quantity") or 1),
-                "price_unit": float(item.get("amount") or 0),
-                "account_id": self.default_account_id.id if self.default_account_id else False,
-                "tax_ids": [(5, 0, 0)],  # clear default taxes; WHMCS manages tax separately
-            }))
-
-        if not lines:
-            lines = [(0, 0, {
-                "name": f"WHMCS Invoice #{inv.get('id', '')}",
-                "quantity": 1,
-                "price_unit": float(inv.get("total") or 0),
-                "account_id": self.default_account_id.id if self.default_account_id else False,
-                "tax_ids": [(5, 0, 0)],
-            })]
-        return lines
 
     @staticmethod
     def _total_results(data, key):

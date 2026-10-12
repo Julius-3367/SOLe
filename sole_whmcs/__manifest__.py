@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SOLe WHMCS Connector',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'category': 'Sales/CRM',
     'summary': 'Sync clients and invoices between WHMCS billing platform and Odoo',
     'description': """
