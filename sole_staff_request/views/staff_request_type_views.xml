@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_staff_request_type_list" model="ir.ui.view">
+        <field name="name">sole.staff.request.type.list</field>
+        <field name="model">sole.staff.request.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="expense_account_id"/>
+                <field name="recover_via_payroll"/>
+                <field name="max_amount"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_staff_request_type_form" model="ir.ui.view">
+        <field name="name">sole.staff.request.type.form</field>
+        <field name="model">sole.staff.request.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="expense_account_id"/>
+                            <field name="recover_via_payroll"/>
+                        </group>
+                        <group>
+                            <field name="max_amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Guidance shown to staff when they pick this type"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_staff_request_type" model="ir.actions.act_window">
+        <field name="name">Request Types</field>
+        <field name="res_model">sole.staff.request.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_staff_request_voucher" model="ir.actions.report">
+        <field name="name">Payment Voucher</field>
+        <field name="model">sole.staff.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sole_staff_request.report_staff_request_voucher</field>
+        <field name="report_file">sole_staff_request.report_staff_request_voucher</field>
+        <field name="print_report_name">'Voucher - %s' % object.name.replace('/', '-')</field>
+        <field name="binding_model_id" ref="model_sole_staff_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_staff_request_voucher">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Payment Voucher <span t-field="o.name"/></h2>
+                        <table class="table table-sm table-bordered mt-4">
+                            <tr>
+                                <th style="width: 30%;">Paid to</th>
+                                <td><span t-field="o.employee_id"/><t t-if="o.department_id"> (<span t-field="o.department_id"/>)</t></td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td><span t-field="o.type_id"/></td>
+                            </tr>
+                            <tr>
+                                <th>Reason</th>
+                                <td><span t-field="o.purpose"/></td>
+                            </tr>
+                            <tr>
+                                <th>Amount</th>
+                                <td>
+                                    <strong t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    <div class="text-muted small" t-out="o.currency_id.amount_to_text(o.amount)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Requested on</th>
+                                <td><span t-field="o.create_date" t-options="{'widget': 'date'}"/></td>
+                            </tr>
+                            <tr>
+                                <th>Approved by</th>
+                                <td><span t-field="o.approver_id"/> <t t-if="o.approved_date">on <span t-field="o.approved_date" t-options="{'widget': 'date'}"/></t></td>
+                            </tr>
+                            <tr>
+                                <th>Paid from</th>
+                                <td><span t-field="o.journal_id"/> on <span t-field="o.payment_date"/><t t-if="o.payment_reference">, ref. <span t-field="o.payment_reference"/></t></td>
+                            </tr>
+                            <tr t-if="o.recover_via_payroll">
+                                <th>Recovery</th>
+                                <td>Deducted from payroll from <span t-field="o.recovery_date"/></td>
+                            </tr>
+                        </table>
+
+                        <div class="row mt-5" style="page-break-inside: avoid;">
+                            <div class="col-3 text-center">
+                                <div style="border-top: 1px solid #333; margin-top: 50px;">Requested by</div>
+                                <div class="small" t-field="o.employee_id"/>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div style="border-top: 1px solid #333; margin-top: 50px;">Approved by</div>
+                                <div class="small" t-field="o.approver_id"/>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div style="border-top: 1px solid #333; margin-top: 50px;">Paid by</div>
+                                <div class="small" t-field="o.paid_by_id"/>
+                            </div>
+                            <div class="col-3 text-center">
+                                <div style="border-top: 1px solid #333; margin-top: 50px;">Received by</div>
+                                <div class="small">Signature and date</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

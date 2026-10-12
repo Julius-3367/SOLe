@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sole.staff.request</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="86"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Staff Requests" string="Staff Requests" name="sole_staff_request"
+                     groups="sole_staff_request.group_staff_request_manager">
+                    <block title="Approval" name="sole_request_approval">
+                        <setting string="Default Approver"
+                                 help="Approves requests from staff with no manager on their employee record, and requests from managers themselves.">
+                            <field name="sole_request_default_approver_id" options="{'no_create': True}"/>
+                        </setting>
+                        <setting string="Finance Officer"
+                                 help="Gets an activity to pay each approved request.">
+                            <field name="sole_request_finance_user_id" options="{'no_create': True}"/>
+                        </setting>
+                    </block>
+                    <block title="Accounting" name="sole_request_accounting">
+                        <setting string="Default Payment Journal"
+                                 help="Suggested when finance pays a request: petty cash, M-Pesa or bank.">
+                            <field name="sole_request_journal_id" options="{'no_create': True}"/>
+                        </setting>
+                        <setting string="Staff Advances Account"
+                                 help="Debited when a request will be recovered through payroll. The payroll deduction credits it back.">
+                            <field name="sole_staff_advance_account_id" options="{'no_create': True}"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_staff_request_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'module': 'sole_staff_request', 'bin_size': False}</field>
+    </record>
+</odoo>

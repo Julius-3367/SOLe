@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_staff_request_user,sole.staff.request.user,model_sole_staff_request,base.group_user,1,1,1,1
+access_staff_request_type_user,sole.staff.request.type.user,model_sole_staff_request_type,base.group_user,1,0,0,0
+access_staff_request_type_manager,sole.staff.request.type.manager,model_sole_staff_request_type,group_staff_request_manager,1,1,1,1
+access_staff_request_reject_user,sole.staff.request.reject.user,model_sole_staff_request_reject,base.group_user,1,1,1,0
+access_staff_request_pay_finance,sole.staff.request.pay.finance,model_sole_staff_request_pay,group_staff_request_finance,1,1,1,0

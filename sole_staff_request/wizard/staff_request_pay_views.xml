@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_staff_request_pay_form" model="ir.ui.view">
+        <field name="name">sole.staff.request.pay.form</field>
+        <field name="model">sole.staff.request.pay</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="request_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="amount"/>
+                    </group>
+                    <group>
+                        <field name="journal_id" options="{'no_create': True}"/>
+                        <field name="payment_date"/>
+                        <field name="reference" placeholder="e.g. SJK4XB2Q7M"/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="recover_via_payroll"/>
+                        <field name="recovery_date" invisible="not recover_via_payroll"
+                               required="recover_via_payroll"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_pay" type="object" string="Confirm Payment" class="btn-primary"/>
+                    <button string="Discard" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

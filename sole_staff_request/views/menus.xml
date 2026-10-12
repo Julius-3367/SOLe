@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_staff_request_root"
+              name="Staff Requests"
+              sequence="72"
+              web_icon="sole_staff_request,static/description/icon.png"
+              groups="base.group_user"/>
+
+    <menuitem id="menu_staff_request_mine"
+              name="My Requests"
+              parent="menu_staff_request_root"
+              action="action_staff_request_mine"
+              sequence="10"/>
+
+    <menuitem id="menu_staff_request_to_approve"
+              name="To Approve"
+              parent="menu_staff_request_root"
+              action="action_staff_request_to_approve"
+              sequence="20"/>
+
+    <menuitem id="menu_staff_request_finance"
+              name="Finance"
+              parent="menu_staff_request_root"
+              sequence="30"
+              groups="sole_staff_request.group_staff_request_finance"/>
+
+    <menuitem id="menu_staff_request_to_pay"
+              name="To Pay"
+              parent="menu_staff_request_finance"
+              action="action_staff_request_to_pay"
+              sequence="10"/>
+
+    <menuitem id="menu_staff_request_all"
+              name="All Requests"
+              parent="menu_staff_request_finance"
+              action="action_staff_request_all"
+              sequence="20"/>
+
+    <menuitem id="menu_staff_request_report"
+              name="Spending Analysis"
+              parent="menu_staff_request_finance"
+              action="action_staff_request_report"
+              sequence="30"/>
+
+    <menuitem id="menu_staff_request_config"
+              name="Configuration"
+              parent="menu_staff_request_root"
+              sequence="90"
+              groups="sole_staff_request.group_staff_request_manager"/>
+
+    <menuitem id="menu_staff_request_settings"
+              name="Settings"
+              parent="menu_staff_request_config"
+              action="action_staff_request_settings"
+              sequence="10"
+              groups="base.group_system"/>
+
+    <menuitem id="menu_staff_request_types"
+              name="Request Types"
+              parent="menu_staff_request_config"
+              action="action_staff_request_type"
+              sequence="20"/>
+</odoo>

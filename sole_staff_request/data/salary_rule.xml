@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_staff_advance" model="hr.salary.rule">
+        <field name="name">Staff Advance Recovery</field>
+        <field name="code">STAFF_ADVANCE</field>
+        <field name="sequence">157</field>
+        <field name="category_id" ref="sole_payroll_ke.categ_other_ded"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = contract.sole_staff_advance_due(payslip.date_to) > 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = contract.sole_staff_advance_due(payslip.date_to)</field>
+        <field name="note">Paid staff requests marked for payroll recovery whose recovery date falls on or before the end of this payslip. They are marked recovered when the payslip is confirmed.</field>
+    </record>
+
+    <function model="hr.payroll.structure" name="_sole_link_staff_advance_rule"/>
+</odoo>
