@@ -37,7 +37,7 @@
     </table>
 
     <p style="font-size: 16px; font-weight: bold; color: #c0392b;">
-        Total Outstanding: <t t-out="object.total_overdue" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+        Total Outstanding: <t t-out="object.total_due" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
     </p>
 
     <p>Please contact us if you have any questions regarding your account or if payment has already been arranged.</p>
