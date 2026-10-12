@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Kenyan payroll fields on the employment contract.
+"""Kenyan payroll fields on the employee's contract version.
 
-These mirror the fields Odoo's own Kenyan localisation puts on a contract, so
-the salary rules read the same way. The `l10n_ke_` prefix is dropped in favour
-of `ke_`, since this is our module and not Odoo's localisation — keeping their
-prefix would imply their maintenance.
+Odoo 19 keeps contract terms on hr.version, and hr_payroll_community hands
+that record to the salary rules as `contract`. These fields started life on
+the old hr.contract shim, which the rules never see; that is why every rule
+reading them failed.
+
+hr.employee inherits hr.version, so everything here is also editable from the
+employee form and writes through to the current version.
 """
 from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
-class HrContract(models.Model):
-    _inherit = "hr.contract"
+class HrVersion(models.Model):
+    _inherit = "hr.version"
 
     # ── Allowances ───────────────────────────────────────────────────────────
     # Each of these is untaxed up to a statutory ceiling and taxed above it,
@@ -66,6 +70,18 @@ class HrContract(models.Model):
         help="Tick when the employee pays the premium directly. Relief still "
              "applies, but nothing is deducted from their pay.",
     )
+    ke_helb = fields.Monetary(
+        string="HELB Repayment",
+        help="Monthly HELB loan repayment as set by HELB's deduction notice. "
+             "Deducted every month until changed. A one-off adjustment can "
+             "still be entered as a HELB input on a single payslip.",
+    )
+    ke_recurring_line_ids = fields.One2many(
+        "sole.payroll.recurring.line", "version_id",
+        string="Fixed Deductions and Allowances",
+        help="Amounts that repeat every month: SACCO, staff loan, welfare, "
+             "a fixed taxable allowance. Each applies between its own dates.",
+    )
 
     ke_is_secondary = fields.Boolean(
         string="Secondary Employment",
@@ -74,16 +90,61 @@ class HrContract(models.Model):
              "statutory deductions are handled by the primary employer.",
     )
 
-    # ── Helper exposed to salary rules ───────────────────────────────────────
+    # ── Helpers exposed to salary rules ──────────────────────────────────────
     def rule_param(self, code, date=None):
         """Look up a payroll rate parameter from inside a salary rule.
 
         `contract` is one of the few real recordsets available in a rule's
-        evaluation context, so hanging this method here is what makes rate
-        lookups possible at all — the payslip object rules receive is a thin
-        wrapper that cannot take method calls.
+        evaluation context, so this is where rate lookups have to live — the
+        payslip object rules receive is a thin wrapper that cannot take
+        method calls.
 
         Always pass the payslip date. Without it the current rate is used,
         which silently rewrites history when an old payslip is recomputed.
         """
         return self.env["sole.payroll.parameter"].get_value(code, date or None)
+
+    def ke_recurring_total(self, kind, date_from, date_to):
+        """Total of the fixed lines of `kind` in force during the period."""
+        self.ensure_one()
+        lines = self.ke_recurring_line_ids.filtered(
+            lambda l: l.kind == kind
+            and l.date_from <= date_to
+            and (not l.date_to or l.date_to >= date_from)
+        )
+        return sum(lines.mapped("amount"))
+
+
+class SolePayrollRecurringLine(models.Model):
+    _name = "sole.payroll.recurring.line"
+    _description = "Fixed Monthly Deduction or Allowance"
+    _order = "kind, date_from"
+
+    version_id = fields.Many2one(
+        "hr.version", required=True, ondelete="cascade", index=True
+    )
+    employee_id = fields.Many2one(related="version_id.employee_id", store=True)
+    name = fields.Char(
+        string="Description", required=True,
+        help="Shown to payroll staff, e.g. 'Stima SACCO' or 'Staff loan, June 2026'.",
+    )
+    kind = fields.Selection(
+        [("deduction", "Deduction"), ("allowance", "Taxable Allowance")],
+        required=True, default="deduction",
+    )
+    amount = fields.Monetary(required=True, help="Monthly amount.")
+    currency_id = fields.Many2one(related="version_id.currency_id")
+    date_from = fields.Date(
+        string="From", required=True, default=fields.Date.context_today
+    )
+    date_to = fields.Date(
+        string="Until", help="Last month it applies. Leave empty to continue until removed."
+    )
+
+    @api.constrains("amount", "date_from", "date_to")
+    def _check_line(self):
+        for line in self:
+            if line.amount <= 0:
+                raise ValidationError(_("'%s' must have a positive amount.") % line.name)
+            if line.date_to and line.date_to < line.date_from:
+                raise ValidationError(_("'%s' ends before it starts.") % line.name)

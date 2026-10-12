@@ -8,8 +8,11 @@ Kenyan Payroll
 
 Salary rules for Kenyan payroll built on ``hr_payroll_community``: NSSF
 Tier I and II, SHIF, the Affordable Housing Levy, PAYE with banded rates,
-personal and insurance reliefs, and the taxed/untaxed treatment of
-allowances.
+personal and insurance reliefs, the taxed/untaxed treatment of allowances,
+HELB, and fixed monthly deductions such as SACCO or staff loans.
+
+Payroll terms are kept on the employee's contract version (``hr.version``)
+and edited from the Kenyan Payroll tab of the employee form.
 
 Rates are not written into the rules. Each one is a dated parameter record,
 so when a Finance Act changes a band or a ceiling an accountant adds a new
@@ -30,23 +33,23 @@ Run a full month in parallel against payslips whose correct figures are
 already known, and reconcile every line. Payroll errors are not bugs to be
 fixed next sprint — they are underpaid staff and short remittances to KRA.
 """,
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "category": "Human Resources/Payroll",
     "author": "Softlink Options Limited",
     "website": "https://softlinkoptions.co.ke",
     "license": "LGPL-3",
     "depends": [
         "hr_payroll_community",
-        "hr_contract",
     ],
     "data": [
         "security/ir.model.access.csv",
         "data/salary_rule_categories.xml",
         "data/payroll_parameters.xml",
         "data/salary_rules.xml",
+        "data/salary_rule_inputs.xml",
         "data/payroll_structure.xml",
         "views/payroll_parameter_views.xml",
-        "views/hr_contract_views.xml",
+        "views/hr_version_views.xml",
         "views/hr_employee_views.xml",
     ],
     "installable": True,

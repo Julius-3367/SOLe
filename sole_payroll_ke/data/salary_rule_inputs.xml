@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Declaring an input on its rule is what makes a new payslip list it
+            for the payroll officer to fill in. Without these, inputs.CODE was
+            always empty unless someone knew to add the line by hand.
+        -->
+        <record id="input_bonus" model="hr.rule.input">
+            <field name="name">Bonus</field>
+            <field name="code">BONUS</field>
+            <field name="input_id" ref="rule_bonus"/>
+        </record>
+        <record id="input_commission" model="hr.rule.input">
+            <field name="name">Commission</field>
+            <field name="code">COMMISSION</field>
+            <field name="input_id" ref="rule_commission"/>
+        </record>
+        <record id="input_reimbursement" model="hr.rule.input">
+            <field name="name">Reimbursement</field>
+            <field name="code">REIMBURSEMENT</field>
+            <field name="input_id" ref="rule_reimbursement"/>
+        </record>
+        <record id="input_attach_salary" model="hr.rule.input">
+            <field name="name">Attachment of Salary</field>
+            <field name="code">ATTACH_SALARY</field>
+            <field name="input_id" ref="rule_attach_salary"/>
+        </record>
+        <record id="input_assig_salary" model="hr.rule.input">
+            <field name="name">Assignment of Salary</field>
+            <field name="code">ASSIG_SALARY</field>
+            <field name="input_id" ref="rule_assig_salary"/>
+        </record>
+        <record id="input_child_support" model="hr.rule.input">
+            <field name="name">Child Support</field>
+            <field name="code">CHILD_SUPPORT</field>
+            <field name="input_id" ref="rule_child_support"/>
+        </record>
+        <record id="input_deduction" model="hr.rule.input">
+            <field name="name">Other Deduction (one-off)</field>
+            <field name="code">DEDUCTION</field>
+            <field name="input_id" ref="rule_deduction"/>
+        </record>
+        <record id="input_helb" model="hr.rule.input">
+            <field name="name">HELB adjustment (one-off)</field>
+            <field name="code">HELB</field>
+            <field name="input_id" ref="rule_helb"/>
+        </record>
+        <record id="input_fringe_benefit" model="hr.rule.input">
+            <field name="name">Fringe Benefit Tax</field>
+            <field name="code">FRINGE_BENEFIT</field>
+            <field name="input_id" ref="rule_fringe_benefit"/>
+        </record>
+        <record id="input_non_cash_benefit" model="hr.rule.input">
+            <field name="name">Non-Cash Benefit</field>
+            <field name="code">NON_CASH_BENEFIT</field>
+            <field name="input_id" ref="rule_non_cash_benefit"/>
+        </record>
+    </data>
+</odoo>

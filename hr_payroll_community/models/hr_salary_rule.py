@@ -196,21 +196,21 @@ class HrSalaryRule(models.Model):
                 try:
                     return rec.amount_fix, float(
                         safe_eval(rec.quantity, localdict)), 100.0
-                except:
+                except Exception as exc:
                     raise UserError(
-                        _('Wrong quantity defined for salary rule %s (%s).') % (
-                            rec.name, rec.code))
+                        _('Wrong quantity defined for salary rule %s (%s): %s') % (
+                            rec.name, rec.code, exc)) from exc
             elif rec.amount_select == 'percentage':
                 try:
                     return (
                         float(safe_eval(rec.amount_percentage_base, localdict)),
                         float(safe_eval(rec.quantity, localdict)),
                         rec.amount_percentage)
-                except:
+                except Exception as exc:
                     raise UserError(
                         _('Wrong percentage base or quantity defined '
-                          'for salary rule %s (%s).') % (
-                            rec.name, rec.code))
+                          'for salary rule %s (%s): %s') % (
+                            rec.name, rec.code, exc)) from exc
             else:
                 try:
 
@@ -219,11 +219,12 @@ class HrSalaryRule(models.Model):
                             'result_qty' in localdict and
                             localdict['result_qty'] or 1.0, 'result_rate'
                             in localdict and localdict['result_rate'] or 100.0)
-                except:
+                except Exception as exc:
+                    # the cause is the only clue to which line of the rule failed
                     raise UserError(
                         _('Wrong python code defined for salary '
-                          'rule %s (%s).') % (
-                            rec.name, rec.code))
+                          'rule %s (%s): %s') % (
+                            rec.name, rec.code, exc)) from exc
 
     def _satisfy_condition(self, localdict):
         """
@@ -239,18 +240,19 @@ class HrSalaryRule(models.Model):
                 result = safe_eval(self.condition_range, localdict)
                 return (
                             self.condition_range_min <= result <= self.condition_range_max or False)
-            except:
+            except Exception as exc:
                 raise UserError(
                     _('Wrong range condition defined for '
-                      'salary rule %s (%s).') % (
-                        self.name, self.code))
+                      'salary rule %s (%s): %s') % (
+                        self.name, self.code, exc)) from exc
         else:  # python code
             try:
-                safe_eval(self.condition_python, localdict, mode='exec',
-                          nocopy=True)
+                # Odoo 18+ safe_eval writes results back into the context
+                # itself; it no longer takes nocopy
+                safe_eval(self.condition_python, localdict, mode='exec')
                 return 'result' in localdict and localdict['result'] or False
-            except:
+            except Exception as exc:
                 raise UserError(
                     _('Wrong python condition defined for '
-                      'salary rule %s (%s).') % (
-                        self.name, self.code))
+                      'salary rule %s (%s): %s') % (
+                        self.name, self.code, exc)) from exc

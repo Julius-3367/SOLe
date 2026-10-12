@@ -47,10 +47,10 @@ class SolePayrollParameter(models.Model):
         "res.company", default=lambda self: self.env.company
     )
 
-    _sql_constraints = [
-        ("code_uniq", "unique(code, company_id)",
-         "A payroll parameter with this code already exists."),
-    ]
+    _code_uniq = models.Constraint(
+        "unique(code, company_id)",
+        "A payroll parameter with this code already exists.",
+    )
 
     @api.model
     def get_value(self, code, date=None):

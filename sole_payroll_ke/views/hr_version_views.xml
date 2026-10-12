@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The fields live on hr.version; the employee form edits the current version through _inherits -->
+    <record id="view_hr_employee_form_ke_payroll" model="ir.ui.view">
+        <field name="name">hr.employee.form.ke.payroll.terms</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='payroll_information']" position="after">
+                <page string="Kenyan Payroll" name="ke_payroll" groups="hr.group_hr_manager">
+                    <group>
+                        <group string="Structure">
+                            <field name="struct_id" string="Salary Structure"/>
+                            <field name="ke_is_secondary"/>
+                        </group>
+                        <group string="Housing Allowance">
+                            <field name="ke_housing_allowance_unit"/>
+                            <field name="ke_housing_allowance_fixed"
+                                   invisible="ke_housing_allowance_unit != 'fixed'"/>
+                            <field name="ke_housing_allowance_percentage"
+                                   invisible="ke_housing_allowance_unit != 'percentage'"/>
+                        </group>
+                        <group string="Allowances">
+                            <field name="ke_food_allowance"/>
+                            <field name="ke_airtime_allowance"/>
+                            <field name="ke_pension_allowance"/>
+                            <field name="ke_commuter_allowance"/>
+                        </group>
+                        <group string="Insurance and Pension">
+                            <field name="ke_pension_contribution"/>
+                            <field name="ke_voluntary_medical_insurance"/>
+                            <field name="ke_life_insurance"/>
+                            <field name="ke_is_li_managed_by_employee"/>
+                            <field name="ke_education"/>
+                        </group>
+                        <group string="Loans">
+                            <field name="ke_helb"/>
+                        </group>
+                    </group>
+                    <separator string="Fixed Monthly Deductions and Allowances"/>
+                    <field name="ke_recurring_line_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="name"/>
+                            <field name="kind"/>
+                            <field name="amount" sum="Total"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <p class="text-muted">
+                        Food and airtime allowances are untaxed only up to their
+                        statutory ceiling. Above it, the whole allowance becomes
+                        taxable, not just the excess. Only the excess of a pension
+                        allowance is taxed. The ceilings are set under
+                        Payroll &gt; Configuration &gt; Payroll Rates.
+                    </p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -188,6 +188,22 @@ else:
 ]]></field>
         </record>
 
+        <record id="rule_fixed_allowance" model="hr.salary.rule">
+            <field name="name">Other Fixed Allowances</field>
+            <field name="code">FIXED_ALLOWANCE</field>
+            <field name="sequence">27</field>
+            <field name="category_id" ref="categ_ke_t_alw"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.ke_recurring_total('allowance', payslip.date_from, payslip.date_to) > 0
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_recurring_total('allowance', payslip.date_from, payslip.date_to)
+]]></field>
+            <field name="note">Taxable allowances from the employee's fixed monthly lines.</field>
+        </record>
+
         <record id="rule_taxed_allowance" model="hr.salary.rule">
             <field name="name">Taxed Allowances</field>
             <field name="code">TAXED_ALLOWANCE</field>
@@ -206,7 +222,7 @@ else:
             <field name="sequence">31</field>
             <field name="category_id" ref="categ_alw"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.BONUS)</field>
+            <field name="condition_python">result = bool(inputs.BONUS and inputs.BONUS.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.BONUS.amount</field>
         </record>
@@ -217,7 +233,7 @@ else:
             <field name="sequence">32</field>
             <field name="category_id" ref="categ_alw"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.COMMISSION)</field>
+            <field name="condition_python">result = bool(inputs.COMMISSION and inputs.COMMISSION.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.COMMISSION.amount</field>
         </record>
@@ -228,7 +244,7 @@ else:
             <field name="sequence">33</field>
             <field name="category_id" ref="categ_alw"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.REIMBURSEMENT)</field>
+            <field name="condition_python">result = bool(inputs.REIMBURSEMENT and inputs.REIMBURSEMENT.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.REIMBURSEMENT.amount</field>
         </record>
@@ -240,7 +256,7 @@ else:
             <field name="sequence">75</field>
             <field name="category_id" ref="categ_total_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.ATTACH_SALARY)</field>
+            <field name="condition_python">result = bool(inputs.ATTACH_SALARY and inputs.ATTACH_SALARY.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.ATTACH_SALARY.amount</field>
         </record>
@@ -251,7 +267,7 @@ else:
             <field name="sequence">76</field>
             <field name="category_id" ref="categ_total_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.ASSIG_SALARY)</field>
+            <field name="condition_python">result = bool(inputs.ASSIG_SALARY and inputs.ASSIG_SALARY.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.ASSIG_SALARY.amount</field>
         </record>
@@ -262,7 +278,7 @@ else:
             <field name="sequence">77</field>
             <field name="category_id" ref="categ_total_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.CHILD_SUPPORT)</field>
+            <field name="condition_python">result = bool(inputs.CHILD_SUPPORT and inputs.CHILD_SUPPORT.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.CHILD_SUPPORT.amount</field>
         </record>
@@ -273,7 +289,7 @@ else:
             <field name="sequence">78</field>
             <field name="category_id" ref="categ_total_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.DEDUCTION)</field>
+            <field name="condition_python">result = bool(inputs.DEDUCTION and inputs.DEDUCTION.amount)</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.DEDUCTION.amount</field>
         </record>
@@ -321,12 +337,12 @@ if contract.ke_is_secondary:
     result_rate = 0
 else:
     lower_limit = contract.rule_param('ke_nssf_lower_limit', payslip.date_to)
-    pensionable = categories.BASIC
+    pensionable = GROSS
     result = min(lower_limit, pensionable)
     result_rate = contract.rule_param('ke_nssf_rate', payslip.date_to)
 ]]></field>
             <field name="appears_on_payslip" eval="False"/>
-            <field name="note">Pensionable pay is taken as basic salary. Confirm with the accountant whether commission and allowances should be pensionable here — if so, this is the line to change.</field>
+            <field name="note">Pensionable earnings are gross pay, as the NSSF Act 2013 defines them, capped by the tier limits.</field>
         </record>
 
         <record id="rule_nssf_tier_2" model="hr.salary.rule">
@@ -343,7 +359,7 @@ if contract.ke_is_secondary:
 else:
     lower_limit = contract.rule_param('ke_nssf_lower_limit', payslip.date_to)
     upper_limit = contract.rule_param('ke_nssf_upper_limit', payslip.date_to)
-    pensionable = categories.BASIC
+    pensionable = GROSS
     if upper_limit < pensionable:
         result = upper_limit - lower_limit
     elif lower_limit < pensionable:
@@ -377,10 +393,10 @@ else:
 exempt = 0
 if employee.ke_disabled:
     exempt = contract.rule_param('ke_disability_threshold', payslip.date_to)
-result = max(0, categories.BASIC - exempt)
+result = max(0, GROSS - exempt)
 result_rate = contract.rule_param('ke_ahl_employee', payslip.date_to) * 100
 ]]></field>
-            <field name="note">Charged on basic salary, following the reference configuration. If Softlink pays significant allowances, confirm with the accountant whether the levy should instead be charged on gross pay.</field>
+            <field name="note">Charged on gross salary, as the Affordable Housing Act 2024 requires.</field>
         </record>
 
         <!-- ══ 25-26. NHIF (historic) ════════════════════════════════════ -->
@@ -631,9 +647,30 @@ result = GROSS_TAXABLE >= contract.rule_param('ke_paye_lower_bound', payslip.dat
             <field name="sequence">152</field>
             <field name="category_id" ref="categ_other_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.HELB) and not contract.ke_is_secondary</field>
+            <field name="condition_python"><![CDATA[
+result = bool(contract.ke_helb or (inputs.HELB and inputs.HELB.amount))
+]]></field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = inputs.HELB.amount</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_helb + (inputs.HELB.amount if inputs.HELB else 0)
+]]></field>
+            <field name="note">The monthly amount on the employee's Kenyan Payroll tab, plus any one-off HELB input on this payslip. Deducted on secondary employment too: HELB recovery follows the borrower, not the main job.</field>
+        </record>
+
+        <record id="rule_fixed_ded" model="hr.salary.rule">
+            <field name="name">Other Fixed Deductions</field>
+            <field name="code">FIXED_DED</field>
+            <field name="sequence">157</field>
+            <field name="category_id" ref="categ_other_ded"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python"><![CDATA[
+result = contract.ke_recurring_total('deduction', payslip.date_from, payslip.date_to) > 0
+]]></field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute"><![CDATA[
+result = contract.ke_recurring_total('deduction', payslip.date_from, payslip.date_to)
+]]></field>
+            <field name="note">SACCO, staff loan, welfare and other deductions from the employee's fixed monthly lines.</field>
         </record>
 
         <record id="rule_med_insurance" model="hr.salary.rule">
@@ -692,7 +729,7 @@ result = (contract.ke_life_insurance
             <field name="sequence">157</field>
             <field name="category_id" ref="categ_other_ded"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = bool(inputs.FRINGE_BENEFIT) and not contract.ke_is_secondary</field>
+            <field name="condition_python">result = bool(inputs.FRINGE_BENEFIT and inputs.FRINGE_BENEFIT.amount) and not contract.ke_is_secondary</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">result = inputs.FRINGE_BENEFIT.amount</field>
         </record>
@@ -751,7 +788,7 @@ result = (contract.ke_life_insurance
 exempt = 0
 if employee.ke_disabled:
     exempt = contract.rule_param('ke_disability_threshold', payslip.date_to)
-result = max(0, categories.BASIC - exempt)
+result = max(0, GROSS - exempt)
 result_rate = contract.rule_param('ke_ahl_employer', payslip.date_to) * 100
 ]]></field>
         </record>
