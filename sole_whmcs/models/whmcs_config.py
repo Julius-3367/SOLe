@@ -203,11 +203,10 @@ class SoleWhmcsConfig(models.Model):
                             limit=1,
                         )
 
+                    company = (client.get("companyname") or "").strip()
+                    person = f"{client.get('firstname', '')} {client.get('lastname', '')}".strip()
                     vals = {
-                        "name": (
-                            f"{client.get('firstname', '')} {client.get('lastname', '')}".strip()
-                            or client.get("companyname", "Unknown")
-                        ),
+                        "name": company or person or "Unknown",
                         "email": client.get("email", ""),
                         "phone": client.get("phonenumber", ""),
                         "street": client.get("address1", ""),
@@ -215,15 +214,17 @@ class SoleWhmcsConfig(models.Model):
                         "city": client.get("city", ""),
                         "zip": client.get("postcode", ""),
                         "country_id": _get_country(client.get("countrycode", "")),
-                        "is_company": bool(client.get("companyname", "")),
+                        "is_company": bool(company),
                         "customer_rank": 1,
                         "whmcs_client_id": whmcs_id,
                     }
-                    if client.get("companyname"):
-                        vals["company_name"] = client["companyname"]
 
                     if existing:
-                        existing.write(vals)
+                        # Odoo is the record accounts maintain: link it and fill gaps, never overwrite
+                        existing.write({
+                            k: v for k, v in vals.items()
+                            if k == "whmcs_client_id" or (v and not existing[k])
+                        })
                         total_updated += 1
                     else:
                         Partner.create(vals)
