@@ -224,9 +224,8 @@ class SoleWhmcsConfig(models.Model):
                 except Exception as exc:
                     errors.append(f"Client {whmcs_id}: {exc}")
 
-            total_results = int((data.get("clients") or {}).get("totalresults") or 0)
-            offset += limit_per_page
-            if offset >= total_results:
+            offset += len(clients)
+            if offset >= self._total_results(data, "clients"):
                 break
 
         self.last_client_sync = fields.Datetime.now()
@@ -280,6 +279,9 @@ class SoleWhmcsConfig(models.Model):
                     Partner.search([("whmcs_client_id", "=", client_id)], limit=1)
                     if client_id else Partner.browse()
                 )
+                if not partner:
+                    errors.append(f"Invoice {whmcs_inv_id}: WHMCS client {client_id or '?'} not in Odoo, run client sync first")
+                    continue
 
                 whmcs_status = inv.get("status", "Unpaid")
 
@@ -310,9 +312,8 @@ class SoleWhmcsConfig(models.Model):
                     _logger.exception("WHMCS: failed to import invoice %s", whmcs_inv_id)
                     errors.append(f"Invoice {whmcs_inv_id}: {exc}")
 
-            total_results = int((data.get("invoices") or {}).get("totalresults") or 0)
-            offset += limit_per_page
-            if offset >= total_results:
+            offset += len(invoices)
+            if offset >= self._total_results(data, "invoices"):
                 break
 
         self.last_invoice_sync = fields.Datetime.now()
@@ -346,6 +347,11 @@ class SoleWhmcsConfig(models.Model):
                 "tax_ids": [(5, 0, 0)],
             })]
         return lines
+
+    @staticmethod
+    def _total_results(data, key):
+        # WHMCS returns totalresults at the top level, not inside the list block
+        return int(data.get("totalresults") or (data.get(key) or {}).get("totalresults") or 0)
 
     @staticmethod
     def _parse_date(value):
