@@ -4,7 +4,7 @@
         <!-- Section contains a structure for the Trial Balance report,
         including a filter view and a table view. It has div elements for the
         filter view and table view,with respective classes for styling.-->
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div class="fin_report">
                 <!--  Filter View  -->
                 <div class="filter_view_gl">
@@ -307,7 +307,7 @@
                                                 </t>
                                             </t>
                                             <th style="text-align:center;font-weight: 700;">
-                                                <t t-esc="state.sale_total.toFixed(2)"/>
+                                                <t t-esc="formatAmount(state.sale_total)"/>
                                             </th>
                                         </tr>
                                         <t t-set="i" t-value="0"/>
@@ -414,7 +414,7 @@
                                                 </t>
                                             </t>
                                             <th style="text-align:center;font-weight: 700;">
-                                                <t t-esc="state.purchase_total.toFixed(2)"/>
+                                                <t t-esc="formatAmount(state.purchase_total)"/>
                                             </th>
                                         </tr>
                                         <t t-set="i" t-value="0"/>

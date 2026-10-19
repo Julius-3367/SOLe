@@ -6,7 +6,7 @@
     <t t-name="bls_template_new" owl="1">
         <t t-log="state"/>
         <t t-log="state.title"/>
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div class="fin_report">
                 <!--  Filter View  -->
                 <div class="filter_view_dfr p-2">

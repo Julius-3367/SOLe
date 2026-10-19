@@ -21,7 +21,7 @@
 ################################################################################
 {
     'name': 'Odoo17 Dynamic Accounts  Reports',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Accounting',
     'summary': "Odoo17 Dynamic Accounts  Reports, Dynamic Financial Reports with drill down and filters–"
                "Community Edition",
@@ -65,6 +65,7 @@
             'dynamic_accounts_report/static/src/xml/cash_flow_statement_templates.xml',
             'dynamic_accounts_report/static/src/xml/equity_statement_templates.xml',
             'dynamic_accounts_report/static/src/css/accounts_report.css',
+            'dynamic_accounts_report/static/src/js/format_amount.js',
             'dynamic_accounts_report/static/src/js/general_ledger.js',
             'dynamic_accounts_report/static/src/js/trial_balance.js',
             'dynamic_accounts_report/static/src/js/cash_flow.js',

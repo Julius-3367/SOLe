@@ -6,3 +6,19 @@
 	margin-left: 2px;
 	margin-right: 2px;
 }
+
+/* client actions get no scrolling container from the web client, so long or
+   unfolded reports ran past the window and could only be read by zooming out */
+.o_dfr_report {
+	height: 100%;
+	overflow: auto;
+	padding: 0 1.5rem 2rem;
+}
+.o_dfr_report .sub_container_right {
+	flex-wrap: wrap;
+	row-gap: .5rem;
+}
+.o_dfr_report table .text-end {
+	white-space: nowrap;
+	padding-left: 1rem;
+}

@@ -2,7 +2,7 @@
 <templates>
     <!-- The gl_template_new template for the GeneralLedger component. -->
     <t t-name="gl_template_new" owl="1">
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div class="fin_report">
                 <div class="filter_view_gl">
                     <div class="">
@@ -324,7 +324,7 @@
                                                 <th>
                                                     <span class="fw-bolder">
                                                         <t t-esc="state.account_total[account]['currency_id']"/>
-                                                        <t t-esc="(state.account_total[account]['total_debit'] - state.account_total[account]['total_credit']).toFixed(2)"/>
+                                                        <t t-esc="formatAmount((state.account_total[account]['total_debit'] - state.account_total[account]['total_credit']))"/>
                                                     </span>
                                                 </th>
                                             </tr>
@@ -409,7 +409,7 @@
                                         </th>
                                         <th class="o_heading">
                                             <t t-esc="state.currency"/>
-                                            <t t-out="(state.total_debit - state.total_credit).toFixed(2)"/>
+                                            <t t-out="formatAmount((state.total_debit - state.total_credit))"/>
                                         </th>
                                     </tr>
                                 </tbody>

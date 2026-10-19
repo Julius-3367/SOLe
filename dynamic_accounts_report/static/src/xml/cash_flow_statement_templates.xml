@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates>
     <t t-name="cfs_template_new" owl="1">
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div style="border-bottom: 1px solid #d8dadd;">
                 <div class="filter_view_dfr p-2">
                     <div>

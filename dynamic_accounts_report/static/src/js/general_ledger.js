@@ -1,5 +1,6 @@
 /** @odoo-module */
 import { registry } from "@web/core/registry";
+import { formatAmount } from "@dynamic_accounts_report/js/format_amount";
 import { useService } from "@web/core/utils/hooks";
 import { Component, useRef, useState } from "@odoo/owl";
 import { BlockUI } from "@web/core/ui/block_ui";
@@ -7,6 +8,7 @@ import { download } from "@web/core/network/download";
 const actionRegistry = registry.category("actions");
 
 class GeneralLedger extends Component {
+    formatAmount = formatAmount;
     setup() {
         super.setup(...arguments);
         this.initial_render = true;

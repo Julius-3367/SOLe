@@ -2,7 +2,7 @@
 <templates>
     <!-- Template for bank book report -->
     <t t-name="bnk_b_template_new" owl="1">
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div class="fin_report">
                 <div class="filter_view_gl fin_report">
                     <div class="">
@@ -252,7 +252,7 @@
                                                     <th>
                                                         <span class="fw-bolder">
                                                             <t t-esc="state.total[move_line]['currency_id']"/>
-                                                            <t t-esc="(state.total[move_line]['total_debit'] - state.total[move_line]['total_credit']).toFixed(2)"/>
+                                                            <t t-esc="formatAmount((state.total[move_line]['total_debit'] - state.total[move_line]['total_credit']))"/>
                                                         </span>
                                                     </th>
                                                 </tr>
@@ -350,7 +350,7 @@
                                             </th>
                                             <th class="o_heading">
                                                 <t t-esc="state.currency"/>
-                                                <t t-out="(state.total_debit - state.total_credit).toFixed(2)"/>
+                                                <t t-out="formatAmount((state.total_debit - state.total_credit))"/>
                                             </th>
                                             <th/>
                                         </tr>

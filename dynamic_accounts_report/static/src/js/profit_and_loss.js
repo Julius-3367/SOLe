@@ -1,6 +1,7 @@
 /** @odoo-module **/
 const now = new Date();
 import { registry } from "@web/core/registry";
+import { formatAmount } from "@dynamic_accounts_report/js/format_amount";
 import { useService } from "@web/core/utils/hooks";
 import { Component, useRef, useState } from "@odoo/owl";
 import { BlockUI } from "@web/core/ui/block_ui";
@@ -8,6 +9,7 @@ import { download } from "@web/core/network/download";
 const actionRegistry = registry.category("actions");
 
 class ProfitAndLoss extends Component {
+    formatAmount = formatAmount;
     async setup() {
         super.setup(...arguments);
         this.initial_render = true;
@@ -282,17 +284,10 @@ class ProfitAndLoss extends Component {
             }
         this.load_data(self.initial_render);
     }
-    sumGrossProfit(op_inc, cor) {
-        /**
-         * Calculates the sum of values in an array of objects by a specified key.
-         *
-         * @param {Array} data - Array of objects containing numeric values.
-         * @param {string} key - The key to access the numeric value in each object.
-         * @returns {number} The sum of the numeric values.
-         */
-         const stringValue = cor;
-         const floatValue = parseFloat(stringValue.replace(/,/g, ''));
-        return parseFloat(op_inc) + floatValue;
+    sumGrossProfit(costOfRevenue, operatingIncome) {
+        // both come from the server as formatted strings, e.g. "185,037.25"
+        const num = (v) => parseFloat(String(v).replace(/,/g, '')) || 0;
+        return num(operatingIncome) - num(costOfRevenue);
     }
     async applyComparisonYear(){
         this.state.comparison = this.period_year.el.value

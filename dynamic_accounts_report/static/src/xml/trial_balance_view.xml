@@ -4,7 +4,7 @@
         <!-- Section contains a structure for the Trial Balance report, including a filter
         view and a table view. It has div elements for the filter view and table view,
          with respective classes for styling.-->
-        <div class="w-100">
+        <div class="w-100 o_dfr_report">
             <div class="fin_report">
                 <!--  Filter View  -->
                 <div class="filter_view_gl">
@@ -369,19 +369,19 @@
                                                 </t>
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['total_debit']"
-                                                       t-esc="move_line['total_debit'].toFixed(2)"/>
+                                                       t-esc="formatAmount(move_line['total_debit'])"/>
                                                 </th>
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['total_credit']"
-                                                       t-esc="move_line['total_credit'].toFixed(2)"/>
+                                                       t-esc="formatAmount(move_line['total_credit'])"/>
                                                 </th>
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['end_total_debit']"
-                                                       t-esc="move_line['end_total_debit'].toFixed(2)"/>
+                                                       t-esc="formatAmount(move_line['end_total_debit'])"/>
                                                 </th>
                                                 <th style="text-align:center;">
                                                     <t t-if="move_line['end_total_credit']"
-                                                       t-esc="move_line['end_total_credit'].toFixed(2)"/>
+                                                       t-esc="formatAmount(move_line['end_total_credit'])"/>
                                                 </th>
                                             </tr>
                                         </t>
@@ -389,10 +389,10 @@
                                             style="border-spacing: 0 10px;color:#000">
                                             <th colspan="6">Total</th>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'initial_total_debit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'initial_total_debit'))"/>
                                             </th>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'initial_total_credit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'initial_total_credit'))"/>
                                             </th>
                                             <t t-if="state.apply_comparison == true">
                                                 <t t-set="number_of_periods"
@@ -400,24 +400,24 @@
                                                 <t t-foreach="number_of_periods"
                                                    t-as="nb" t-key="nb">
                                                     <th style="text-align:center;">
-                                                        <t t-esc="sumByKey(state.data, 'dynamic_total_debit_' + nb).toFixed(2)"/>
+                                                        <t t-esc="formatAmount(sumByKey(state.data, 'dynamic_total_debit_' + nb))"/>
                                                     </th>
                                                     <th style="text-align:center;">
-                                                        <t t-esc="sumByKey(state.data, 'dynamic_total_credit_' + nb).toFixed(2)"/>
+                                                        <t t-esc="formatAmount(sumByKey(state.data, 'dynamic_total_credit_' + nb))"/>
                                                     </th>
                                                 </t>
                                             </t>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'total_debit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'total_debit'))"/>
                                             </th>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'total_credit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'total_credit'))"/>
                                             </th>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'end_total_debit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'end_total_debit'))"/>
                                             </th>
                                             <th style="text-align:center;">
-                                                <t t-esc="sumByKey(state.data, 'end_total_credit').toFixed(2)"/>
+                                                <t t-esc="formatAmount(sumByKey(state.data, 'end_total_credit'))"/>
                                             </th>
                                         </tr>
                                     </t>
