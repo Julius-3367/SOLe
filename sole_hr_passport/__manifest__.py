@@ -5,8 +5,8 @@
     "description": """
 Odoo keeps the passport number and expiry date on the employee but has nowhere
 to store the passport itself, unlike the ID card, driving licence and work
-permit. This adds a Passport Copy upload on the Personal tab, visible to HR
-officers only.
+permit. This adds a Passport Copy upload under Documents on the Personal tab,
+visible to HR officers only.
 """,
     "version": "19.0.1.0.0",
     "category": "Human Resources/Employees",

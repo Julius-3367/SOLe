@@ -5,7 +5,7 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <field name="passport_id" position="after">
+            <field name="driving_license" position="after">
                 <field name="passport_copy" filename="passport_copy_name"/>
                 <field name="passport_copy_name" invisible="1"/>
             </field>
